@@ -22,8 +22,11 @@
  * selects it.  This is the way back to the vendor system without touching a
  * byte of its firmware body.
  *
- * Read/modify tool for the two firmware-slot partitions of this board only.
- * It never touches bootloader, tag, wifi or config partitions.
+ * Reads and writes stay inside the two slot windows.  Where the running system
+ * maps a slot as one partition that partition is used; where it does not (the
+ * vendor table only exposes the first 3.25 MiB of each slot) the whole-flash
+ * device is used instead and every offset is checked against the slot.
+ * Bootloader, tag, wifi and config partitions are never touched.
  */
 #include <errno.h>
 #include <fcntl.h>
@@ -237,6 +240,9 @@ static int slot_mtd(int slot)
 struct mtd {
 	int fd;
 	struct mtd_info_user info;
+	/* Every offset below is relative to the slot; base translates it. */
+	uint64_t base;
+	uint32_t span;
 };
 
 static void mtd_open(struct mtd *m, int index, bool writable)
@@ -249,11 +255,28 @@ static void mtd_open(struct mtd *m, int index, bool writable)
 		die(path);
 	if (ioctl(m->fd, MEMGETINFO, &m->info) < 0)
 		die("MEMGETINFO");
+	m->base = 0;
+	m->span = m->info.size;
+}
+
+/*
+ * Turn a slot-relative offset into a device offset, and stop anything that
+ * would leave the slot: through the whole-flash device an unchecked offset
+ * would land in the neighbouring slot or in the bootloader.
+ */
+static uint64_t slot_ofs(struct mtd *m, uint64_t ofs)
+{
+	if (ofs >= m->span) {
+		fprintf(stderr, "e2631-fwslot: offset %#llx is past the slot, refusing\n",
+			(unsigned long long)ofs);
+		exit(1);
+	}
+	return m->base + ofs;
 }
 
 static bool mtd_bad(struct mtd *m, uint64_t ofs)
 {
-	long long o = ofs;
+	long long o = slot_ofs(m, ofs);
 
 	return ioctl(m->fd, MEMGETBADBLOCK, &o) > 0;
 }
@@ -265,7 +288,7 @@ static bool mtd_bad(struct mtd *m, uint64_t ofs)
  */
 static void mtd_mark_bad(struct mtd *m, uint64_t ofs)
 {
-	long long o = ofs;
+	long long o = slot_ofs(m, ofs);
 
 	if (ioctl(m->fd, MEMSETBADBLOCK, &o) < 0)
 		perror("  could not mark the block bad");
@@ -273,7 +296,7 @@ static void mtd_mark_bad(struct mtd *m, uint64_t ofs)
 
 static int mtd_erase(struct mtd *m, uint64_t ofs)
 {
-	struct erase_info_user e = { .start = ofs, .length = m->info.erasesize };
+	struct erase_info_user e = { .start = slot_ofs(m, ofs), .length = m->info.erasesize };
 
 	ioctl(m->fd, MEMUNLOCK, &e);
 	return ioctl(m->fd, MEMERASE, &e);
@@ -281,8 +304,78 @@ static int mtd_erase(struct mtd *m, uint64_t ofs)
 
 static void mtd_read(struct mtd *m, uint64_t ofs, void *buf, size_t len)
 {
-	if (lseek(m->fd, ofs, SEEK_SET) < 0 || read(m->fd, buf, len) != (ssize_t)len)
+	if (lseek(m->fd, slot_ofs(m, ofs), SEEK_SET) < 0 ||
+	    read(m->fd, buf, len) != (ssize_t)len)
 		die("mtd read");
+}
+
+/* A device that contains the whole slot but is not the slot itself: under the
+ * vendor firmware no partition spans a slot (kernel1/kernel2 cover its first
+ * 3.25 MiB), and only the master flash reaches the payload and the version
+ * header at the end of it.
+ */
+static int mtd_find_covering(uint64_t offset, uint32_t size)
+{
+	DIR *d = opendir("/sys/class/mtd");
+	struct dirent *e;
+	int found = -1;
+
+	if (!d)
+		return -1;
+	while ((e = readdir(d))) {
+		int idx;
+
+		if (sscanf(e->d_name, "mtd%d", &idx) != 1 || strchr(e->d_name, 'r'))
+			continue;
+		if (mtd_sysfs_u(idx, "offset") == 0 &&
+		    mtd_sysfs_u(idx, "size") >= (long)(offset + size)) {
+			found = idx;
+			break;
+		}
+	}
+	closedir(d);
+	return found;
+}
+
+/*
+ * Open the slot as a window of slot_span bytes whose offsets start at zero,
+ * whichever way the running system happens to map the flash. Returns the mtd
+ * number, or -1 when nothing on this system reaches the slot.
+ */
+static int slot_open(struct mtd *m, int slot, bool writable)
+{
+	int idx = slot_mtd(slot);
+
+	if (idx >= 0) {
+		mtd_open(m, idx, writable);
+		if (m->info.size == slot_span)
+			return idx;
+		close(m->fd);
+	}
+
+	idx = mtd_find_covering(slot_start[slot], slot_span);
+	if (idx < 0) {
+		fprintf(stderr,
+			"e2631-fwslot: nothing maps slot %d (%#x + %#x) on this system.\n",
+			slot, slot_start[slot], slot_span);
+		return -1;
+	}
+	mtd_open(m, idx, writable);
+	m->base = slot_start[slot];
+	m->span = slot_span;
+	if (writable)
+		fprintf(stderr, "  slot %d reached through mtd%d (whole flash, from %#llx)\n",
+			slot, idx, (unsigned long long)slot_start[slot]);
+	return idx;
+}
+
+static int slot_open_or_die(struct mtd *m, int slot, bool writable)
+{
+	int idx = slot_open(m, slot, writable);
+
+	if (idx < 0)
+		exit(1);
+	return idx;
 }
 
 /* Find this slot's version header by scanning erase blocks. Only what cspboot
@@ -293,7 +386,7 @@ static long slot_scan(struct mtd *m, uint32_t *serial)
 	uint8_t hdr[VER_HDR_SIZE];
 	uint32_t bs = m->info.erasesize;
 
-	for (uint64_t ofs = 0; ofs + VER_HDR_SIZE <= m->info.size; ofs += bs) {
+	for (uint64_t ofs = 0; ofs + VER_HDR_SIZE <= m->span; ofs += bs) {
 		if (mtd_bad(m, ofs))
 			continue;
 		mtd_read(m, ofs, hdr, sizeof(hdr));
@@ -313,13 +406,10 @@ static uint32_t max_serial(void)
 	uint32_t best = 0;
 
 	for (int s = 0; s < 2; s++) {
-		int idx = slot_mtd(s);
 		struct mtd m;
 		uint32_t serial;
 
-		if (idx < 0)
-			continue;
-		mtd_open(&m, idx, false);
+		slot_open_or_die(&m, s, false);
 		if (slot_scan(&m, &serial) >= 0 && serial > best)
 			best = serial;
 		close(m.fd);
@@ -412,7 +502,7 @@ static const char *slot_verify(struct mtd *m, const uint8_t *hdr)
 	r[1] = (struct region){ "root filesystem CRC mismatch",
 			       kstart + (foff - koff), rd32(hdr, H_FS_SIZE),
 			       rd32(hdr, H_FS_CRC), 0xffffffffu };
-	if (body_len > m->info.size)
+	if (body_len > m->span)
 		return "bad firmware layout";
 	for (int i = 0; i < 2; i++)
 		if (r[i].start + r[i].len > body_len)
@@ -424,7 +514,7 @@ static const char *slot_verify(struct mtd *m, const uint8_t *hdr)
 	while (pos < body_len) {
 		size_t n = body_len - pos < bs ? body_len - pos : bs;
 
-		if (ofs + bs > m->info.size) {
+		if (ofs + bs > m->span) {
 			bad = "payload runs past the end of the slot";
 			break;
 		}
@@ -432,7 +522,7 @@ static const char *slot_verify(struct mtd *m, const uint8_t *hdr)
 			ofs += bs;
 			continue;
 		}
-		if (pread(m->fd, buf, n, ofs) != (ssize_t)n) {
+		if (pread(m->fd, buf, n, slot_ofs(m, ofs)) != (ssize_t)n) {
 			bad = "read error";
 			break;
 		}
@@ -519,14 +609,14 @@ static uint64_t write_block(struct mtd *m, uint64_t ofs, const uint8_t *buf)
 {
 	uint32_t bs = m->info.erasesize;
 
-	while (ofs < m->info.size) {
+	while (ofs < m->span) {
 		if (mtd_bad(m, ofs)) {
 			fprintf(stderr, "  skip bad block at %#llx\n",
 				(unsigned long long)ofs);
 			ofs += bs;
 			continue;
 		}
-		if (lseek(m->fd, ofs, SEEK_SET) < 0 ||
+		if (lseek(m->fd, slot_ofs(m, ofs), SEEK_SET) < 0 ||
 		    write(m->fd, buf, bs) != (ssize_t)bs) {
 			fprintf(stderr, "  write failed at %#llx, marking the block bad\n",
 				(unsigned long long)ofs);
@@ -550,7 +640,7 @@ static void erase_slot(struct mtd *m)
 {
 	uint32_t bs = m->info.erasesize;
 
-	for (uint64_t ofs = 0; ofs < m->info.size; ofs += bs) {
+	for (uint64_t ofs = 0; ofs < m->span; ofs += bs) {
 		if (mtd_bad(m, ofs))
 			continue;
 		if (mtd_erase(m, ofs) < 0)
@@ -565,16 +655,13 @@ static void erase_slot(struct mtd *m)
  */
 static int retitle_slot(int slot, uint32_t serial)
 {
-	int idx = slot_mtd(slot);
 	struct mtd m;
 	long hpos;
 	uint32_t got;
 	uint8_t hdr[VER_HDR_SIZE];
 	const char *why;
 
-	if (idx < 0)
-		errno = ENODEV, die("slot partition not found");
-	mtd_open(&m, idx, true);
+	slot_open_or_die(&m, slot, true);
 	hpos = slot_scan(&m, &got);
 	if (hpos < 0) {
 		fprintf(stderr, "e2631-fwslot: slot %d holds no valid firmware header\n", slot);
@@ -605,7 +692,7 @@ static int retitle_slot(int slot, uint32_t serial)
 		memcpy(blk, hdr, VER_HDR_SIZE);
 		if (mtd_erase(&m, hpos) < 0)
 			die("erase header block");
-		if (lseek(m.fd, hpos, SEEK_SET) < 0 ||
+		if (lseek(m.fd, slot_ofs(&m, hpos), SEEK_SET) < 0 ||
 		    write(m.fd, blk, m.info.erasesize) != (ssize_t)m.info.erasesize)
 			die("write header");
 		free(blk);
@@ -637,6 +724,8 @@ static int cmd_flash(const char *path)
 	const uint8_t *src;
 	int running;
 	uint8_t *blk;
+	long hpos;
+	const char *why;
 
 	package_load(&p, path);
 
@@ -645,12 +734,9 @@ static int cmd_flash(const char *path)
 		errno = ENODEV, die("cannot tell which slot is running from /proc/cmdline");
 	target_slot = running ^ 1;
 
-	idx = slot_mtd(target_slot);
-	if (idx < 0)
-		errno = ENODEV, die("target slot partition not found");
-	mtd_open(&m, idx, true);
+	idx = slot_open_or_die(&m, target_slot, true);
 	bs = m.info.erasesize;
-	if (p.body_len > m.info.size - bs)
+	if (p.body_len > m.span - bs)
 		errno = ENOSPC, die("package larger than the slot");
 
 	/*
@@ -708,8 +794,28 @@ static int cmd_flash(const char *path)
 	memcpy(blk, hdr, VER_HDR_SIZE);
 	ofs = write_block(&m, ofs, blk);
 
-	if (slot_scan(&m, &serial) < 0)
-		errno = EIO, die("header verify failed after flash");
+	/*
+	 * Read the slot back the way cspboot will: the header first, then the
+	 * kernel and root filesystem extents it records.  A mismatch means the
+	 * flash does not hold what we wrote, so this slot must not become the
+	 * one the bootloader picks: erase its header and leave slot 0 in
+	 * charge, rather than point the boot at a broken image.
+	 */
+	hpos = slot_scan(&m, &serial);
+	why = "no readable version header";
+	if (hpos >= 0) {
+		mtd_read(&m, hpos, blk, VER_HDR_SIZE);
+		why = slot_verify(&m, blk);
+	}
+	if (why) {
+		if (hpos >= 0)
+			mtd_erase(&m, hpos);
+		fprintf(stderr,
+			"e2631-fwslot: slot %d does not read back (%s); its header is "
+			"erased, so the boot stays on slot %d\n",
+			target_slot, why, running);
+		exit(1);
+	}
 
 	free(blk);
 	close(m.fd);
@@ -737,6 +843,7 @@ static int cmd_boot(int slot)
 
 struct slot_info {
 	int mtd;
+	bool whole;		/* the partition is the slot, not a view of it */
 	bool valid;
 	long hpos;
 	uint8_t hdr[VER_HDR_SIZE];
@@ -749,10 +856,10 @@ static void slot_info_read(int s, struct slot_info *si)
 	uint32_t serial;
 
 	memset(si, 0, sizeof(*si));
-	si->mtd = slot_mtd(s);
+	si->mtd = slot_open(&m, s, false);
 	if (si->mtd < 0)
 		return;
-	mtd_open(&m, si->mtd, false);
+	si->whole = m.base == 0;
 	si->hpos = slot_scan(&m, &serial);
 	if (si->hpos >= 0) {
 		si->valid = true;
@@ -802,8 +909,8 @@ static int cmd_info(bool json)
 	if (json) {
 		printf("{\"running\":%d,\"next\":%d,\"slots\":[", running, next);
 		for (int s = 0; s < 2; s++) {
-			printf("%s{\"slot\":%d,\"mtd\":%d,\"valid\":%s,\"intact\":%s",
-			       s ? "," : "", s, si[s].mtd,
+			printf("%s{\"slot\":%d,\"mtd\":%d,\"partition_is_slot\":%s,\"valid\":%s,\"intact\":%s",
+			       s ? "," : "", s, si[s].mtd, si[s].whole ? "true" : "false",
 			       si[s].valid ? "true" : "false",
 			       si[s].valid && !si[s].broken ? "true" : "false");
 			if (si[s].valid) {
@@ -832,9 +939,11 @@ static int cmd_info(bool json)
 		printf("slot %d: base %#x span %#x mtd%d", s, slot_start[s],
 		       slot_span, si[s].mtd);
 		if (si[s].mtd < 0) {
-			printf(" (missing partition)\n");
+			printf(" (no device reaches the slot)\n");
 			continue;
 		}
+		if (!si[s].whole)
+			printf(" (viewed through the whole-flash mtd)");
 		if (!si[s].valid) {
 			printf(" (no valid version header)\n");
 			continue;
