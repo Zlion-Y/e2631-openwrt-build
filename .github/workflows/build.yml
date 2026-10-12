@@ -127,7 +127,12 @@ jobs:
         run: |
           mkdir -p out/payload
           B=openwrt/bin/targets/sanechips/generic
-          cp -t out "$B"/*.bin "$B"/*.manifest 2>/dev/null || true
+          cp -t out "$B"/*.bin "$B"/*.manifest "$B"/config-* 2>/dev/null || true
+          # The board .dtb on its own: boot readiness is checked against the
+          # structure the kernel actually sees, not against the .dts source.
+          DTB=$(find openwrt/build_dir -maxdepth 5 -name 'image-zx279128s-zte-zxhn-e2631.dtb' | head -1)
+          test -n "$DTB" || { echo "no built board dtb found"; exit 1; }
+          cp "$DTB" out/e2631.dtb
           tar -xf "$B"/openwrt-*-sysupgrade*.bin -C out/payload
           # The slot tool is needed on the *vendor* system too, to write the first
           # OpenWrt image, so ship the bare cross-compiled ELF as well.
