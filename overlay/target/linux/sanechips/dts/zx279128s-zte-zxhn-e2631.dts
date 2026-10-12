@@ -167,10 +167,15 @@
 };
 
 /*
- * MT7916 dual-band Wi-Fi 6 (vendor lsmod: mt7916, chip named ZX279128R in
- * wlandiagcli). One package on each PCIe controller, sharing the reset line,
- * as on the H3600. Calibration data lives in the "wifi" partition (JFFS2,
- * plaintext on this board).
+ * MT7916 dual-band Wi-Fi 6 (vendor lsmod: mt7916, out of tree; the calibration
+ * file in the "wifi" partition starts with 16 79 = chip id 0x7916 and is the
+ * only file there, 0x30000 bytes, mounted by the vendor at /wlan).
+ *
+ * One package behind both PCIe controllers, as on the H3600, whose vendor
+ * driver is the same MediaTek code family. The reset GPIO number is inherited
+ * from the H3600 board file and is NOT measured on this board: if nothing
+ * enumerates on pci0/01, check this line first (the H3600 also drives an
+ * enable-gpios on &gpio3 7, left out here on purpose until PCIe is seen).
  */
 &pcie0 {
 	reset-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;

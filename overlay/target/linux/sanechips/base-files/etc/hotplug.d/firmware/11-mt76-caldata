@@ -1,0 +1,49 @@
+#!/bin/sh
+
+[ -e /lib/firmware/$FIRMWARE ] && exit 0
+
+. /lib/functions/caldata.sh
+
+# The ZTE firmware keeps the MT7915/MT7916 calibration as the file "caldata" in
+# the JFFS2 filesystem of the "wifi" partition. On the E2631 that partition is
+# mounted by the vendor system at /wlan and holds one 0x30000-byte caldata
+# whose first two bytes are 16 79, the chip ID 0x7916; the H3600 card reads
+# 15 79 (0x7915).
+zte_caldata_from_jffs2() {
+	local part dir=/tmp/wifi-caldata id
+
+	part=$(find_mtd_part wifi)
+	[ -n "$part" ] || caldata_die "no mtd device found for partition wifi"
+
+	mkdir -p $dir
+	mount -t jffs2 -o ro $part $dir || caldata_die "failed to mount $part"
+	id=$(hexdump -v -n 2 -e '2/1 "%02x"' $dir/caldata 2>/dev/null)
+	case "$board:$id" in
+	zte,zxhn-h3600:1579)
+		caldata_from_file $dir/caldata 0x0 0xe00
+		;;
+	zte,zxhn-e2631:1679)
+		# The whole card file: the driver picks the sections it needs. If
+		# mt7915e rejects the image, its request size is what belongs here.
+		caldata_from_file $dir/caldata 0x0 0x30000
+		;;
+	*)
+		echo "caldata: chip id $id in $part is not this board's Wi-Fi chip"
+		;;
+	esac
+	umount $dir
+	rmdir $dir
+}
+
+board=$(board_name)
+
+case "$FIRMWARE" in
+"mediatek/mt7915_eeprom.bin"|\
+"mediatek/mt7915_eeprom_dbdc.bin")
+	case "$board" in
+	zte,zxhn-h3600|zte,zxhn-e2631)
+		zte_caldata_from_jffs2
+		;;
+	esac
+	;;
+esac
