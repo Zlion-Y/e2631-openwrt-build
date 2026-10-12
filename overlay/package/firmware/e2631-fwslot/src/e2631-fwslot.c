@@ -683,12 +683,19 @@ static int retitle_slot(int slot, uint32_t serial)
 	/* H_CRC covers [0:0xa4] and is unaffected; H_CRC2 covers the serial. */
 	wr32(hdr, H_CRC2, crc32(hdr, H_CRC2));
 
+	/*
+	 * Rewrite the header block as read-modify-write. The live vendor image
+	 * has data directly after the 512-byte header inside the same erase
+	 * block (0x3860200 reads back full of bytes, not erased), so writing
+	 * "header + 0xff" would throw that away. NAND needs an erase before it
+	 * can be written, which is why the block is read first.
+	 */
 	{
-		uint8_t *blk = calloc(m.info.erasesize, 1);
+		uint8_t *blk = malloc(m.info.erasesize);
 
 		if (!blk)
 			die("out of memory");
-		memset(blk, 0xff, m.info.erasesize);
+		mtd_read(&m, hpos, blk, m.info.erasesize);
 		memcpy(blk, hdr, VER_HDR_SIZE);
 		if (mtd_erase(&m, hpos) < 0)
 			die("erase header block");
