@@ -285,8 +285,13 @@
 			 */
 			partition@700000 {
 				label = "slot0";
+				/* Deliberately not read-only: switching back to the stock
+				 * firmware rewrites the version header inside this slot, and
+				 * "read-only" masks MTD_WRITEABLE off the partition, which
+				 * would make that impossible. e2631-fwslot refuses to flash
+				 * into slot 0 instead.
+				 */
 				reg = <0x00700000 0x01c00000>;
-				read-only;
 			};
 
 			partition@2300000 {
