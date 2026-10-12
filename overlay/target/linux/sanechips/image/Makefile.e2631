@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# E2631 additions. apply.sh makes the base target/linux/sanechips/image/Makefile
+# include this file just before $(eval $(call BuildImage)).
+#
+# The device tree lives in ../dts, not in the kernel tree, because the board
+# partition table describes the OpenWrt layout rather than the vendor one.
+
+# An official E2631 upgrade package supplies the 512-byte version header, the
+# product string and the slot address table. It is not redistributed here;
+# CONFIG_E2631_VENDOR_TEMPLATE must point at a local copy.
+E2631_VENDOR_TEMPLATE := $(call qstrip,$(CONFIG_E2631_VENDOR_TEMPLATE))
+
+define Device/zte_zxhn-e2631
+  $(Device/Default)
+  DEVICE_VENDOR := ZTE
+  DEVICE_MODEL := ZXHN E2631
+  DEVICE_DTS := zx279128s-zte-zxhn-e2631
+  DEVICE_DTS_DIR := $(TOPDIR)/target/linux/sanechips/dts
+  # The package pads the kernel region so the rootfs starts at slot +0x800000,
+  # which is where the DTS partition table says it is.
+  KERNEL_SIZE := 8192k
+  KERNEL := kernel-bin | append-dtb | uImage none | zte-slot-marker | \
+	check-size $$(KERNEL_SIZE)
+  KERNEL_INITRAMFS := kernel-bin | append-dtb | uImage-ramboot
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7915-firmware e2631-fwslot
+  IMAGES := factory.bin sysupgrade.bin
+  IMAGE/factory.bin := e2631-factory
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += zte_zxhn-e2631
+
+# Pack the built kernel and squashfs into the vendor upgrade format, so the
+# same file installs from the vendor supgrade.html page or from sysupgrade.
+# Kernel and rootfs are stored in the clear: on this board the vendor
+# bootloader boots a plaintext uImage and the AES layer only covers the vendor
+# rootfs, inside the vendor kernel's own MTD read path.
+define Build/e2631-factory
+	[ -n "$(E2631_VENDOR_TEMPLATE)" ] || { \
+		echo "CONFIG_E2631_VENDOR_TEMPLATE must name an official E2631 package" >&2; exit 1; }
+	[ -f "$(E2631_VENDOR_TEMPLATE)" ] || { \
+		echo "no such vendor template: $(E2631_VENDOR_TEMPLATE)" >&2; exit 1; }
+	node $(TOPDIR)/tools/e2631-mkfactory.mjs pack \
+		--template $(E2631_VENDOR_TEMPLATE) \
+		--kernel $(IMAGE_KERNEL) --rootfs $(IMAGE_ROOTFS) \
+		--rootfs-at 0x800000 --out $@
+endef

@@ -1,0 +1,323 @@
+// SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+/*
+ * ZTE ZXHN E2631 (a.k.a. 巡天 AX3000): dual-band Wi-Fi 6 router on the
+ * Sanechips ZX279128(S/R) SoC, 256 MiB DDR, 128 MiB SPI NAND, one WAN and
+ * three LAN ports, all served by the four integrated GbE PHYs.
+ *
+ * Hardware facts below were read off a live board (2026-10-13) and are marked
+ * with where they came from. Values still needing confirmation on first boot
+ * are called out in comments - do not treat them as measured.
+ */
+
+/dts-v1/;
+
+#include "zx279128s.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/leds/common.h>
+
+/ {
+	model = "ZTE ZXHN E2631";
+	compatible = "zte,zxhn-e2631", "zte,zx279128s";
+
+	aliases {
+		serial0 = &serial0;
+		serial1 = &serial1;
+		led-boot = &led_power;
+		led-failsafe = &led_power;
+		led-running = &led_power;
+		led-upgrade = &led_power;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	memory@40000000 {
+		device_type = "memory";
+		/* /proc/capability/boardtype: totalram 256M; vendor cmdline mem=256M */
+		reg = <0x40000000 0x10000000>;
+	};
+
+	cpus {
+		/* Vendor DT says enable-method = "zte,zx279128-smp" (no trailing s);
+		 * the string only has to agree between this board file and platsmp.
+		 */
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		/* Vendor ledkey_m table (/proc/zte/ledkey_m/led): LedId 0x32/0x64/0x128
+		 * on flat GPIO 8/40/60. Flat number = controller*16 + line, the same
+		 * convention the GPIO driver uses. Which one is power / wlan / internet
+		 * on the panel is NOT yet confirmed: light them one by one from the
+		 * initramfs before renaming. 40 is the one lit at boot.
+		 */
+		led_power: led-power {
+			color = <LED_COLOR_ID_GREEN>;
+			function = LED_FUNCTION_POWER;
+			gpios = <&gpio2 8 GPIO_ACTIVE_LOW>;
+			default-state = "on";
+		};
+
+		led_internet: led-internet {
+			color = <LED_COLOR_ID_GREEN>;
+			function = LED_FUNCTION_INET;
+			gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
+		};
+
+		led_wlan: led-wlan {
+			color = <LED_COLOR_ID_GREEN>;
+			function = LED_FUNCTION_WLAN;
+			gpios = <&gpio3 12 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	keys {
+		/* Polled on purpose: the ZTE GPIO IRQ chip is unvalidated on this
+		 * family and a gpio-keys irq-mode probe locked the H3600 up.
+		 * Vendor key table (/proc/zte/ledkey_m/key): flat GPIO 18 and 20.
+		 */
+		compatible = "gpio-keys-polled";
+		poll-interval = <50>;
+
+		key-reset {
+			label = "reset";
+			gpios = <&gpio1 2 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_RESTART>;
+		};
+
+		key-wps {
+			label = "wps";
+			gpios = <&gpio1 4 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_WPS_BUTTON>;
+		};
+	};
+};
+
+/*
+ * Port mapping read from the running vendor system,
+ * /proc/capability/ethernetmac (PhyMnf "ZTE" on all four => no external PHY,
+ * unlike the H3600 which hangs its WAN off a ZX5201 at MDIO address 8):
+ *
+ *   eth0 -> switch port 3   not in br0, PROMISC uplink  = WAN
+ *   eth1 -> switch port 2   in br0                      = LAN
+ *   eth2 -> switch port 1   in br0                      = LAN
+ *   eth3 -> switch port 0   in br0                      = LAN
+ *
+ * The MDIO addresses of the four integrated PHYs are taken from the H3600
+ * board file (0xa..0xd) and are UNVERIFIED on this board. Confirm on first
+ * boot from our own kernel - "ls /sys/bus/mdio_bus/devices" must show
+ * 0-000a..0-000d, and each must report the sanechips GbPHY id - before this
+ * ships. Never probe MDIO by poking the controller under the vendor system:
+ * writing CMD/STATUS there reset the board within seconds.
+ */
+&gmac {
+	status = "okay";
+};
+
+&gmac_port0 {
+	label = "lan3";
+	phy-handle = <&phy10>;
+	phy-mode = "internal";
+	status = "okay";
+};
+
+&gmac_port1 {
+	label = "lan2";
+	phy-handle = <&phy11>;
+	phy-mode = "internal";
+	status = "okay";
+};
+
+&gmac_port2 {
+	label = "lan1";
+	phy-handle = <&phy12>;
+	phy-mode = "internal";
+	status = "okay";
+};
+
+&gmac_port3 {
+	label = "wan";
+	phy-handle = <&phy13>;
+	phy-mode = "internal";
+	status = "okay";
+};
+
+/* Only four ports are wired on this board; the SoC offers a fifth. */
+&gmac_port4 {
+	status = "disabled";
+};
+
+&mdio {
+	status = "okay";
+
+	phy10: ethernet-phy@a {
+		reg = <10>;
+	};
+
+	phy11: ethernet-phy@b {
+		reg = <11>;
+	};
+
+	phy12: ethernet-phy@c {
+		reg = <12>;
+	};
+
+	phy13: ethernet-phy@d {
+		reg = <13>;
+	};
+};
+
+/*
+ * MT7916 dual-band Wi-Fi 6 (vendor lsmod: mt7916, chip named ZX279128R in
+ * wlandiagcli). One package on each PCIe controller, sharing the reset line,
+ * as on the H3600. Calibration data lives in the "wifi" partition (JFFS2,
+ * plaintext on this board).
+ */
+&pcie0 {
+	reset-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
+	status = "okay";
+};
+
+&pcie1 {
+	status = "okay";
+};
+
+/* No USB on this board: the vendor kernel ships "# CONFIG USB is not set" and
+ * on some E2631 units the controller is not populated at all - probing it
+ * hangs the SoC and the watchdog reboots. Leave both nodes disabled.
+ */
+&usb {
+	status = "disabled";
+};
+
+&spifc {
+	status = "okay";
+
+	flash@0 {
+		compatible = "spi-nand";
+		reg = <0>;
+		spi-max-frequency = <50000000>;
+		spi-rx-bus-width = <2>;
+		spi-tx-bus-width = <1>;
+
+		/* HYF1GQ4UTACAE: 128 MiB, 2 KiB pages, 128 KiB erase blocks */
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "bootloader";
+				reg = <0x0000000 0x0100000>;
+				read-only;
+			};
+
+			partition@100000 {
+				label = "tag";
+				reg = <0x0100000 0x0100000>;
+				read-only;
+
+				nvmem-layout {
+					compatible = "fixed-layout";
+					#address-cells = <1>;
+					#size-cells = <1>;
+
+					/* LAN MAC; WAN uses the next one (H3600 convention,
+					 * verify against the vendor web UI before shipping)
+					 */
+					macaddr_tag_1e: macaddr@1e {
+						compatible = "mac-base";
+						reg = <0x1e 0x6>;
+						#nvmem-cell-cells = <1>;
+					};
+				};
+			};
+
+			partition@200000 {
+				label = "wifi";
+				reg = <0x0200000 0x0100000>;
+			};
+
+			partition@300000 {
+				label = "usercfg";
+				reg = <0x0300000 0x0200000>;
+				read-only;
+			};
+
+			partition@500000 {
+				label = "defcfg";
+				reg = <0x0500000 0x0200000>;
+				read-only;
+			};
+
+			/*
+			 * The system lives in two whole-image slots, declared by every
+			 * official upgrade package (header +0x4c/+0x5c) and confirmed by
+			 * /proc/zte/verinfo/versionstates: 0x700000..0x2300000 and
+			 * 0x2300000..0x3f00000, 28 MiB each. Slot 0 keeps the vendor
+			 * system; OpenWrt is installed into slot 1 so that
+			 * "e2631-fwslot switch" can boot the vendor side again without
+			 * rewriting a byte of it.
+			 *
+			 * Inside slot 1 the image is laid out by our own package:
+			 *   +0x000000  32-byte slot marker
+			 *   +0x000020  kernel (plaintext legacy uImage, load 0x40008000),
+			 *                padded so the rootfs starts at +0x800000
+			 *   +0x800000  squashfs root filesystem
+			 *   +0x1000000 version header (the block after the body)
+			 *   +0x1020000 overlay (rootfs_data) up to the end of the slot
+			 */
+			partition@700000 {
+				label = "slot0";
+				reg = <0x00700000 0x01c00000>;
+				read-only;
+			};
+
+			partition@2300000 {
+				label = "slot1";
+				reg = <0x02300000 0x01c00000>;
+
+				partitions {
+					compatible = "fixed-partitions";
+					#address-cells = <1>;
+					#size-cells = <1>;
+
+					/* 32-byte slot marker plus the plaintext uImage, padded so
+					 * that the root filesystem lands on +0x800000.
+					 */
+					slot1_kernel: partition@0 {
+						label = "slot1-kernel";
+						reg = <0x0000000 0x00800000>;
+					};
+
+					slot1_rootfs: partition@800000 {
+						label = "slot1-rootfs";
+						reg = <0x00800000 0x00800000>;
+					};
+
+					/* The 512-byte version header sits in the erase block
+					 * right after the body; e2631-fwslot scans for it rather
+					 * than trusting this, because bad blocks move it.
+					 */
+					slot1_header: partition@1000000 {
+						label = "slot1-header";
+						reg = <0x01000000 0x00020000>;
+					};
+
+					slot1_data: partition@1020000 {
+						label = "rootfs_data";
+						reg = <0x01020000 0x00be0000>;
+					};
+				};
+			};
+
+			/* Vendor plugin area: 0x6e00000..0x7f00000 on this board. Left
+			 * alone; it is AES-128-ECB at rest and only readable through the
+			 * vendor kernel.
+			 */
+		};
+	};
+};
