@@ -657,6 +657,7 @@ static int retitle_slot(int slot, uint32_t serial)
 	long hpos;
 	uint32_t got;
 	uint8_t hdr[VER_HDR_SIZE];
+	uint8_t old[VER_HDR_SIZE];
 	const char *why;
 
 	slot_open_or_die(&m, slot, true);
@@ -667,6 +668,7 @@ static int retitle_slot(int slot, uint32_t serial)
 		return 1;
 	}
 	mtd_read(&m, hpos, hdr, sizeof(hdr));
+	memcpy(old, hdr, sizeof(old));
 
 	/* cspboot does not fall back: never point it at a broken slot. */
 	why = slot_verify(&m, hdr);
@@ -700,6 +702,31 @@ static int retitle_slot(int slot, uint32_t serial)
 		if (lseek(m.fd, slot_ofs(&m, hpos), SEEK_SET) < 0 ||
 		    write(m.fd, blk, m.info.erasesize) != (ssize_t)m.info.erasesize)
 			die("write header");
+
+		/*
+		 * Read it back and put the original block back if the header
+		 * does not verify. This is the rollback path: a damaged header
+		 * here costs the boot loader its way back to the stock slot,
+		 * and nothing falls back on its own.
+		 */
+		mtd_read(&m, hpos, hdr, sizeof(hdr));
+		why = slot_verify(&m, hdr);
+		if (why) {
+			fprintf(stderr, "e2631-fwslot: slot %d header reads back damaged (%s)\n",
+				slot, why);
+			memcpy(blk, old, VER_HDR_SIZE);
+			if (mtd_erase(&m, hpos) == 0 &&
+			    lseek(m.fd, slot_ofs(&m, hpos), SEEK_SET) >= 0 &&
+			    write(m.fd, blk, m.info.erasesize) == (ssize_t)m.info.erasesize)
+				fprintf(stderr, "e2631-fwslot: original header restored, "
+					"slot %d left as it was\n", slot);
+			else
+				fprintf(stderr, "e2631-fwslot: RESTORE FAILED - slot %d needs "
+					"its header rebuilt by hand\n", slot);
+			free(blk);
+			close(m.fd);
+			return 1;
+		}
 		free(blk);
 	}
 	close(m.fd);
