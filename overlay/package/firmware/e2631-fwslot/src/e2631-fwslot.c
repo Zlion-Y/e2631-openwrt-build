@@ -437,18 +437,49 @@ static long running_slot_offset(void)
 		return -1;
 	buf[n] = 0;
 	p = strstr(buf, "U-Boot");
-	if (!p)
+	if (p) {
+		if (sscanf(p, "%31s %31s %63s %lx %lx %lx %lx", tag, ver, date,
+			   &base, &x0, &x1, &x2) >= 4)
+			return (long)base;
 		return -1;
-	if (sscanf(p, "%31s %31s %63s %lx %lx %lx %lx", tag, ver, date,
-		   &base, &x0, &x1, &x2) < 4)
-		return -1;
-	return (long)base;
+	}
+
+	/*
+	 * OpenWrt gets here: CONFIG_CMDLINE_FORCE replaces the vendor bootargs,
+	 * and this is exactly the system that has to be able to switch back.
+	 * The partition the root filesystem lives on says where we are - its
+	 * sysfs offset is an absolute flash offset, so it falls inside one slot.
+	 *
+	 * Only trust that on our own image. A vendor system without the trailer
+	 * would answer with the single "rootfs" of its static table (slot A),
+	 * which says nothing about the slot it really booted; the whole-slot
+	 * partitions exist in the E2631 device tree and nowhere else.
+	 */
+	{
+		int idx;
+		long ofs;
+
+		if (mtd_find_by_label("slot0") < 0)
+			return -1;
+		idx = mtd_find_by_label("rootfs");
+		if (idx < 0)
+			return -1;
+		ofs = mtd_sysfs_u(idx, "offset");
+		if (ofs < 0)
+			return -1;
+		return ofs;
+	}
 }
 
 static int slot_index(long offset)
 {
-	return offset == (long)slot_start[0] ? 0 :
-	       offset == (long)slot_start[1] ? 1 : -1;
+	int s;
+
+	/* Range, not equality: the rootfs of a slot is not at the slot's start. */
+	for (s = 0; s < 2; s++)
+		if (offset >= (long)slot_start[s] && offset < (long)(slot_start[s] + slot_span))
+			return s;
+	return -1;
 }
 
 struct region {
@@ -763,8 +794,11 @@ static int cmd_flash(const char *path)
 
 	running = slot_index(running_slot_offset());
 	if (running < 0)
-		errno = ENODEV, die("cannot tell which slot is running from /proc/cmdline");
+		errno = ENODEV, die("cannot tell which slot is running, from /proc/cmdline or from the rootfs partition");
 	target_slot = running ^ 1;
+	if (target_slot == 0)
+		die("refusing to overwrite slot 0: this port keeps the stock firmware there, "
+		    "and flash is meant to be run from the vendor system");
 
 	idx = slot_open_or_die(&m, target_slot, true);
 	bs = m.info.erasesize;
