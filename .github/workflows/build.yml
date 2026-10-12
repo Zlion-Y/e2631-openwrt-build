@@ -31,6 +31,20 @@ jobs:
             overlay/package/firmware/e2631-fwslot/src/e2631-fwslot.c
           /tmp/e2631-fwslot 2>&1 | tail -8 || true
 
+      # The vendor package cannot be committed, so make one here: mkfactory.mjs
+      # writes it and the C reader has to accept it - and reject the same file
+      # with one byte of the kernel changed. This is the parser that runs on the
+      # device before anything is written to flash.
+      - name: read a package with the compiled tool
+        run: |
+          node tools/make_fixture.mjs /tmp/fix > /dev/null
+          /tmp/e2631-fwslot check /tmp/fix/fixture.bin
+          if /tmp/e2631-fwslot check /tmp/fix/fixture-broken.bin; then
+            echo "the tool accepted a package with a corrupted kernel"
+            exit 1
+          fi
+          echo ok: check accepts the package and rejects the altered one
+
   build:
     runs-on: ubuntu-24.04
     permissions:

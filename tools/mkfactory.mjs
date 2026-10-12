@@ -11,7 +11,11 @@
 //   node mkfactory.mjs selftest   --template <official.bin>
 //   node mkfactory.mjs info       --template <official.bin>
 //   node mkfactory.mjs pack       --template <official.bin> --kernel <k> --rootfs <r> --out <o> [opts]
-// options: --version <s> --build <s> --product <s> --key1 <hex> --key2 <hex> --note
+// options: --version <s> --build <s> --product <s> --key1 <hex> --key2 <hex>
+//          --rootfs-at <ofs>  start the rootfs extent at this slot offset
+//          --header-at <ofs>  end the body here, so the version header block
+//                             always lands on this slot offset (pads rootfs)
+//          --note --keep-crc2
 import fs from 'node:fs';
 import zlib from 'node:zlib';
 
@@ -80,14 +84,24 @@ function assemble(hdr, kernelBuf, rootfsBuf, opts = {}) {
   SLOT_MARKER.copy(body, 0); k.copy(body, MARKER);
   const rFileBase = body.length;
   const rp = Buffer.from(r);
-  const rt = up(rp.length, BLOCK);
+  // --header-at pins the end of the body, so the version header block always
+  // lands on the slot offset the board DTS says it is on. The stored rootfs
+  // extent then covers the whole padded region: the header's rSize/rCrc must
+  // describe the bytes as stored, exactly as in the official packages.
+  const headerAt = opts.headerAt ? Math.max(1, parseInt(opts.headerAt, 16) || parseInt(opts.headerAt, 10)) : 0;
+  let rt = up(rp.length, BLOCK);
+  if (headerAt) {
+    if (bodyLen >= headerAt) die(`kernel region (0x${bodyLen.toString(16)}) is not below the header block at 0x${headerAt.toString(16)}`);
+    if (headerAt - bodyLen < rp.length) die(`rootfs (0x${rp.length.toString(16)}) does not fit in 0x${(headerAt - bodyLen).toString(16)} before the header block`);
+    rt = headerAt - bodyLen;
+  }
   const rpad = Buffer.alloc(rt, 0xff); rp.copy(rpad);
   const full = Buffer.concat([body, rpad]);
 
   const w = (key, v) => hdr.writeUInt32LE(v >>> 0, M[key]);
   w('bodySize', full.length);
   w('kSize', k.length); w('kFileOff', OUTER + VER_HDR + MARKER); w('kCrc', crc32(k));
-  w('rSize', rp.length); w('rFileOff', OUTER + VER_HDR + rFileBase); w('rCrc', crc32(rpad));
+  w('rSize', rpad.length); w('rFileOff', OUTER + VER_HDR + rFileBase); w('rCrc', crc32(rpad));
   w('bootIncl', 0); w('ubootCrc', 0);
   hdr.writeUInt32LE(crc32(hdr.subarray(0, M.crc1)) >>> 0, M.crc1);
   if (!opts.keepCrc2) hdr.writeUInt32LE(crc32(hdr.subarray(0, M.crc2)) >>> 0, M.crc2);
@@ -150,7 +164,8 @@ if (args.cmd === 'pack') {
   }
   const r = assemble(Buffer.from(t.hdr), kernel, rootfs, {
     version: args.o.version, build: args.o.build, product: args.o.product,
-    key1: args.o.key1, key2: args.o.key2, keepCrc2: args.o.keepCrc2, rootfsAt: args.o.rootfsAt });
+    key1: args.o.key1, key2: args.o.key2, keepCrc2: args.o.keepCrc2,
+    rootfsAt: args.o.rootfsAt, headerAt: args.o.headerAt });
   const slot = t.hdr.readUInt32LE(M.slotABase), span = t.hdr.readUInt32LE(M.slotASpan);
   const bodyLen = r.out.length - (OUTER + VER_HDR);
   console.log(`out      : ${args.o.out}  0x${r.out.length.toString(16)} bytes (body 0x${bodyLen.toString(16)})`);
