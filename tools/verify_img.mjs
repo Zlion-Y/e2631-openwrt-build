@@ -245,6 +245,12 @@ const needBuiltin = [
   ['DEVTMPFS_MOUNT', 'the kernel mounting /dev before it opens the root'],
   ['SQUASHFS', 'the read-only root'],
   ['JFFS2_FS', 'the overlay'],
+  // Patch 029 puts the JFFS2 clean marker in the data area on single-program
+  // pages, and that code lives in wbuf.c: with the writebuffer off the patch is
+  // inert, the marker goes to the OOB, the page gets programmed twice and the
+  // overlay comes back uncorrectable - a read-only root and a box that reboots
+  // in a loop.
+  ['JFFS2_FS_WRITEBUFFER', 'patch 029, the in-data clean marker'],
   // Not fatal to mounting the root, but fatal to seeing why: with the console
   // driver as a module there is no early print, no /dev/console before init and
   // no serial shell to work with if anything else goes wrong.
@@ -257,6 +263,20 @@ for (const [sym, why] of needBuiltin)
 // "at least one, built in" is the property that matters.
 const decomps = ['ZLIB', 'LZO', 'XZ', 'LZ4', 'ZSTD'].filter((a) => kv(`SQUASHFS_${a}`) === 'y');
 okC('the kernel builds in a squashfs decompressor', decomps.length > 0, decomps.join(', '));
+
+// An embedded initramfs would run instead of the root on mtdblock, so the
+// root= above would be silently ignored.
+okC('CONFIG_INITRAMFS_SOURCE is empty (nothing embedded that would run before the root)',
+  kv('INITRAMFS_SOURCE') === undefined || kv('INITRAMFS_SOURCE') === '',
+  JSON.stringify(kv('INITRAMFS_SOURCE')));
+
+// The SPI-NAND core only marks a page "program once" when the on-die ECC engine
+// is the one in use, and that is what selects the in-data JFFS2 clean marker.
+// An explicit nand-ecc-engine to a controller engine would take the OOB path
+// again, which is the bug patch 029 exists for.
+ok('the flash node names no external ECC engine (on-die ECC, so program_once applies)',
+  !!flash && !flash.props['nand-ecc-engine'],
+  flash && flash.props['nand-ecc-engine'] ? 'nand-ecc-engine is set' : 'no such property');
 
 // The user's own constraint, checked where it matters: this board family reboots
 // when a controller that is not populated gets probed. Both are gated by the
