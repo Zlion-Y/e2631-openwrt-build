@@ -12,7 +12,6 @@ define Package/e2631-fwslot
   SECTION:=firmware
   CATEGORY:=Firmware
   TITLE:=Flash and select the ZTE ZXHN E2631 firmware slots
-  DEPENDS:=+kmod-mtd-rw
 endef
 
 define Package/e2631-fwslot/description
@@ -22,9 +21,14 @@ define Package/e2631-fwslot/description
   byte of its kernel or root filesystem. "info" reports both slots.
 endef
 
+define Build/Prepare
+	mkdir -p $(PKG_BUILD_DIR)
+	$(CP) ./src/* $(PKG_BUILD_DIR)/
+endef
+
 define Build/Compile
-	$(TARGET_CC) $(TARGET_CFLAGS) -Wall -Werror -o $(PKG_BUILD_DIR)/e2631-fwslot \
-		$(CURDIR)/src/e2631-fwslot.c
+	$(TARGET_CC) $(TARGET_CFLAGS) $(TARGET_LDFLAGS) -Wall -Werror \
+		-o $(PKG_BUILD_DIR)/e2631-fwslot $(PKG_BUILD_DIR)/e2631-fwslot.c
 endef
 
 define Package/e2631-fwslot/install
