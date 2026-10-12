@@ -16,6 +16,21 @@ env:
   BASE_SHA: db8b8d4130457dbe46558a7cea872dd2dae539e6
 
 jobs:
+  # Fast feedback on the slot tool: the runner has a native gcc, so this reports
+  # compile errors in about ten seconds instead of after a forty minute world build.
+  fwslot-native:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: install the MTD headers
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends linux-libc-dev
+      - name: compile natively with warnings as errors
+        run: |
+          gcc -std=gnu11 -Wall -Wextra -Werror \
+            -o /tmp/e2631-fwslot \
+            overlay/package/firmware/e2631-fwslot/src/e2631-fwslot.c
+          /tmp/e2631-fwslot 2>&1 | tail -8 || true
+
   build:
     runs-on: ubuntu-24.04
     permissions:
