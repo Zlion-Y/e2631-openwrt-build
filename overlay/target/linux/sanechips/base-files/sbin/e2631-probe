@@ -7,7 +7,7 @@
 #
 # Keep it until every line has been checked against zx279128s-zte-zxhn-e2631.dts.
 
-echo "=== cmdline (root= must be mtdblock7, our squashfs) ==="
+echo "=== cmdline (root= should be the squashfs row: mtdblock7 with today's table) ==="
 cat /proc/cmdline
 
 echo "=== mtd table: numbering, sizes, bad blocks and ECC counters ==="
@@ -20,7 +20,7 @@ for d in /sys/class/mtd/mtd*; do
 		"$(cat $d/corrected_bits 2>/dev/null)"
 done
 
-echo "=== mounts: is the overlay on mtdblock9, and is jffs2 readable ==="
+echo "=== mounts: the overlay should be the jffs2 row (mtdblock9 with today's table) ==="
 grep -E 'jffs2|squashfs|overlay' /proc/mounts
 
 echo "=== mdio: which PHY addresses answered (board file guesses 0xa..0xd) ==="
@@ -40,6 +40,9 @@ for d in /sys/bus/pci/devices/*; do
 	echo "  ${d##*/} $(cat $d/vendor):$(cat $d/device) irq=$(cat $d/irq) driver=$(basename $(readlink $d/driver 2>/dev/null) 2>/dev/null)"
 done
 ls /lib/firmware/mediatek 2>&1
+
+echo "=== modules actually loaded (mt7915e needs firmware to have arrived first) ==="
+lsmod
 
 echo "=== gpio chips (LEDs claim &gpio2 8 / &gpio0 8 / &gpio3 12, keys &gpio1 2 and 4) ==="
 for c in /sys/class/gpio/gpiochip*; do
