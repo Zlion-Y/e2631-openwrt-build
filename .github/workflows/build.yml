@@ -134,6 +134,10 @@ jobs:
           ELF=$(find openwrt/build_dir -type f -name e2631-fwslot -not -path '*ipk*' | head -1)
           test -n "$ELF" || { echo "no built e2631-fwslot ELF found"; exit 1; }
           cp "$ELF" out/payload/e2631-fwslot
+          file out/payload/e2631-fwslot
+          # It has to run on the vendor system, which has no musl loader.
+          file out/payload/e2631-fwslot | grep -q 'statically linked' \
+            || { echo "e2631-fwslot is dynamically linked; -static did not take"; exit 1; }
           readelf -h "$ELF" | sed -n 's/^\s*Flags:\s*\(.*\)$/\1/p'
           F=$(readelf -h "$ELF" | awk '/^ *Flags:/{print $2}')
           # EF_ARM_ABI_FLOAT_SOFT=0x200 must be set, EF_ARM_ABI_FLOAT_HARD=0x400 clear.

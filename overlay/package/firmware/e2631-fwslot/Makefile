@@ -27,7 +27,10 @@ define Build/Prepare
 endef
 
 define Build/Compile
-	$(TARGET_CC) $(TARGET_CFLAGS) $(TARGET_LDFLAGS) -Wall -Werror \
+	# Static on purpose: the first image has to be written from the vendor
+	# system, which runs uClibc and has no musl loader. A static binary is the
+	# only thing that runs there unchanged.
+	$(TARGET_CC) $(TARGET_CFLAGS) $(TARGET_LDFLAGS) -static -Wall -Werror \
 		-o $(PKG_BUILD_DIR)/e2631-fwslot $(PKG_BUILD_DIR)/e2631-fwslot.c
 endef
 
