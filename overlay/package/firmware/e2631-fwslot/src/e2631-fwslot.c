@@ -45,9 +45,13 @@
 #define KERNEL_MAGIC_SIZE 32	/* 33333333 cccccccc 88888888 dddddddd + 16 x ff */
 #define UBOOT_SIZE	0	/* E2631 upgrade packages carry no bootloader */
 
-/* Version header fields, relative to the start of the 512-byte header. */
-#define H_KEY1		0x08
-#define H_KEY2		0x0c
+/*
+ * Version header fields this tool reads or writes, relative to the start of the
+ * 512-byte header. Fields it must not disturb - the upgrade keys at +0x08 and
+ * +0x0c, +0xb8 which the vendor switch path wants zero, the hardware string at
+ * +0x110 and the slot address table at +0x1e0 - are copied through from the
+ * package untouched.
+ */
 #define H_VERSION	0x10
 #define H_FW_SIZE	0x30	/* body size; also where the header lands when
 				 * the body is block aligned, which stock is.
@@ -59,18 +63,12 @@
 #define H_FS_FILEOFS	0x44
 #define H_FS_CRC	0x48
 #define H_SLOT0		0x4c
-#define H_SLOT0_SPAN	0x50
 #define H_SLOT1		0x5c
-#define H_SLOT1_SPAN	0x60
 #define H_PRODUCT	0x6c
 #define H_BOOT_INCLUDED 0x8c
-#define H_UBOOT_CRC	0x98
 #define H_CRC		0xa4	/* CRC32 over [0x00:0xa4] - checked by cspboot */
 #define H_BUILD		0xa8
-#define H_INTEGRITY	0xb8
 #define H_INNER_MAGIC	0xf4
-#define H_HWVER		0x110
-#define H_SLottAB	0x1e0
 #define H_SLOT_START	0x1f0
 #define H_SERIAL	0x1f4
 #define H_NEW		0x1f8
