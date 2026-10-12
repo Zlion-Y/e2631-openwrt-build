@@ -22,3 +22,13 @@ What is deliberately different from the H3600 board file:
 * no USB: the vendor kernel has no USB at all, and probing the controller on
   boards where it is not populated reboots the SoC
 * soft-float userspace: this SoC implements no VFP, so CONFIG_VFP must stay off
+* JFFS2 clean markers go in the data area, not the OOB (patches 029 and 030):
+  SPI-NAND with on-die ECC regenerates page ECC on every program, so a page
+  written twice comes back uncorrectable. Without this the overlay fails to
+  remount and the box is stuck on a read-only root.
+* the kernel command line is compiled in and CONFIG_CMDLINE_FORCE is on: the
+  vendor U-Boot passes `root=/dev/mtdblock8 rootfstype=jffs2 init=/bin/sh`,
+  which names the vendor layout and would replace PID 1 with a shell.
+
+The two config edits above are per-target, so a tree that has been overlaid here
+builds the E2631, not the H3600.

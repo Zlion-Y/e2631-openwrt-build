@@ -67,6 +67,10 @@ jobs:
           grep -q Makefile.e2631 ../openwrt/target/linux/sanechips/image/Makefile
           ! grep -qx CONFIG_VFP=y ../openwrt/target/linux/sanechips/config-6.18 \
             || { echo "VFP still enabled: this SoC has no VFP, images would SIGILL"; exit 1; }
+          grep -qx CONFIG_CMDLINE_FORCE=y ../openwrt/target/linux/sanechips/config-6.18 \
+            || { echo "command line not forced: the vendor bootargs would take over"; exit 1; }
+          ls ../openwrt/target/linux/sanechips/patches-6.18/029-*.patch \
+             ../openwrt/target/linux/sanechips/patches-6.18/030-*.patch
 
       - name: cache the download and build dirs
         uses: actions/cache@v4
