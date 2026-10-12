@@ -59,7 +59,7 @@
 
 		led_internet: led-internet {
 			color = <LED_COLOR_ID_GREEN>;
-			function = LED_FUNCTION_INET;
+			function = LED_FUNCTION_WAN;
 			gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
 		};
 
