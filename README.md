@@ -13,6 +13,16 @@ workstation). Packaging into the vendor upgrade format happens locally with
 tools/mkfactory.mjs, because the official package used as the version-header
 template is not uploaded here.
 
+Three screens run before the forty-minute build is allowed to be the test:
+`tools/dts_lint.mjs` resolves the board file's includes, `&labels` and
+dt-binding macros against the kernel patches and the fetched headers; the
+slot tool is compiled natively with `-Werror` and has to accept a synthesized
+package and reject one byte-flipped copy; and `tools/verify_img.mjs` checks
+the finished image for the things that stop a boot - `root=` against the
+partition order the dtb really creates, built-in flash/squashfs/jffs2
+drivers, the forced command line, USB and watchdog staying disabled,
+soft-float, and the root filesystem's package list.
+
 What is deliberately different from the H3600 board file:
 
 * one WAN + three LAN, all four on the integrated GbE PHYs - no external PHY
