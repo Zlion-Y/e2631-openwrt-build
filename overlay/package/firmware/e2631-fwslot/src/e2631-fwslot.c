@@ -173,7 +173,7 @@ static void mtd_sysfs_s(int index, const char *attr, char *out, size_t len)
 	buf[n] = 0;
 	if (n && buf[n - 1] == '\n')
 		buf[n - 1] = 0;
-	snprintf(out, len, "%s", buf);
+	snprintf(out, len, "%.*s", (int)(len - 1), buf);
 }
 
 /* Find the MTD partition carrying the given label. */
