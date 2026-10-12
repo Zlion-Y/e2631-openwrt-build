@@ -107,16 +107,16 @@ jobs:
           grep -q '^CONFIG_SOFT_FLOAT=y' .config \
             || { echo "soft-float is off in .config"; exit 1; }
 
-      # Keep the whole log in a file: the tail of it is what usually hides the
-      # first error, and an artifact is cheaper than another 45 minute guess.
+      # Keep the whole log in a file AND show it as it goes: a redirected build is
+      # silent for an hour, which is no way to watch a first attempt. pipefail
+      # still carries make's own exit status through tee.
       - name: build
         run: |
           set +e
-          make -C openwrt -j"$(nproc)" world V=s > build.log 2>&1
-          rc=$?
+          make -C openwrt -j"$(nproc)" world V=s 2>&1 | tee build.log |
+            grep --line-buffered -E '^>>> |\*\*\* |Error [0-9]|: error:|make: \*\*\*'
+          rc=${PIPESTATUS[0]}
           set -e
-          grep -n -E "Error [0-9]+($|:)|error:|Newer symbol|\(NEW\)" build.log | head -30
-          tail -n 40 build.log
           echo "make world exited with $rc"
           exit $rc
 
