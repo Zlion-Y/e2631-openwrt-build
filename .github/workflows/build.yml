@@ -90,6 +90,10 @@ jobs:
           make defconfig
           grep -q '^CONFIG_TARGET_DEVICE_sanechips_generic_DEVICE_zte_zxhn-e2631=y' .config \
             || { echo "the E2631 profile was not selected"; grep -i e2631 .config || true; exit 1; }
+          # Invisible at build time, fatal on the device: without soft-float every
+          # binary starts with SIGILL, because this SoC has no VFP.
+          grep -q '^CONFIG_SOFT_FLOAT=y' .config \
+            || { echo "soft-float is off in .config"; exit 1; }
 
       - name: build
         run: make -C openwrt -j"$(nproc)" world V=s 2>&1 | tail -400
@@ -103,6 +107,16 @@ jobs:
           B=openwrt/bin/targets/sanechips/generic
           cp -t out "$B"/*.bin "$B"/*.manifest 2>/dev/null || true
           tar -xf "$B"/openwrt-*-sysupgrade*.bin -C out/payload
+          # The slot tool is needed on the *vendor* system too, to write the first
+          # OpenWrt image, so ship the bare cross-compiled ELF as well.
+          ELF=$(find openwrt/build_dir -type f -name e2631-fwslot -not -path '*ipk*' | head -1)
+          test -n "$ELF" || { echo "no built e2631-fwslot ELF found"; exit 1; }
+          cp "$ELF" out/payload/e2631-fwslot
+          readelf -h "$ELF" | sed -n 's/^\s*Flags:\s*\(.*\)$/\1/p'
+          F=$(readelf -h "$ELF" | awk '/^ *Flags:/{print $2}')
+          # EF_ARM_ABI_FLOAT_SOFT=0x200 must be set, EF_ARM_ABI_FLOAT_HARD=0x400 clear.
+          [ $(( F & 0x200 )) -ne 0 ] && [ $(( F & 0x400 )) -eq 0 ] \
+            || { echo "e2631-fwslot is not soft-float EABI5 (flags $F)"; exit 1; }
           ls -lR out
 
       - uses: actions/upload-artifact@v4
