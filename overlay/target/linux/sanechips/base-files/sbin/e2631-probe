@@ -1,0 +1,54 @@
+#!/bin/sh
+# Hardware probe for the E2631 port: everything the board device tree had to
+# guess at, measured from the running system and printed to stdout.
+# Read-only; it never writes flash. Run it over the network on first boot:
+#
+#   /sbin/e2631-probe 2>&1 | tee /tmp/probe.txt
+#
+# Keep it until every line has been checked against zx279128s-zte-zxhn-e2631.dts.
+
+echo "=== cmdline (root= must be mtdblock7, our squashfs) ==="
+cat /proc/cmdline
+
+echo "=== mtd table: numbering, sizes, bad blocks and ECC counters ==="
+cat /proc/mtd
+for d in /sys/class/mtd/mtd*; do
+	[ -d "$d" ] || continue
+	printf '%-6s %-14s size=%-10s erasesize=%-8s bad=%-3s ecc_fail=%-3s corrected=%s\n' \
+		"${d##*/}" "$(cat $d/name)" "$(cat $d/size)" "$(cat $d/erasesize)" \
+		"$(cat $d/bad_blocks 2>/dev/null)" "$(cat $d/ecc_failures 2>/dev/null)" \
+		"$(cat $d/corrected_bits 2>/dev/null)"
+done
+
+echo "=== mounts: is the overlay on mtdblock9, and is jffs2 readable ==="
+grep -E 'jffs2|squashfs|overlay' /proc/mounts
+
+echo "=== mdio: which PHY addresses answered (board file guesses 0xa..0xd) ==="
+ls /sys/bus/mdio_bus/devices 2>/dev/null
+for f in /sys/bus/mdio_bus/devices/*/*id*; do [ -e "$f" ] && echo "  $f = $(cat $f)"; done 2>/dev/null
+
+echo "=== netdevs and their PHYs ==="
+for d in /sys/class/net/*; do
+	n=${d##*/}
+	[ -e "$d/phydev" ] && echo "  $n phy=$(basename $(readlink $d/phydev)) state=$(cat $d/operstate) mac=$(cat $d/address)"
+done
+ip -o link 2>/dev/null
+
+echo "=== pci: does the Wi-Fi chip enumerate (MediaTek vendor 0x14c3) ==="
+for d in /sys/bus/pci/devices/*; do
+	[ -r "$d/vendor" ] || continue
+	echo "  ${d##*/} $(cat $d/vendor):$(cat $d/device) irq=$(cat $d/irq) driver=$(basename $(readlink $d/driver 2>/dev/null) 2>/dev/null)"
+done
+ls /lib/firmware/mediatek 2>&1
+
+echo "=== gpio chips (LEDs claim &gpio2 8 / &gpio0 8 / &gpio3 12, keys &gpio1 2 and 4) ==="
+for c in /sys/class/gpio/gpiochip*; do
+	[ -d "$c" ] || continue
+	echo "  ${c##*/} base=$(cat $c/base) ngpio=$(cat $c/ngpio) label=$(cat $c/label)"
+done
+ls /sys/class/leds 2>/dev/null
+
+echo "=== kernel log: flash, wifi, vfp, errors ==="
+dmesg | grep -i -E 'spinand|nand|jffs2|squashfs|mtd|mdio|phy|gmac|pcie|vfp|neon|error|warn|fail'
+
+echo "=== done ==="
