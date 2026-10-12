@@ -328,7 +328,7 @@ warn('cpu enable-method matches the string the compiled platsmp registers',
       ['procd', 'pid 1'],
       ['fstools', 'mount_root and the jffs2 overlay'],
       ['netifd', 'LAN and WAN'],
-      ['uhttpd', 'the web interface'],
+      ['dropbear', 'ssh in to run the probe: this base tree ships no uhttpd by default'],
       ['e2631-fwslot', 'switching back to the stock slot'],
     ];
     for (const [p, why] of need) ok(`${p} is installed (${why})`, pkgs.has(p), pkgs.has(p) ? '' : 'not in the manifest');
