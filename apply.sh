@@ -52,15 +52,32 @@ done
 # /proc/cmdline of the running vendor system), which describes the vendor
 # partition table and would leave PID 1 as a shell. Compile in the command line
 # of our own table and ignore the bootloader's, the way the SR1010 port does.
-# root=/dev/mtdblock7 is the "rootfs" row of the board DTS, counted from mtd0
-# because CONFIG_MTD_PARTITIONED_MASTER is off in the OpenWrt baseline.
+#
+# The mtdblock number is the row the "rootfs" label occupies in the board DTS,
+# counted from mtd0 because CONFIG_MTD_PARTITIONED_MASTER is off. Counted, not
+# remembered: a table edit that shifts the rows would otherwise bake a wrong
+# root= into the kernel and only show up on the device, after the flash.
+DTS="$TREE/target/linux/sanechips/dts/zx279128s-zte-zxhn-e2631.dts"
+ROOTDEV=$(awk '
+	/[[:space:]]partitions[[:space:]]*\{/ { p = 1 }
+	p {
+		d += gsub(/\{/, "{") - gsub(/\}/, "}")
+		if (match($0, /label[ \t]*=[ \t]*"[^"]*"/)) {
+			s = substr($0, RSTART, RLENGTH); sub(/^[^"]*"/, "", s); sub(/".*$/, "", s)
+			if (s == "rootfs") { print n; exit }
+			n++
+		}
+		if (d == 0) p = 0
+	}' "$DTS")
+[ -n "$ROOTDEV" ] || { echo "no partition labelled rootfs in $DTS" >&2; exit 1; }
+
 if ! grep -q '^CONFIG_CMDLINE_FORCE=y' "$CFG"; then
 	printf '%s\n' \
 		'# E2631: the vendor bootargs name the vendor layout, not ours (see apply.sh)' \
 		'CONFIG_CMDLINE_BOOL=y' \
-		'CONFIG_CMDLINE="console=ttyAMA0,115200n8 root=/dev/mtdblock7 rootfstype=squashfs ro rootwait"' \
+		"CONFIG_CMDLINE=\"console=ttyAMA0,115200n8 root=/dev/mtdblock$ROOTDEV rootfstype=squashfs ro rootwait\"" \
 		'CONFIG_CMDLINE_FORCE=y' >> "$CFG"
-	echo "kernel config: forced the OpenWrt command line"
+	echo "kernel config: forced the OpenWrt command line, root on mtdblock$ROOTDEV"
 fi
 
 echo "overlay applied to $TREE (base $BASE_SHA)"
