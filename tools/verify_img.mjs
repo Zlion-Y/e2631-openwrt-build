@@ -332,6 +332,12 @@ warn('cpu enable-method matches the string the compiled platsmp registers',
       ['e2631-fwslot', 'switching back to the stock slot'],
     ];
     for (const [p, why] of need) ok(`${p} is installed (${why})`, pkgs.has(p), pkgs.has(p) ? '' : 'not in the manifest');
+    // FEATURES on this target still says "usb", and OpenWrt's default package
+    // list keys off FEATURES. A USB kmod in the image is the user's hard no:
+    // probing a controller that is not populated reboots the SoC.
+    const usbPkgs = [...pkgs].filter((p) => /^kmod-usb|^usb-tools|^usbutils/.test(p));
+    ok('no USB kernel packages in the image (probing this controller reboots the SoC)',
+      usbPkgs.length === 0, usbPkgs.join(', '));
   }
 }
 
