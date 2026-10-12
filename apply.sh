@@ -25,12 +25,23 @@ fi
 grep -q 'Makefile.e2631' "$IMG" || { echo "failed to hook image/Makefile" >&2; exit 1; }
 
 # The target inherits cortex-a9 hard-float defaults; this SoC has no VFP at all.
+# Turn the option off together with everything that depends on it: leaving
+# CONFIG_VFPv3=y with VFP unset makes the kernel's syncconfig restart and then
+# stop on an interactive prompt (that is what a "VFP ... [N/y/?] (NEW)" failure
+# in a CI log means). The names are matched case-insensitively and rewritten
+# with their own spelling, because the fragment writes CONFIG_VFPv3, not
+# CONFIG_VFPV3.
 CFG="$TREE/target/linux/sanechips/config-6.18"
-for opt in CONFIG_VFP CONFIG_VFPV3 CONFIG_NEON CONFIG_ARM_THUMBEE; do
-	if grep -q "^$opt=y$" "$CFG"; then
-		sed -i "s|^$opt=y\$|# CONFIG_$opt is not set|" "$CFG"
-		echo "kernel config: disabled $opt"
+for opt in VFP VFPv3 NEON KERNEL_MODE_NEON ARM_THUMBEE; do
+	if sed -E -n "s|^CONFIG_(${opt})=y\$|# CONFIG_\\1 is not set|Ip" "$CFG" \
+	   | grep -q .; then
+		sed -E -i "s|^CONFIG_(${opt})=y\$|# CONFIG_\\1 is not set|I" "$CFG"
+		echo "kernel config: disabled ${opt}"
 	fi
+done
+for opt in VFP VFPv3 NEON; do
+	grep -qiE "^CONFIG_${opt}=y$" "$CFG" && {
+		echo "kernel config: $opt still enabled" >&2; exit 1; }
 done
 
 # The vendor U-Boot hands the kernel its own bootargs - on this board they are

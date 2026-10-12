@@ -65,15 +65,13 @@ jobs:
           test -f ../openwrt/tools/e2631-mkfactory.mjs
           grep -q zxhn-e2631 ../openwrt/target/linux/sanechips/base-files/etc/board.d/02_network
           grep -q Makefile.e2631 ../openwrt/target/linux/sanechips/image/Makefile
-          ! grep -qx CONFIG_VFP=y ../openwrt/target/linux/sanechips/config-6.18 \
-            || { echo "VFP still enabled: this SoC has no VFP, images would SIGILL"; exit 1; }
           grep -qx CONFIG_CMDLINE_FORCE=y ../openwrt/target/linux/sanechips/config-6.18 \
             || { echo "command line not forced: the vendor bootargs would take over"; exit 1; }
           ls ../openwrt/target/linux/sanechips/patches-6.18/029-*.patch \
              ../openwrt/target/linux/sanechips/patches-6.18/030-*.patch
 
-      - name: cache the download and build dirs
-        uses: actions/cache@v4
+      - name: restore the download and build dirs
+        uses: actions/cache/restore@v4
         with:
           path: |
             openwrt/dl
@@ -95,8 +93,18 @@ jobs:
           grep -q '^CONFIG_SOFT_FLOAT=y' .config \
             || { echo "soft-float is off in .config"; exit 1; }
 
+      # Keep the whole log in a file: the tail of it is what usually hides the
+      # first error, and an artifact is cheaper than another 45 minute guess.
       - name: build
-        run: make -C openwrt -j"$(nproc)" world V=s 2>&1 | tail -400
+        run: |
+          set +e
+          make -C openwrt -j"$(nproc)" world V=s > build.log 2>&1
+          rc=$?
+          set -e
+          grep -n -E "Error [0-9]+($|:)|error:|Newer symbol|\(NEW\)" build.log | head -30
+          tail -n 40 build.log
+          echo "make world exited with $rc"
+          exit $rc
 
       # The sysupgrade file is a tar holding the two payloads under
       # sysupgrade-<profile>/{kernel,root}; unpacking it here gives stable
@@ -126,6 +134,23 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: build log on failure
+      - name: the build log on failure
         if: failure()
-        run: tail -200 openwrt/*.log 2>/dev/null || true
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+      # A failed run still has to bank the downloads and the toolchain: without
+      # this the next attempt pays for them again. actions/cache@v4 saves in a
+      # post step, which this runner skipped after a failed job.
+      - name: save the download and build dirs
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            openwrt/dl
+            openwrt/staging_dir
+          key: ow-${{ env.BASE_SHA }}-${{ hashFiles('e2631/apply.sh', 'e2631/overlay') }}
