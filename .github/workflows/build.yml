@@ -182,6 +182,19 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      # After the upload on purpose: this has to be able to fail the run without
+      # costing the artifact, which is what the static checks are compared with.
+      # Passing the bootloader's CRCs only says the bytes are accepted. Whether
+      # the system then boots is a separate question, and a kernel that hangs
+      # after flash does not fall back by itself, so check the things that stop
+      # a boot: root= against the partition order the dtb really creates, the
+      # flash/squashfs/jffs2 drivers being built in, the command line beating
+      # the vendor bootargs, USB and watchdog nodes staying disabled, and what
+      # actually went into the root filesystem.
+      - name: boot readiness (static)
+        working-directory: e2631
+        run: node tools/verify_img.mjs ../out
+
       - name: the build log on failure
         if: failure()
         uses: actions/upload-artifact@v4
