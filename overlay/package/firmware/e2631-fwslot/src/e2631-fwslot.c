@@ -653,6 +653,23 @@ static int cmd_flash(const char *path)
 	if (p.body_len > m.info.size - bs)
 		errno = ENOSPC, die("package larger than the slot");
 
+	/*
+	 * The board partition table puts the root filesystem and the version
+	 * header on fixed offsets inside the slot. Blocks are skipped while
+	 * writing, so a single bad block in that range would move both away
+	 * from where the kernel looks for them. Check before erasing: the
+	 * factory bad block table is content independent, so this is valid
+	 * while the slot still holds the vendor image.
+	 */
+	for (uint64_t o = 0, need = (p.body_len + bs) / bs * bs; o < need; o += bs)
+		if (mtd_bad(&m, o)) {
+			fprintf(stderr,
+				"zte-fwslot: slot %d has a bad erase block at %#llx, inside the "
+				"area the fixed partition offsets rely on; refusing to write\n",
+				target_slot, (unsigned long long)o);
+			return 1;
+		}
+
 	blk = malloc(bs);
 	if (!blk)
 		die("out of memory");

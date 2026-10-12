@@ -12,19 +12,23 @@
 E2631_VENDOR_TEMPLATE := $(call qstrip,$(CONFIG_E2631_VENDOR_TEMPLATE))
 
 define Device/zte_zxhn-e2631
-  $(Device/Default)
   DEVICE_VENDOR := ZTE
   DEVICE_MODEL := ZXHN E2631
   DEVICE_DTS := zx279128s-zte-zxhn-e2631
   DEVICE_DTS_DIR := $(TOPDIR)/target/linux/sanechips/dts
-  # The package pads the kernel region so the rootfs starts at slot +0x800000,
-  # which is where the DTS partition table says it is.
+  # The package pads the kernel region so the rootfs starts at slot +0x800000
+  # and pads the rootfs so the version header block lands on +0x1000000, which
+  # is where the board DTS says both are.
   KERNEL_SIZE := 8192k
   KERNEL := kernel-bin | append-dtb | uImage none | zte-slot-marker | \
 	check-size $$(KERNEL_SIZE)
   KERNEL_INITRAMFS := kernel-bin | append-dtb | uImage-ramboot
   DEVICE_PACKAGES := kmod-mt7915e kmod-mt7915-firmware e2631-fwslot
-  IMAGES := factory.bin sysupgrade.bin
+  # The factory package needs an official package as its version-header
+  # template, and those are not redistributed, so it is only built when
+  # CONFIG_E2631_VENDOR_TEMPLATE names one. CI leaves it empty and gets
+  # sysupgrade.bin; tools/release.mjs packs the factory file locally.
+  IMAGES := $(if $(E2631_VENDOR_TEMPLATE),factory.bin )sysupgrade.bin
   IMAGE/factory.bin := e2631-factory
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 endef
@@ -43,5 +47,5 @@ define Build/e2631-factory
 	node $(TOPDIR)/tools/e2631-mkfactory.mjs pack \
 		--template $(E2631_VENDOR_TEMPLATE) \
 		--kernel $(IMAGE_KERNEL) --rootfs $(IMAGE_ROOTFS) \
-		--rootfs-at 0x800000 --out $@
+		--rootfs-at 0x800000 --header-at 0x1000000 --out $@
 endef

@@ -33,5 +33,4 @@ for opt in CONFIG_VFP CONFIG_VFPV3 CONFIG_NEON CONFIG_ARM_THUMBEE; do
 	fi
 done
 
-chmod +x "$TREE/target/linux/sanechips/base-files/etc/uci-defaults/"* 2>/dev/null || true
 echo "overlay applied to $TREE (base $BASE_SHA)"

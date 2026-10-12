@@ -62,6 +62,8 @@ jobs:
         run: |
           ./apply.sh ../openwrt
           test -f ../openwrt/target/linux/sanechips/dts/zx279128s-zte-zxhn-e2631.dts
+          test -f ../openwrt/tools/e2631-mkfactory.mjs
+          grep -q zxhn-e2631 ../openwrt/target/linux/sanechips/base-files/etc/board.d/02_network
           grep -q Makefile.e2631 ../openwrt/target/linux/sanechips/image/Makefile
           ! grep -qx CONFIG_VFP=y ../openwrt/target/linux/sanechips/config-6.18 \
             || { echo "VFP still enabled: this SoC has no VFP, images would SIGILL"; exit 1; }
@@ -86,15 +88,18 @@ jobs:
             || { echo "the E2631 profile was not selected"; grep -i e2631 .config || true; exit 1; }
 
       - name: build
-        run: make -C openwrt -j$(nproc) -j1 world V=s 2>&1 | tail -400
+        run: make -C openwrt -j"$(nproc)" world V=s 2>&1 | tail -400
 
+      # The sysupgrade file is a tar holding the two payloads under
+      # sysupgrade-<profile>/{kernel,root}; unpacking it here gives stable
+      # names, instead of guessing at paths inside build_dir.
       - name: collect the artifacts
         run: |
-          mkdir -p out
-          cp openwrt/bin/targets/sanechips/generic/*.bin out/ 2>/dev/null || true
-          find openwrt/build_dir -maxdepth 3 \( -name 'openwrt-*-kernel' -o \
-               -name 'openwrt-*-rootfs.bin' \) -exec cp -t out/ {} +
-          ls -l out
+          mkdir -p out/payload
+          B=openwrt/bin/targets/sanechips/generic
+          cp -t out "$B"/*.bin "$B"/*.manifest 2>/dev/null || true
+          tar -xf "$B"/openwrt-*-sysupgrade*.bin -C out/payload
+          ls -lR out
 
       - uses: actions/upload-artifact@v4
         with:

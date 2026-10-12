@@ -11,7 +11,7 @@
 
 /dts-v1/;
 
-#include "zx279128s.dtsi"
+#include "zte/zx279128s.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/leds/common.h>
@@ -21,6 +21,7 @@
 	compatible = "zte,zxhn-e2631", "zte,zx279128s";
 
 	aliases {
+		ethernet0 = &gmac;
 		serial0 = &serial0;
 		serial1 = &serial1;
 		led-boot = &led_power;
@@ -39,11 +40,6 @@
 		reg = <0x40000000 0x10000000>;
 	};
 
-	cpus {
-		/* Vendor DT says enable-method = "zte,zx279128-smp" (no trailing s);
-		 * the string only has to agree between this board file and platsmp.
-		 */
-	};
 
 	leds {
 		compatible = "gpio-leds";
@@ -258,17 +254,29 @@
 			 * official upgrade package (header +0x4c/+0x5c) and confirmed by
 			 * /proc/zte/verinfo/versionstates: 0x700000..0x2300000 and
 			 * 0x2300000..0x3f00000, 28 MiB each. Slot 0 keeps the vendor
-			 * system; OpenWrt is installed into slot 1 so that
+			 * system; OpenWrt is installed into slot 1, so that
 			 * "e2631-fwslot switch" can boot the vendor side again without
 			 * rewriting a byte of it.
 			 *
-			 * Inside slot 1 the image is laid out by our own package:
+			 * rootfs, slot1-header and rootfs_data are windows into slot1, the
+			 * same way the vendor table overlaps "rootfs" inside "kernel1".
+			 * They stay flat on purpose: mainline ofpart only looks for
+			 * sub-partitions when the partition node itself carries
+			 * "compatible = fixed-partitions", and then their offsets are
+			 * relative. One flat table keeps every address an absolute flash
+			 * offset, which is also what e2631-fwslot matches against
+			 * /sys/class/mtd/mtdN/offset.
+			 *
+			 * Inside slot 1 our package is laid out as
 			 *   +0x000000  32-byte slot marker
 			 *   +0x000020  kernel (plaintext legacy uImage, load 0x40008000),
 			 *                padded so the rootfs starts at +0x800000
-			 *   +0x800000  squashfs root filesystem
-			 *   +0x1000000 version header (the block after the body)
+			 *   +0x800000  squashfs, padded to fill up to +0x1000000
+			 *   +0x1000000 the 512-byte version header block
 			 *   +0x1020000 overlay (rootfs_data) up to the end of the slot
+			 * Those fixed addresses hold only while no erase block of
+			 * [slot start, +0x1000000) is bad; e2631-fwslot checks that and
+			 * refuses to write when it is not.
 			 */
 			partition@700000 {
 				label = "slot0";
@@ -279,39 +287,21 @@
 			partition@2300000 {
 				label = "slot1";
 				reg = <0x02300000 0x01c00000>;
+			};
 
-				partitions {
-					compatible = "fixed-partitions";
-					#address-cells = <1>;
-					#size-cells = <1>;
+			partition@2b00000 {
+				label = "rootfs";
+				reg = <0x02b00000 0x00800000>;
+			};
 
-					/* 32-byte slot marker plus the plaintext uImage, padded so
-					 * that the root filesystem lands on +0x800000.
-					 */
-					slot1_kernel: partition@0 {
-						label = "slot1-kernel";
-						reg = <0x0000000 0x00800000>;
-					};
+			partition@3300000 {
+				label = "slot1-header";
+				reg = <0x03300000 0x00020000>;
+			};
 
-					slot1_rootfs: partition@800000 {
-						label = "slot1-rootfs";
-						reg = <0x00800000 0x00800000>;
-					};
-
-					/* The 512-byte version header sits in the erase block
-					 * right after the body; e2631-fwslot scans for it rather
-					 * than trusting this, because bad blocks move it.
-					 */
-					slot1_header: partition@1000000 {
-						label = "slot1-header";
-						reg = <0x01000000 0x00020000>;
-					};
-
-					slot1_data: partition@1020000 {
-						label = "rootfs_data";
-						reg = <0x01020000 0x00be0000>;
-					};
-				};
+			partition@3320000 {
+				label = "rootfs_data";
+				reg = <0x03320000 0x00be0000>;
 			};
 
 			/* Vendor plugin area: 0x6e00000..0x7f00000 on this board. Left
