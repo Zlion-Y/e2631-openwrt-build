@@ -755,7 +755,7 @@ static int cmd_flash(const char *path)
 	for (uint64_t o = 0, need = (p.body_len + bs) / bs * bs; o < need; o += bs)
 		if (mtd_bad(&m, o)) {
 			fprintf(stderr,
-				"zte-fwslot: slot %d has a bad erase block at %#llx, inside the "
+				"e2631-fwslot: slot %d has a bad erase block at %#llx, inside the "
 				"area the fixed partition offsets rely on; refusing to write\n",
 				target_slot, (unsigned long long)o);
 			return 1;
