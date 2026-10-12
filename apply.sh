@@ -15,7 +15,7 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 
 cp -r "$HERE/overlay/." "$TREE/"
 mkdir -p "$TREE/tools"
-cp "$HERE/../tools/mkfactory.mjs" "$TREE/tools/e2631-mkfactory.mjs"
+cp "$HERE/tools/mkfactory.mjs" "$TREE/tools/e2631-mkfactory.mjs"
 
 IMG="$TREE/target/linux/sanechips/image/Makefile"
 if ! grep -q 'Makefile.e2631' "$IMG"; then

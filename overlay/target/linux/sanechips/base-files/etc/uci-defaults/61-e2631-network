@@ -1,0 +1,12 @@
+#!/bin/sh
+# Panel wiring read off the vendor system (/proc/capability/ethernetmac):
+# eth0 is the WAN uplink on switch port 3, eth1..eth3 are the three LAN ports.
+. /lib/functions/uci-defaults.sh
+
+case "$(board_name)" in
+zte,zxhn-e2631)
+	ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" "wan"
+	ucidef_set_interface_lan "lan1 lan2 lan3"
+	;;
+esac
+exit 0
