@@ -84,6 +84,31 @@ jobs:
           ls ../openwrt/target/linux/sanechips/patches-6.18/029-*.patch \
              ../openwrt/target/linux/sanechips/patches-6.18/030-*.patch
 
+      # Run 7 lost 57 minutes to a dtc "Lexical error: Unexpected
+      # 'LED_FUNCTION_INET'", a symbol that does not exist in any header. dtc
+      # only runs inside make world, so the board file is cross-checked here
+      # instead: labels and #includes against the dtsi the target's kernel
+      # patches add, dt-binding macros against the fetched headers.
+      - name: offline device-tree cross-check
+        working-directory: e2631
+        run: |
+          mkdir -p out/hdrs
+          KV=$(basename "$(ls ../openwrt/target/linux/sanechips/config-*)" | sed 's/^config-//')
+          test -n "$KV" || { echo "no config-<version> in the target"; exit 1; }
+          echo "kernel series of the target: $KV"
+          for h in leds/common.h gpio/gpio.h input/linux-event-codes.h; do
+            f=out/hdrs/$(basename $(dirname $h)).h
+            curl -sf -H 'Accept: application/vnd.github.raw' \
+              "https://api.github.com/repos/torvalds/linux/contents/include/dt-bindings/$h?ref=v$KV" -o "$f" \
+            || curl -sf -H 'Accept: application/vnd.github.raw' \
+              "https://api.github.com/repos/torvalds/linux/contents/include/dt-bindings/$h?ref=master" -o "$f" \
+            || echo "  could not fetch $h: macro names will not be checked"
+          done
+          node tools/dts_lint.mjs \
+            overlay/target/linux/sanechips/dts/zx279128s-zte-zxhn-e2631.dts \
+            ../openwrt/target/linux/sanechips/dts \
+            ../openwrt/target/linux/sanechips/patches-6.18
+
       - name: restore the download and build dirs
         uses: actions/cache/restore@v4
         with:
