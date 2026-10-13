@@ -44,29 +44,40 @@
 	leds {
 		compatible = "gpio-leds";
 
-		/* Vendor ledkey_m table (/proc/zte/ledkey_m/led): LedId 0x32/0x64/0x128
-		 * on flat GPIO 8/40/60. Flat number = controller*16 + line, the same
-		 * convention the GPIO driver uses. Which one is power / wlan / internet
-		 * on the panel is NOT yet confirmed: light them one by one from the
-		 * initramfs before renaming. 40 is the one lit at boot.
+		/* Vendor ledkey table (/proc/zte/ledkey_m/led) lists three LEDs on flat
+		 * GPIO 8/40/60; flat = controller*16 + line, the convention
+		 * gpio-zx279128s uses (six banks of 16 lines). Two samples of
+		 * CurrentOnOff taken an hour apart on the vendor system disagree about
+		 * which lamp is lit: 3 minutes after a reboot it was gpio 40, in a fully
+		 * settled system it was gpio 60, and gpio 8 was never lit. The
+		 * bootloader drives 8 and 40 high and 60 low.
+		 *
+		 * So 40 is the lamp that is lit earliest, which is what a power LED
+		 * does, and its lit level is high in the U-Boot phase. That is a reasoned
+		 * call, not a measurement: these bank registers cannot be read to check
+		 * it, because reading them from the vendor system hangs the SoC and the
+		 * watchdog reboots the box (observed 2026-10-13). On first boot read the
+		 * panel: if the lamp we drive stays dark, swap this line to
+		 * GPIO_ACTIVE_LOW and try 60 (&gpio3 12) in its place.
+		 * Which of 8 and 60 is the internet / wlan lamp is still unknown.
 		 */
 		led_power: led-power {
 			color = <LED_COLOR_ID_GREEN>;
 			function = LED_FUNCTION_POWER;
-			gpios = <&gpio2 8 GPIO_ACTIVE_LOW>;
+			gpios = <&gpio2 8 GPIO_ACTIVE_HIGH>;
 			default-state = "on";
 		};
 
 		led_internet: led-internet {
 			color = <LED_COLOR_ID_GREEN>;
 			function = LED_FUNCTION_WAN;
-			gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
+			gpios = <&gpio3 12 GPIO_ACTIVE_LOW>;
 		};
 
 		led_wlan: led-wlan {
 			color = <LED_COLOR_ID_GREEN>;
 			function = LED_FUNCTION_WLAN;
-			gpios = <&gpio3 12 GPIO_ACTIVE_LOW>;
+			gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
 		};
 	};
 
@@ -275,12 +286,22 @@
 			 * Inside slot 1 our package is laid out as
 			 *   +0x000000  32-byte slot marker
 			 *   +0x000020  kernel (plaintext legacy uImage, load 0x40008000),
-			 *                padded so the rootfs starts at +0x800000
-			 *   +0x800000  squashfs, padded to fill up to +0x1000000
-			 *   +0x1000000 the 512-byte version header block
-			 *   +0x1020000 overlay (rootfs_data) up to the end of the slot
+			 *                padded to fill the region up to +0x400000
+			 *   +0x400000  squashfs, padded to fill up to +0xc00000
+			 *   +0xc00000  the 512-byte version header block
+			 *   +0xc20000  overlay (rootfs_data) up to the end of the slot
+			 *
+			 * +0x400000 is not a free choice. cspboot locates the rootfs as
+			 * "slot + ceil(declared kernel size / 128k)" and ignores the header's
+			 * own rootfs offset (proved on the serial console: a kernel of
+			 * 0x34bdf8 made it read slot+0x360000, rejected the CRC and fell back
+			 * to slot 0). The packer therefore declares the padded kernel extent
+			 * 0x3fffe0, whose rounded-up value is exactly +0x400000, which is also
+			 * why KERNEL_SIZE is capped at 4096k: a kernel that outgrows this
+			 * region must fail the build, not move the rootfs under the table.
+			 *
 			 * Those fixed addresses hold only while no erase block of
-			 * [slot start, +0x1000000) is bad; e2631-fwslot checks that and
+			 * [slot start, +0xc00000) is bad; e2631-fwslot checks that and
 			 * refuses to write when it is not.
 			 */
 			partition@700000 {
@@ -299,19 +320,19 @@
 				reg = <0x02300000 0x01c00000>;
 			};
 
-			partition@2b00000 {
+			partition@2700000 {
 				label = "rootfs";
-				reg = <0x02b00000 0x00800000>;
+				reg = <0x02700000 0x00800000>;
 			};
 
-			partition@3300000 {
+			partition@2f00000 {
 				label = "slot1-header";
-				reg = <0x03300000 0x00020000>;
+				reg = <0x02f00000 0x00020000>;
 			};
 
-			partition@3320000 {
+			partition@2f20000 {
 				label = "rootfs_data";
-				reg = <0x03320000 0x00be0000>;
+				reg = <0x02f20000 0x00fe0000>;
 			};
 
 			/* Vendor plugin area: 0x6e00000..0x7f00000 on this board. Left

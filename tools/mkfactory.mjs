@@ -4,6 +4,12 @@
 //   body  : [32B slot marker][kernel extent][0x00 pad to 128K][rootfs extent][0xFF pad to 128K]
 //   verhdr offsets are RELATIVE to the header start (file offset = relative + 0x14)
 //
+// The invariant cspboot enforces (read off the serial console, and true of every
+// official package): rFileOff == 0x14 + 0x200 + ceil(kSize / erasesize), i.e. the
+// rootfs begins one erase block past the *declared* kernel extent, and the header's
+// own value is just that position written as a file offset. Declaring a padded
+// kSize is therefore the only way to pin the rootfs anywhere else.
+//
 // Self-test mode reproduces its own template byte-for-byte, which is the proof
 // that the geometry + CRC model is right.
 //
@@ -80,8 +86,21 @@ function assemble(hdr, kernelBuf, rootfsBuf, opts = {}) {
   const minBody = opts.rootfsAt ? Math.max(1, parseInt(opts.rootfsAt, 16) || parseInt(opts.rootfsAt, 10)) : 0;
   const bodyLen = Math.max(up(MARKER + k.length, BLOCK), up(minBody, BLOCK));
   if (bodyLen < MARKER + k.length) die(`kernel (0x${k.length.toString(16)}) overruns the requested rootfs offset`);
+  if (opts.rootfsAt && bodyLen % BLOCK) die(`rootfs offset 0x${bodyLen.toString(16)} is not erase-block aligned`);
   const body = Buffer.alloc(bodyLen, 0x00);
   SLOT_MARKER.copy(body, 0); k.copy(body, MARKER);
+
+  // What the header declares as the kernel extent.
+  //
+  // cspboot does not use the header's rootfs file offset: on the serial console
+  // it was seen locating the rootfs at  slot + ceil(kSize / erasesize)  and then
+  // CRC-ing rSize bytes from there, which is how our first image got rejected
+  // (declared kSize 0x34bdf8 => it looked at slot+0x360000, our squashfs lived at
+  // slot+0x800000). So when --rootfs-at pins the rootfs, the declared kernel
+  // extent has to be the whole padded region: ceil((rootfsAt - 32) / block) is
+  // exactly rootfsAt, the derivation and the real layout agree, and the padding
+  // belongs to the stored kernel, so its CRC covers it as written.
+  const kExtent = opts.rootfsAt ? bodyLen - MARKER : k.length;
   const rFileBase = body.length;
   const rp = Buffer.from(r);
   // --header-at pins the end of the body, so the version header block always
@@ -100,7 +119,7 @@ function assemble(hdr, kernelBuf, rootfsBuf, opts = {}) {
 
   const w = (key, v) => hdr.writeUInt32LE(v >>> 0, M[key]);
   w('bodySize', full.length);
-  w('kSize', k.length); w('kFileOff', OUTER + VER_HDR + MARKER); w('kCrc', crc32(k));
+  w('kSize', kExtent); w('kFileOff', OUTER + VER_HDR + MARKER); w('kCrc', crc32(body.subarray(MARKER, MARKER + kExtent)));
   w('rSize', rpad.length); w('rFileOff', OUTER + VER_HDR + rFileBase); w('rCrc', crc32(rpad));
   w('bootIncl', 0); w('ubootCrc', 0);
   hdr.writeUInt32LE(crc32(hdr.subarray(0, M.crc1)) >>> 0, M.crc1);
@@ -108,7 +127,11 @@ function assemble(hdr, kernelBuf, rootfsBuf, opts = {}) {
 
   const out = Buffer.alloc(OUTER + VER_HDR + full.length);
   OUTER_MAGIC.copy(out, 0); out.writeUInt32LE(0, 0x10); hdr.copy(out, OUTER); full.copy(out, OUTER + VER_HDR);
-  return { out, hdr, bodyKernelOff: OUTER + VER_HDR + MARKER, bodyRootOff: OUTER + VER_HDR + rFileBase, rootfsStored: rpad };
+  // The one rule the bootloader actually enforces, asserted on every package.
+  if (up(kExtent, BLOCK) !== rFileBase)
+    die(`cspboot would look for the rootfs at slot+0x${up(kExtent, BLOCK).toString(16)}, it is stored at slot+0x${rFileBase.toString(16)}`);
+  return { out, hdr, bodyKernelOff: OUTER + VER_HDR + MARKER, bodyRootOff: OUTER + VER_HDR + rFileBase,
+    rootfsStored: rpad, kExtent, rootfsSlotOffset: rFileBase };
 }
 
 function putStr(hdr, ofs, size, text) {
@@ -170,6 +193,7 @@ if (args.cmd === 'pack') {
   const bodyLen = r.out.length - (OUTER + VER_HDR);
   console.log(`out      : ${args.o.out}  0x${r.out.length.toString(16)} bytes (body 0x${bodyLen.toString(16)})`);
   console.log(`kernel   : 0x${kernel.length.toString(16)} at file 0x${r.bodyKernelOff.toString(16)}, magic ${r.out.subarray(r.bodyKernelOff, r.bodyKernelOff + 4).toString('hex')}`);
+  console.log(`declared : kSize 0x${r.kExtent.toString(16)} (kernel + pad) => cspboot looks for the rootfs at slot + 0x${r.rootfsSlotOffset.toString(16)}`);
   console.log(`rootfs   : 0x${rootfs.length.toString(16)} stored 0x${r.rootfsStored.length.toString(16)} at file 0x${r.bodyRootOff.toString(16)}`);
   console.log(`slot fit : body 0x${bodyLen.toString(16)} vs slot span 0x${span.toString(16)} -> ${bodyLen + BLOCK <= span ? 'FITS' : 'TOO BIG'} (free 0x${(span - bodyLen - BLOCK).toString(16)})`);
   console.log(`header   : will land at slot_base + 0x${bodyLen.toString(16)} (i.e. 0x${(slot + bodyLen).toString(16)})`);
@@ -190,10 +214,12 @@ function readTemplateWrite(path, expected) {
   const okR = crc32(d.subarray(rOff, rOff + rLen)) === h.readUInt32LE(M.rCrc);
   const okS = h.readUInt32LE(M.bodySize) === d.length - (OUTER + VER_HDR);
   const okE = kOff + kLen <= rOff;
+  const okD = OUTER + VER_HDR + up(kLen, BLOCK) === rOff;   // cspboot's own rootfs derivation
   const okM = d.subarray(OUTER + VER_HDR, OUTER + VER_HDR + MARKER).equals(SLOT_MARKER);
   return [ `CRC1 ${ok1 ? 'ok' : 'FAIL'}`, `CRC2 ${ok2 ? 'ok' : 'FAIL'}`, `kernelCRC ${okK ? 'ok' : 'FAIL'}`,
     `rootfsCRC ${okR ? 'ok' : 'FAIL'}`, `bodySize ${okS ? 'ok' : 'FAIL'}`, `layout ${okE ? 'ok' : 'FAIL'}`,
-    `slotMarker ${okM ? 'ok' : 'FAIL'}`, `innerMagic ${h.subarray(M.inner, M.inner + 16).equals(INNER_MAGIC) ? 'ok' : 'FAIL'}` ].join(' ');
+    `derivedFsOff ${okD ? 'ok' : 'FAIL'}`, `slotMarker ${okM ? 'ok' : 'FAIL'}`,
+    `innerMagic ${h.subarray(M.inner, M.inner + 16).equals(INNER_MAGIC) ? 'ok' : 'FAIL'}` ].join(' ');
 }
 
 die('unknown command; use selftest | info | pack');

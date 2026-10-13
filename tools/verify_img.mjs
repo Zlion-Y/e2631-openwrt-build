@@ -258,18 +258,32 @@ console.log('  partition order as the kernel will create it:');
 table.forEach((t, i) => console.log(`    mtd${i}  ${t.label.padEnd(14)} ${hx(t.addr)} + ${hx(t.size)}  end ${hx(t.addr + t.size)}`));
 
 const idxOf = (label) => table.findIndex((t) => t.label === label);
-const SLOT1 = 0x2300000, SPAN = 0x1c00000;
+// The geometry the packer and the board DTS must agree on, and why:
+// cspboot locates the rootfs at  slot + ceil(declared kernel size / 128k)  and
+// ignores the rootfs offset stored in the version header (serial console,
+// 2026-10-13). Our packer therefore declares the whole 4 MiB kernel region as
+// the kernel extent, so the derived position is exactly KERNEL_AT.
+const BLOCK = 0x20000, SLOT1 = 0x2300000, SPAN = 0x1c00000;
+const KERNEL_AT = 0x400000, ROOTFS_SPAN = 0x800000, HEADER_AT = KERNEL_AT + ROOTFS_SPAN;
 const iRoot = idxOf('rootfs'), iData = idxOf('rootfs_data'), iSlot1 = idxOf('slot1');
+const iHdr = idxOf('slot1-header');
 ok('there is a partition labelled rootfs', iRoot >= 0, `mtd${iRoot}`);
 ok('there is one labelled rootfs_data (the overlay)', iData >= 0, `mtd${iData}`);
 ok('slot1 spans the whole 28 MiB slot', iSlot1 >= 0 && table[iSlot1].addr === SLOT1 && table[iSlot1].size === SPAN);
-ok('rootfs is where our package puts it (slot1 + 0x800000)',
-  iRoot >= 0 && table[iRoot].addr === SLOT1 + 0x800000 && table[iRoot].size === 0x800000,
+ok(`the kernel plus its 32-byte slot marker fits the ${hx(KERNEL_AT)} region`,
+  MARKER.length + u.length <= KERNEL_AT, `kernel=0x${(MARKER.length + u.length).toString(16)} free=0x${(KERNEL_AT - MARKER.length - u.length).toString(16)}`);
+ok(`rootfs is where cspboot derives it (slot1 + ceil(kSize) = +${hx(KERNEL_AT)})`,
+  iRoot >= 0 && table[iRoot].addr === SLOT1 + KERNEL_AT && table[iRoot].size === ROOTFS_SPAN,
   iRoot >= 0 ? `${hx(table[iRoot].addr)} + ${hx(table[iRoot].size)}` : '-');
+ok('the squashfs fits its rootfs partition', sq.length <= ROOTFS_SPAN,
+  `0x${sq.length.toString(16)} of ${hx(ROOTFS_SPAN)}`);
+ok('the version header block sits right after the rootfs', iHdr >= 0 &&
+  table[iHdr].addr === SLOT1 + HEADER_AT && table[iHdr].size === BLOCK,
+  iHdr >= 0 ? `${hx(table[iHdr].addr)} + ${hx(table[iHdr].size)}` : '-');
 ok('rootfs_data starts after the version header block and ends at the slot end',
-  iData >= 0 && table[iData].addr === SLOT1 + 0x1020000 &&
+  iData >= 0 && table[iData].addr === SLOT1 + HEADER_AT + BLOCK &&
   table[iData].addr + table[iData].size === SLOT1 + SPAN,
-  iData >= 0 ? `${hx(table[iData].addr)} + ${hx(table[iData].size)}` : '-');
+  iData >= 0 ? `${hx(table[iData].addr)} + ${hx(table[iData].size)} (0x${((table[iData].size || 0) / 1024 / 1024).toFixed(2)} MiB overlay)` : '-');
 
 // The command line baked into the kernel is the only root= the vendor bootargs
 // cannot override, so it must name the mtdblock this very table produces.
