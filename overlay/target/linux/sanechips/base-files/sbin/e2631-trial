@@ -11,8 +11,10 @@
 # serial and reboot. e2631-commit writes the acceptance file, which lives on the
 # jffs2 overlay and therefore survives reboots; a reboot before accepting it is
 # exactly the case this script exists for.
+# procd does not hand a service the shell PATH these commands live in
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
 TRIAL_TIMEOUT=${TRIAL_TIMEOUT-600}
-CONFIRM=/etc/e2631-accepted
+CONFIRM=${CONFIRM-/etc/e2631-accepted}
 
 [ -f "$CONFIRM" ] && exit 0
 
