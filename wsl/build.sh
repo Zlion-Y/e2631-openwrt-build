@@ -15,11 +15,21 @@
 #    accepts the connection and sends nothing blocks the build forever;
 #  - `make world` downloads each source the moment it needs it, so one 5 KB/s
 #    mirror serialises the whole build (musl-1.2.6.tar.gz blocked a finished
-#    toolchain for 5 minutes at 20 KB/s). Pre-fetching with `make download`
-#    at high parallelism is what the download phase is for - the per-connection
-#    cap does not add up when only one file is in flight.
+#    toolchain for 5 minutes at 20 KB/s). The cap is per connection, not per
+#    host, so wsl/segdl.sh fetches each file as parallel byte ranges - wired in
+#    through DOWNLOAD_TOOL_CUSTOM, which is the only hook scripts/download.pl
+#    offers: select_tool() prefers curl and never reaches aria2c.
+#
+# `make download` is deliberately NOT run first: it walks every package in the
+# tree, selected or not, and was pulling broadcom-wl and libwebsockets - which
+# this build does not use - while the selected set waited.
 set -x
 export CURL_OPTIONS="--speed-limit 20000 --speed-time 20"
+export DOWNLOAD_TOOL_CUSTOM="$HOME/e2631/wsl/segdl.sh"
+# Huawei's copy of the OpenWrt distfile mirror answers at ~48 KB/s from here
+# and holds every package source, so it goes in front of the two upstream ones.
+export DOWNLOAD_MIRROR="https://mirrors.huaweicloud.com/openwrt/sources"
+export SEGN=12
 cd ~/openwrt || exit 1
 
 E2631_GNU_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/gnu ~/e2631/apply.sh ~/openwrt || exit 1
@@ -38,11 +48,6 @@ cp ~/e2631/seed/e2631.config .config
 make defconfig > /dev/null 2>&1
 grep -cE '^CONFIG_PACKAGE_luci' .config
 grep -E '^CONFIG_TARGET_DEVICE_sanechips_generic_DEVICE_zte_zxhn-e2631=|^CONFIG_SOFT_FLOAT=|^CONFIG_PACKAGE_luci=|^CONFIG_PACKAGE_luci-proto-ppp=|^CONFIG_PACKAGE_ttyd=|^CONFIG_PACKAGE_luci-app-ttyd=|^CONFIG_PACKAGE_uhttpd=' .config || echo "SEED CHECK FAILED"
-
-echo "PHASE download $(date +%T)"
-make -j"$(expr $(nproc) \* 3)" download > dl.log 2>&1
-echo "PHASE download rc=$? $(date +%T)  cached=$(ls dl | wc -l) files"
-grep -E "^Download failed|Problem : " dl.log | sort | uniq -c | tail -8
 
 echo "PHASE build $(date +%T)"
 make -j"$(nproc)" world V=s > world.log 2>&1

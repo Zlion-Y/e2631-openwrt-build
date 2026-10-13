@@ -52,19 +52,25 @@ answer throttle per connection (kernel.org 73 KB/s, sources.cdn.openwrt.org
 25 KB/s, sources.openwrt.org 14 KB/s, musl.libc.org nothing at all inside a 12 s
 probe). Three things keep that from owning the build:
 
-* `make download` runs before `make world`, at three times the core count, so
-  dozens of distfiles are in flight at once instead of one at a time - the cap
-  is per connection, not per host. A finished toolchain once sat blocked for
-  five minutes on the 1 MiB musl tarball because `make world` fetches each
-  source at the moment it needs it;
+* `wsl/segdl.sh` fetches every distfile as eight parallel byte ranges and is
+  wired in through `DOWNLOAD_TOOL_CUSTOM` - the only hook scripts/download.pl
+  offers, since its select_tool() prefers curl and never reaches aria2c. The cap
+  is per connection rather than per host, so linux-6.18.55.tar.xz (147 MiB)
+  arrived in about three minutes at ~288 KB/s aggregate, and its sha256 matched
+  the one in the download.pl command line, so the result is byte-exact rather
+  than merely fast. A server that answers a range request with 200 and the whole
+  file (mirrors.huaweicloud.com does) falls back to one connection, otherwise
+  every worker would receive the same bytes.
 * `CURL_OPTIONS="--speed-limit 20000 --speed-time 20"` gives curl a transfer
   watchdog, which OpenWrt does not set by default, so a mirror that accepts the
-  connection and sends nothing fails over instead of blocking forever;
-* `wsl/parget.sh <url> <dl/name> [conns] [sha256]` pulls one stuck file as N
-  byte ranges and concatenates them. linux-6.18.55.tar.xz (147 MiB) arrived in
-  about three minutes at ~288 KB/s aggregate, and its sha256 matched the one in
-  the download.pl command line, so the result is byte-exact rather than merely
-  fast.
+  connection and sends nothing fails over instead of blocking forever. A
+  finished toolchain once sat for five minutes on the 1 MiB musl tarball.
+* `wsl/parget.sh <url> <dl/name> [conns] [sha256]` is the same trick by hand,
+  for a file that has to land before the build is restarted.
+
+`make download` is deliberately not run up front: it walks every package in the
+tree, so it was fetching broadcom-wl and libwebsockets - neither of which this
+build selects - while the selected packages waited.
 
 `wsl/collect.sh <out-dir>` then lays the build out the way the CI artifact does
 (`kernel` / `root` / `e2631.dtb` / `config-6.18` / `e2631-fwslot`), which is
