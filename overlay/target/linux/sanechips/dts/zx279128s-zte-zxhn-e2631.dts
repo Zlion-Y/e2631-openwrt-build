@@ -194,6 +194,24 @@
 	status = "disabled";
 };
 
+/*
+ * The SoC include ships both UARTs with status = "disabled", and the aliases +
+ * chosen/stdout-path above do NOT enable them - they only name them. Without
+ * these two lines there is no ttyAMA0 at all, so the forced
+ * "console=ttyAMA0,115200n8" points at a device that never exists and the
+ * kernel goes silent the moment U-Boot says "Starting kernel ..." (measured:
+ * the first boot printed nothing on the TTL pin and logged
+ * "Warning: unable to open an initial console"). The carrier firmware for this
+ * family enables both as well.
+ */
+&serial0 {
+	status = "okay";
+};
+
+&serial1 {
+	status = "okay";
+};
+
 &mdio {
 	status = "okay";
 

@@ -101,13 +101,18 @@ ROOTDEV=$(awk '
 	}' "$DTS")
 [ -n "$ROOTDEV" ] || { echo "no partition labelled rootfs in $DTS" >&2; exit 1; }
 
-if ! grep -q '^CONFIG_CMDLINE_FORCE=y' "$CFG"; then
-	printf '%s\n' \
-		'# E2631: the vendor bootargs name the vendor layout, not ours (see apply.sh)' \
-		'CONFIG_CMDLINE_BOOL=y' \
-		"CONFIG_CMDLINE=\"console=ttyAMA0,115200n8 root=/dev/mtdblock$ROOTDEV rootfstype=squashfs ro rootwait\"" \
-		'CONFIG_CMDLINE_FORCE=y' >> "$CFG"
-	echo "kernel config: forced the OpenWrt command line, root on mtdblock$ROOTDEV"
-fi
+# Written unconditionally, and our previous block removed first: apply.sh runs
+# against a working tree that may already have been patched, and a stale
+# CONFIG_CMDLINE in target/linux/sanechips/config-6.18 would otherwise survive
+# every later edit here (that is how a changed root= or a dropped earlycon would
+# silently keep the old value).
+CMD_MARK='# E2631: the vendor bootargs name the vendor layout, not ours (see apply.sh)'
+sed -i -e "\|^$CMD_MARK\$|d" -e '/^CONFIG_CMDLINE_BOOL=y$/d' -e '/^CONFIG_CMDLINE_FORCE=y$/d' \
+	-e '/^CONFIG_CMDLINE=/d' "$CFG"
+printf '%s\n' "$CMD_MARK" \
+	'CONFIG_CMDLINE_BOOL=y' \
+	"CONFIG_CMDLINE=\"console=ttyAMA0,115200n8 earlycon root=/dev/mtdblock$ROOTDEV rootfstype=squashfs ro rootwait\"" \
+	'CONFIG_CMDLINE_FORCE=y' >> "$CFG"
+echo "kernel config: forced the OpenWrt command line, root on mtdblock$ROOTDEV, earlycon on"
 
 echo "overlay applied to $TREE (base $BASE_SHA)"

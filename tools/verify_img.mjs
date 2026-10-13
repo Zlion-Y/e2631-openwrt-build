@@ -242,6 +242,25 @@ ok('memory is the 256 MiB this board has, at 0x40000000',
   mreg && mreg.addr === 0x40000000 && mreg.size === 0x10000000,
   mreg ? `${hx(mreg.addr)} + ${hx(mreg.size)}` : 'no memory node');
 
+// A UART that is not enabled is not a console. The SoC include ships both serial
+// nodes with status = "disabled" and aliases/stdout-path only *name* them, so a
+// board file that forgets `&serial0 { status = "okay" }` builds, boots, runs -
+// and prints nothing on the TTL pin (this port's first boot did exactly that,
+// logged as "Warning: unable to open an initial console"). Checked in the dtb
+// rather than trusted from the board file.
+const serials = [];
+(function findSerial(n) {
+  if (/^serial@/.test(n.name) && n.props.compatible && /pl011/.test(cval(n.props.compatible))) serials.push(n);
+  for (const c of n.children) findSerial(c);
+})(dtb);
+ok('the dtb has a PL011 serial node', serials.length > 0, `${serials.length} found`);
+ok('the console UART is enabled (aliases alone do not enable it)',
+  serials.some((s) => !s.props.status || cval(s.props.status) === 'okay'),
+  serials.map((s) => `${s.name}:${s.props.status ? cval(s.props.status) : 'okay(default)'}`).join(' '));
+const chosen = fdtFind(dtb, 'chosen');
+ok('/chosen gives stdout-path a serial alias', chosen && /serial\d/.test(sval(chosen.props['stdout-path'])),
+  chosen ? sval(chosen.props['stdout-path']) : 'no chosen node');
+
 // The partition list is what root= has to agree with.
 const flash = (() => {
   const walk2 = (n) => {
