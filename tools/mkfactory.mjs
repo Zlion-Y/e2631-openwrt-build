@@ -10,6 +10,11 @@
 // own value is just that position written as a file offset. Declaring a padded
 // kSize is therefore the only way to pin the rootfs anywhere else.
 //
+// Second rule, learned from the first image that actually booted: rSize must stop
+// at the end of the squashfs (rounded to an erase block), because the kernel turns
+// the rest of the "rootfs" partition into the writable "rootfs_data" - a checksum
+// window over that tail makes every config change break the boot.
+//
 // Self-test mode reproduces its own template byte-for-byte, which is the proof
 // that the geometry + CRC model is right.
 //
@@ -117,10 +122,28 @@ function assemble(hdr, kernelBuf, rootfsBuf, opts = {}) {
   const rpad = Buffer.alloc(rt, 0xff); rp.copy(rpad);
   const full = Buffer.concat([body, rpad]);
 
+  // How much of that stored rootfs the version header declares as checksummed.
+  //
+  // The kernel does not just mount the "rootfs" partition: ofpart's squashfs
+  // split registers the erase blocks *after* the squashfs inside that partition
+  // as "rootfs_data", and fstools puts the JFFS2 overlay there (measured on the
+  // first boot: rootfs = slot+0x400000 size 0x800000, squashfs 0x43dc00, so
+  // mtd8 "rootfs_data" = slot+0x840000 size 0x3c0000). If the declared rootfs
+  // extent covered that tail, every config change would rewrite bytes inside
+  // cspboot's rootfs CRC window and the next boot would reject the slot -- which
+  // is what happened to the first image that booted at all. So declare exactly
+  // the squashfs rounded up to an erase block: the checksummed region ends where
+  // the writable region begins. A reassembled vendor package keeps its own rSize
+  // (their rootfs runs right up to the header block and their config lives in a
+  // partition of its own), so this only applies to our own pinned layout.
+  const rCrcLen = opts.rootfsAt ? Math.max(up(rp.length, BLOCK), BLOCK) : rpad.length;
+  if (rCrcLen > rpad.length) die(`rootfs extent 0x${rCrcLen.toString(16)} exceeds the 0x${rpad.length.toString(16)} in front of the header block`);
+  if (opts.rootfsAt && rpad.length - rCrcLen < BLOCK) die(`no erase block left for the kernel's rootfs_data split: nothing to hold the overlay`);
+
   const w = (key, v) => hdr.writeUInt32LE(v >>> 0, M[key]);
   w('bodySize', full.length);
   w('kSize', kExtent); w('kFileOff', OUTER + VER_HDR + MARKER); w('kCrc', crc32(body.subarray(MARKER, MARKER + kExtent)));
-  w('rSize', rpad.length); w('rFileOff', OUTER + VER_HDR + rFileBase); w('rCrc', crc32(rpad));
+  w('rSize', rCrcLen); w('rFileOff', OUTER + VER_HDR + rFileBase); w('rCrc', crc32(rpad.subarray(0, rCrcLen)));
   w('bootIncl', 0); w('ubootCrc', 0);
   hdr.writeUInt32LE(crc32(hdr.subarray(0, M.crc1)) >>> 0, M.crc1);
   if (!opts.keepCrc2) hdr.writeUInt32LE(crc32(hdr.subarray(0, M.crc2)) >>> 0, M.crc2);
@@ -131,7 +154,7 @@ function assemble(hdr, kernelBuf, rootfsBuf, opts = {}) {
   if (up(kExtent, BLOCK) !== rFileBase)
     die(`cspboot would look for the rootfs at slot+0x${up(kExtent, BLOCK).toString(16)}, it is stored at slot+0x${rFileBase.toString(16)}`);
   return { out, hdr, bodyKernelOff: OUTER + VER_HDR + MARKER, bodyRootOff: OUTER + VER_HDR + rFileBase,
-    rootfsStored: rpad, kExtent, rootfsSlotOffset: rFileBase };
+    rootfsStored: rpad, kExtent, rootfsSlotOffset: rFileBase, rCrcLen, overlaySlotOffset: rFileBase + rCrcLen };
 }
 
 function putStr(hdr, ofs, size, text) {
@@ -195,6 +218,7 @@ if (args.cmd === 'pack') {
   console.log(`kernel   : 0x${kernel.length.toString(16)} at file 0x${r.bodyKernelOff.toString(16)}, magic ${r.out.subarray(r.bodyKernelOff, r.bodyKernelOff + 4).toString('hex')}`);
   console.log(`declared : kSize 0x${r.kExtent.toString(16)} (kernel + pad) => cspboot looks for the rootfs at slot + 0x${r.rootfsSlotOffset.toString(16)}`);
   console.log(`rootfs   : 0x${rootfs.length.toString(16)} stored 0x${r.rootfsStored.length.toString(16)} at file 0x${r.bodyRootOff.toString(16)}`);
+  console.log(`           checksummed 0x${r.rCrcLen.toString(16)}, kernel overlay split starts at slot + 0x${r.overlaySlotOffset.toString(16)}`);
   console.log(`slot fit : body 0x${bodyLen.toString(16)} vs slot span 0x${span.toString(16)} -> ${bodyLen + BLOCK <= span ? 'FITS' : 'TOO BIG'} (free 0x${(span - bodyLen - BLOCK).toString(16)})`);
   console.log(`header   : will land at slot_base + 0x${bodyLen.toString(16)} (i.e. 0x${(slot + bodyLen).toString(16)})`);
   if (bodyLen + BLOCK > span) die('image does not fit a firmware slot');

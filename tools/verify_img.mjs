@@ -252,7 +252,7 @@ const parts = partsNode ? partsNode.children.filter((c) => c.props.reg) : [];
 const table = [];
 {
   const { a, s } = cells(partsNode || dtb);
-  for (const p of parts) table.push({ label: sval(p.props.label), ...regList(p, a, s)[0] });
+  for (const p of parts) table.push({ label: sval(p.props.label), node: p, ...regList(p, a, s)[0] });
 }
 console.log('  partition order as the kernel will create it:');
 table.forEach((t, i) => console.log(`    mtd${i}  ${t.label.padEnd(14)} ${hx(t.addr)} + ${hx(t.size)}  end ${hx(t.addr + t.size)}`));
@@ -268,22 +268,26 @@ const KERNEL_AT = 0x400000, ROOTFS_SPAN = 0x800000, HEADER_AT = KERNEL_AT + ROOT
 const iRoot = idxOf('rootfs'), iData = idxOf('rootfs_data'), iSlot1 = idxOf('slot1');
 const iHdr = idxOf('slot1-header');
 ok('there is a partition labelled rootfs', iRoot >= 0, `mtd${iRoot}`);
-ok('there is one labelled rootfs_data (the overlay)', iData >= 0, `mtd${iData}`);
+ok('nothing is declared as rootfs_data (the kernel splits it off the rootfs tail)', iData < 0,
+  iData < 0 ? 'none' : `mtd${iData} at ${hx(table[iData].addr)} would be a second partition of that name, and fstools takes the first`);
 ok('slot1 spans the whole 28 MiB slot', iSlot1 >= 0 && table[iSlot1].addr === SLOT1 && table[iSlot1].size === SPAN);
 ok(`the kernel plus its 32-byte slot marker fits the ${hx(KERNEL_AT)} region`,
   MARKER.length + u.length <= KERNEL_AT, `kernel=0x${(MARKER.length + u.length).toString(16)} free=0x${(KERNEL_AT - MARKER.length - u.length).toString(16)}`);
 ok(`rootfs is where cspboot derives it (slot1 + ceil(kSize) = +${hx(KERNEL_AT)})`,
   iRoot >= 0 && table[iRoot].addr === SLOT1 + KERNEL_AT && table[iRoot].size === ROOTFS_SPAN,
   iRoot >= 0 ? `${hx(table[iRoot].addr)} + ${hx(table[iRoot].size)}` : '-');
-ok('the squashfs fits its rootfs partition', sq.length <= ROOTFS_SPAN,
-  `0x${sq.length.toString(16)} of ${hx(ROOTFS_SPAN)}`);
-ok('the version header block sits right after the rootfs', iHdr >= 0 &&
+// The overlay is the part of "rootfs" behind the squashfs, so the space the
+// bootloader checksums must stop before it: measured on the first boot, a
+// declared rootfs extent that covered that tail made the first config save
+// destroy the CRC of the slot.
+const sqBlocks = Math.ceil(sq.length / BLOCK) * BLOCK;
+ok('the squashfs leaves writable space inside its partition', sqBlocks + BLOCK <= ROOTFS_SPAN,
+  `squashfs ${hx(sq.length)} -> split at +${hx(KERNEL_AT + sqBlocks)}, partition ends at +${hx(KERNEL_AT + ROOTFS_SPAN)}: overlay ${hx(ROOTFS_SPAN - sqBlocks)} = ${((ROOTFS_SPAN - sqBlocks) / 1048576).toFixed(2)} MiB`);
+ok('the version header block sits right after the rootfs, out of the overlay', iHdr >= 0 &&
   table[iHdr].addr === SLOT1 + HEADER_AT && table[iHdr].size === BLOCK,
   iHdr >= 0 ? `${hx(table[iHdr].addr)} + ${hx(table[iHdr].size)}` : '-');
-ok('rootfs_data starts after the version header block and ends at the slot end',
-  iData >= 0 && table[iData].addr === SLOT1 + HEADER_AT + BLOCK &&
-  table[iData].addr + table[iData].size === SLOT1 + SPAN,
-  iData >= 0 ? `${hx(table[iData].addr)} + ${hx(table[iData].size)} (0x${((table[iData].size || 0) / 1024 / 1024).toFixed(2)} MiB overlay)` : '-');
+ok('the version header block is read-only (the overlay must never reach it)', iHdr >= 0 &&
+  !!table[iHdr].node.props['read-only'], iHdr >= 0 ? (table[iHdr].node.props['read-only'] ? 'read-only present' : 'MISSING') : 'missing');
 
 // The command line baked into the kernel is the only root= the vendor bootargs
 // cannot override, so it must name the mtdblock this very table produces.

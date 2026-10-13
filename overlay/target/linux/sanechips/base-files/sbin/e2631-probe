@@ -13,9 +13,14 @@ cat /proc/cmdline
 echo "=== mtd table: numbering, sizes, bad blocks and ECC counters ==="
 cat /proc/mtd
 for d in /sys/class/mtd/mtd*; do
-	[ -d "$d" ] || continue
-	printf '%-6s %-14s size=%-10s erasesize=%-8s bad=%-3s ecc_fail=%-3s corrected=%s\n' \
-		"${d##*/}" "$(cat $d/name)" "$(cat $d/size)" "$(cat $d/erasesize)" \
+	# /sys/class/mtd also holds the read-only twins (mtdNro); they have no attrs
+	# and only add noise here.
+	case "${d##*/}" in
+	mtd[0-9]|mtd[0-9][0-9]) ;;
+	*) continue ;;
+	esac
+	printf '%-6s %-14s offset=%-10s size=%-10s erasesize=%-8s bad=%-3s ecc_fail=%-3s corrected=%s\n' \
+		"${d##*/}" "$(cat $d/name)" "$(cat $d/offset 2>/dev/null)" "$(cat $d/size)" "$(cat $d/erasesize)" \
 		"$(cat $d/bad_blocks 2>/dev/null)" "$(cat $d/ecc_failures 2>/dev/null)" \
 		"$(cat $d/corrected_bits 2>/dev/null)"
 done
@@ -50,6 +55,17 @@ for c in /sys/class/gpio/gpiochip*; do
 	echo "  ${c##*/} base=$(cat $c/base) ngpio=$(cat $c/ngpio) label=$(cat $c/label)"
 done
 ls /sys/class/leds 2>/dev/null
+
+echo "=== bound devices of this target's own drivers (a driver with no device under it
+    never probed: that is how the first boot lost the PCIe PHYs and syscon-reboot,
+    both children of a CLK_OF_DECLARE clock provider that of_platform_populate skips)"
+for d in /sys/bus/platform/drivers/*/; do
+	name=${d##*/}; name=${name%/}
+	case "$name" in zx*|zte*|syscon*|ramoops|gpio*|leds*|mdio*) ;; *) continue ;; esac
+	echo "  $name: $(for x in ${d}*; do [ -e "$x" ] && echo -n "${x##*/} "; done)"
+done
+echo "  /sys/class/phy: $(ls /sys/class/phy 2>&1)"
+echo "  deferred: $(cat /sys/kernel/debug/devices_deferred 2>/dev/null || echo '(no debugfs)')"
 
 echo "=== kernel log: flash, wifi, vfp, errors ==="
 dmesg | grep -i -E 'spinand|nand|jffs2|squashfs|mtd|mdio|phy|gmac|pcie|vfp|neon|error|warn|fail'

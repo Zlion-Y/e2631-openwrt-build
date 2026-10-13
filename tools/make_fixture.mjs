@@ -63,9 +63,12 @@ rootfs.writeBigUInt64LE(BigInt(rootfs.length), 40);  // bytes used
 fs.writeFileSync(f('rootfs.bin'), rootfs);
 
 // --- pack it: kernel block, rootfs block, version header block --------------
+// The rootfs region needs one erase block *behind* the squashfs as well: that is
+// where the kernel puts its rootfs_data split, and the packer refuses a layout
+// that leaves no room for it (see mkfactory's rSize rule).
 execFileSync(process.execPath, [fileURLToPath(new URL('./mkfactory.mjs', import.meta.url)), 'pack',
   '--template', f('template.bin'), '--kernel', f('kernel.bin'), '--rootfs', f('rootfs.bin'),
-  '--rootfs-at', '0x20000', '--header-at', '0x40000', '--out', f('fixture.bin')], { stdio: 'inherit' });
+  '--rootfs-at', '0x20000', '--header-at', '0x60000', '--out', f('fixture.bin')], { stdio: 'inherit' });
 
 // --- one flipped byte inside the kernel extent ------------------------------
 const broken = fs.readFileSync(f('fixture.bin'));
