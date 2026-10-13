@@ -8,10 +8,10 @@ our own fork so a force-push upstream cannot break the build.
     git -C openwrt checkout db8b8d4130457dbe46558a7cea872dd2dae539e6
     ./apply.sh openwrt
 
-Images are built by .github/workflows/build.yml (no local compiler on this
-workstation). Packaging into the vendor upgrade format happens locally with
-tools/mkfactory.mjs, because the official package used as the version-header
-template is not uploaded here.
+Images are built by .github/workflows/build.yml, or locally inside WSL with
+wsl/build.sh (see below). Packaging into the vendor upgrade format happens on
+the Windows side with tools/mkfactory.mjs, because the official package used as
+the version-header template is not uploaded here.
 
 Three screens run before the forty-minute build is allowed to be the test:
 `tools/dts_lint.mjs` resolves the board file's includes, `&labels` and
@@ -42,3 +42,31 @@ What is deliberately different from the H3600 board file:
 
 The two config edits above are per-target, so a tree that has been overlaid here
 builds the E2631, not the H3600.
+
+## Building it inside WSL
+
+The Windows side of this machine has no cross toolchain, WSL does, and
+`wsl/build.sh` runs the same steps CI does against `~/openwrt` with this repo at
+`~/e2631`. What differs is the network: no proxy here, and the mirrors that
+answer throttle per connection (kernel.org 73 KB/s, sources.cdn.openwrt.org
+25 KB/s, sources.openwrt.org 14 KB/s, musl.libc.org nothing at all inside a 12 s
+probe). Three things keep that from owning the build:
+
+* `make download` runs before `make world`, at three times the core count, so
+  dozens of distfiles are in flight at once instead of one at a time - the cap
+  is per connection, not per host. A finished toolchain once sat blocked for
+  five minutes on the 1 MiB musl tarball because `make world` fetches each
+  source at the moment it needs it;
+* `CURL_OPTIONS="--speed-limit 20000 --speed-time 20"` gives curl a transfer
+  watchdog, which OpenWrt does not set by default, so a mirror that accepts the
+  connection and sends nothing fails over instead of blocking forever;
+* `wsl/parget.sh <url> <dl/name> [conns] [sha256]` pulls one stuck file as N
+  byte ranges and concatenates them. linux-6.18.55.tar.xz (147 MiB) arrived in
+  about three minutes at ~288 KB/s aggregate, and its sha256 matched the one in
+  the download.pl command line, so the result is byte-exact rather than merely
+  fast.
+
+`wsl/collect.sh <out-dir>` then lays the build out the way the CI artifact does
+(`kernel` / `root` / `e2631.dtb` / `config-6.18` / `e2631-fwslot`), which is
+what `node tools/release.mjs --dir <out-dir>` packs and screens. The Windows
+drives are mounted inside the distro, so nothing has to be piped over stdio.
