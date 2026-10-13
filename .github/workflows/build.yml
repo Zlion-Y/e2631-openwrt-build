@@ -206,7 +206,7 @@ jobs:
       # actually went into the root filesystem.
       - name: boot readiness (static)
         working-directory: e2631
-        run: node tools/verify_img.mjs ../out
+        run: node tools/verify_img.mjs ../out --tree ../openwrt --target sanechips
 
       - name: the build log on failure
         if: failure()

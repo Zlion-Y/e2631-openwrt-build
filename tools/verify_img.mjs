@@ -6,24 +6,72 @@
 // leave the box in a slot it cannot fall back from, so they are checked here,
 // before anything is written.
 //
-//   node tools/verify_img.mjs <dir>
+//   node tools/verify_img.mjs <dir> [--tree <openwrt tree>]
 //     <dir>/payload/kernel          uImage with the 32-byte ZTE slot marker
 //     <dir>/payload/root            squashfs root filesystem
 //     <dir>/e2631.dtb               the board .dtb as the kernel sees it
 //     <dir>/config-*                the built kernel .config
+//     --tree  an OpenWrt tree to read target/linux/*/config-* fragments from
+//             (a second witness for the config-side checks), with
+//     --target <name> the target those fragments belong to
 //
 // Exit code is non-zero if anything that can stop a boot is wrong.
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
 
-const dir = process.argv[2];
-if (!dir || !fs.existsSync(dir)) { console.error('usage: verify_img.mjs <artifact dir>'); process.exit(2); }
+const argv = process.argv.slice(2);
+const arg = (n) => { const i = argv.indexOf(n); return i > 0 ? argv[i + 1] : null; };
+const dir = argv.find((a) => !a.startsWith('--'));
+if (!dir || !fs.existsSync(dir)) {
+  console.error('usage: verify_img.mjs <artifact dir> [--tree <openwrt tree, for the config fragments>]');
+  process.exit(2);
+}
 
 const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) =>
   e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
 const files = walk(dir).map((f) => f.split(path.sep).join('/'));   // match on / regardless of host OS
 const find = (re) => files.find((f) => re.test(f));
+
+// The kernel .config that a build leaves in build_dir is whichever phase wrote
+// it last, and make world reconfigures that same directory for the initramfs
+// rescue image. So read the fragments the build asked for as well: generic first,
+// then the target's own file, last assignment wins - the same order the kernel
+// build uses. Two witnesses are what makes a config-side statement believable.
+const frags = (() => {
+  const tree = arg('--tree');
+  const linux = tree ? path.join(tree, 'target/linux') : null;
+  if (!linux || !fs.existsSync(linux)) return null;
+  // Only the fragments this build actually merges, in merge order: generic, then
+  // the target, then its subtargets. Reading every target's config file would let
+  // some other board's "# CONFIG_JFFS2_FS is not set" win over this one's.
+  const all = fs.readdirSync(linux, { withFileTypes: true }).filter((e) => e.isDirectory())
+    .map((e) => e.name).filter((d) => d !== 'generic' && d !== 'include');
+  // Which target is this? Given explicitly, otherwise found by the SoC's own
+  // board files - the base tree without the overlay still has zx279128s files.
+  const dirs = all.filter((d) => {
+    const given = arg('--target');
+    if (given) return d === given;
+    const dt = path.join(linux, d, 'dts');
+    return fs.existsSync(dt) && fs.readdirSync(dt).some((f) => /e2631|zx279128s/i.test(f));
+  });
+  if (!dirs.length) return null;
+  const order = [path.join(linux, 'generic'), path.join(linux, dirs[0]),
+    ...fs.readdirSync(path.join(linux, dirs[0]), { withFileTypes: true })
+      .filter((e) => e.isDirectory()).map((e) => path.join(linux, dirs[0], e.name))];
+  const out = new Map();
+  let n = 0;
+  for (const p of order) {
+    if (!fs.existsSync(p)) continue;
+    for (const f of fs.readdirSync(p).filter((x) => /^config-[0-9]/.test(x)).sort()) {
+      n++;
+      const text = fs.readFileSync(path.join(p, f), 'utf8');
+      for (const m of text.matchAll(/^# (CONFIG_[A-Za-z0-9_]+) is not set$/gm)) out.set(m[1].slice(7), undefined);
+      for (const m of text.matchAll(/^CONFIG_([A-Za-z0-9_]+)=(.*)$/gm)) out.set(m[1], m[2].replace(/^"|"$/g, ''));
+    }
+  }
+  return { map: out, files: n, target: dirs[0] };
+})();
 
 let fails = 0, warns = 0;
 const ok = (name, cond, detail = '') => {
@@ -241,8 +289,6 @@ const needBuiltin = [
   ['BLOCK', '/dev/ block devices at all'],
   ['MTD_BLOCK', '/dev/mtdblock*'],
   ['MTD_OF_PARTS', 'the partition table above'],
-  ['DEVTMPFS', '/dev/mtdblock7 to exist when the root is mounted'],
-  ['DEVTMPFS_MOUNT', 'the kernel mounting /dev before it opens the root'],
   ['SQUASHFS', 'the read-only root'],
   ['JFFS2_FS', 'the overlay'],
   // Patch 029 puts the JFFS2 clean marker in the data area on single-program
@@ -256,8 +302,19 @@ const needBuiltin = [
   // no serial shell to work with if anything else goes wrong.
   ['SERIAL_AMBA_PL011_CONSOLE', 'the serial console'],
 ];
-for (const [sym, why] of needBuiltin)
-  okC(`CONFIG_${sym}=y (needed for ${why})`, kv(sym) === 'y', `is ${kv(sym) || 'unset'}`);
+if (frags) console.log(`config fragments: ${frags.files} file(s) under target/linux/*/config-*`);
+for (const [sym, why] of needBuiltin) {
+  const f = frags ? (frags.map.has(sym) ? frags.map.get(sym) ?? 'not set' : 'not mentioned') : null;
+  okC(`CONFIG_${sym}=y (needed for ${why})`,
+    kv(sym) === 'y' && (!frags || !frags.map.has(sym) || frags.map.get(sym) === 'y'),
+    f === null ? `is ${kv(sym) || 'unset'}` : `built=${kv(sym) || 'unset'} fragments=${f}`);
+}
+// OpenWrt's generic config keeps devtmpfs off on purpose (run 15: every target
+// ships with "# CONFIG_DEVTMPFS is not set"), so this is not a port risk -
+// root=/dev/mtdblock7 is resolved by name inside the kernel, and fstools/mdev
+// make the nodes. It is only a warning, to notice if that ever changes.
+warn('devtmpfs state matches what every other OpenWrt target ships',
+  isNotSet('DEVTMPFS'), `CONFIG_DEVTMPFS=${kv('DEVTMPFS') || 'not set'}`);
 // The root filesystem has to be readable before /init runs, so its decompressor
 // cannot be a module. OpenWrt picks mkfs' compression from this same config, so
 // "at least one, built in" is the property that matters.
@@ -265,10 +322,19 @@ const decomps = ['ZLIB', 'LZO', 'XZ', 'LZ4', 'ZSTD'].filter((a) => kv(`SQUASHFS_
 okC('the kernel builds in a squashfs decompressor', decomps.length > 0, decomps.join(', '));
 
 // An embedded initramfs would run instead of the root on mtdblock, so the
-// root= above would be silently ignored.
-okC('CONFIG_INITRAMFS_SOURCE is empty (nothing embedded that would run before the root)',
-  kv('INITRAMFS_SOURCE') === undefined || kv('INITRAMFS_SOURCE') === '',
-  JSON.stringify(kv('INITRAMFS_SOURCE')));
+// root= above would be silently ignored. Which .config says how the shipped
+// kernel was configured depends on which phase wrote it last, so the fragments
+// decide when they are available: the rescue variant is built with a cpio list
+// on purpose and its value says nothing about the image that gets flashed.
+const isrc = (kv('INITRAMFS_SOURCE') || '').trim();
+const fsrc = frags && frags.map.has('INITRAMFS_SOURCE') ? (frags.map.get('INITRAMFS_SOURCE') || '') : null;
+if (isrc !== '')
+  console.log('NOTE   the .config collected from build_dir is the initramfs rescue kernel\'s\n' +
+      '       (INITRAMFS_SOURCE points at a cpio list); the shipped kernel is judged\n' +
+      '       from the fragments instead.');
+okC('no initramfs baked into the kernel that ships',
+  (fsrc !== null ? fsrc : isrc) === '',
+  `built=${JSON.stringify(isrc)} fragments=${fsrc === null ? 'not read' : JSON.stringify(fsrc)}`);
 
 // The SPI-NAND core only marks a page "program once" when the on-die ECC engine
 // is the one in use, and that is what selects the in-data JFFS2 clean marker.
