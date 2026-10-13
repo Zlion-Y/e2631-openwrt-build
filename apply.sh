@@ -19,7 +19,9 @@ cp "$HERE/tools/mkfactory.mjs" "$TREE/tools/e2631-mkfactory.mjs"
 # The overlay is authored on a filesystem without exec bits; these have to be
 # runnable on the device, and rc.common refuses to enable a service script that
 # is not executable.
-for f in sbin/e2631-probe sbin/e2631-trial sbin/e2631-commit etc/init.d/e2631-trial; do
+for f in sbin/e2631-probe sbin/e2631-trial sbin/e2631-commit sbin/e2631-leds \
+	 etc/init.d/e2631-trial etc/init.d/e2631-wifi-eeprom etc/init.d/e2631-leds \
+	 etc/hotplug.d/firmware/11-mt76-caldata; do
 	chmod +x "$TREE/target/linux/sanechips/base-files/$f"
 done
 
@@ -69,6 +71,21 @@ if ! grep -q 'Makefile.e2631' "$IMG"; then
 	sed -i 's|^$(eval $(call BuildImage))$|include $(TOPDIR)/target/linux/sanechips/image/Makefile.e2631\n\n$(eval $(call BuildImage))|' "$IMG"
 fi
 grep -q 'Makefile.e2631' "$IMG" || { echo "failed to hook image/Makefile" >&2; exit 1; }
+
+# Take the MT7916 off kmodloader's autoload list. The package's AutoProbe entry
+# makes kmodloader load mt7915e during the boot phase, where the PCI core probes
+# the chip's two functions (14c3:7906 and the 14c3:790a ext-HIF) in parallel -
+# and the main function's hif2 handshake reads the other function's BAR, which
+# has been seen to wedge this SoC completely. /etc/init.d/e2631-wifi-eeprom
+# loads the module instead and binds the two functions one at a time, after the
+# calibration file the driver needs has been staged.
+MT76="$TREE/package/kernel/mt76/Makefile"
+if [ -f "$MT76" ]; then
+	sed -i '/AUTOLOAD:=$(call AutoProbe,mt7915e)/d' "$MT76"
+	grep -q 'AutoProbe,mt7915e' "$MT76" && {
+		echo "mt7915e AutoProbe still present in $MT76" >&2; exit 1; }
+	echo "mt7915e autoload removed: e2631-wifi-eeprom owns the load order"
+fi
 
 # The target inherits cortex-a9 hard-float defaults; this SoC has no VFP at all.
 # Turn the option off together with everything that depends on it: leaving
@@ -127,5 +144,44 @@ printf '%s\n' "$CMD_MARK" \
 	"CONFIG_CMDLINE=\"console=ttyAMA0,115200n8 earlycon root=/dev/mtdblock$ROOTDEV rootfstype=squashfs ro rootwait\"" \
 	'CONFIG_CMDLINE_FORCE=y' >> "$CFG"
 echo "kernel config: forced the OpenWrt command line, root on mtdblock$ROOTDEV, earlycon on"
+
+# The MT7916 takes the whole board down without ever printing a line: no console
+# output, no ARP, and only a power cycle brings it back. That is indistinguishable
+# from a dead CPU, so let the kernel speak for itself next time:
+#   SOFTLOCKUP_DETECTOR  a CPU spinning with preemption off gets reported
+#   DETECT_HUNG_TASK     a task blocked in one place for 25 s dumps its stack
+#   MAGIC_SYSRQ_SERIAL   SysRq over a plain serial line, no break needed, so 'w'
+#                        and 'l' can be typed at the console while it is stuck
+DBG_MARK='# E2631: lockup instrumentation for the MT7916 bus hang (see apply.sh)'
+sed -i -e "\|^$DBG_MARK\$|d" -e '/^CONFIG_SOFTLOCKUP_DETECTOR=y$/d' \
+	-e '/^CONFIG_DETECT_HUNG_TASK=y$/d' -e '/^CONFIG_DEFAULT_HUNG_TASK_TIMEOUT=/d' \
+	-e '/^CONFIG_MAGIC_SYSRQ_SERIAL=y$/d' -e '/^CONFIG_PCIEPORTBUS=y$/d' \
+	-e '/^CONFIG_PCIEAER=y$/d' -e '/^CONFIG_PCIEAER_INJECT=y$/d' "$CFG"
+printf '%s\n' "$DBG_MARK" \
+	'CONFIG_SOFTLOCKUP_DETECTOR=y' \
+	'CONFIG_DETECT_HUNG_TASK=y' \
+	'CONFIG_DEFAULT_HUNG_TASK_TIMEOUT=25' \
+	'# CONFIG_BOOTPARAM_HUNG_TASK_PANIC is not set' \
+	'CONFIG_MAGIC_SYSRQ_SERIAL=y' \
+	'CONFIG_PCIEPORTBUS=y' \
+	'CONFIG_PCIEAER=y' >> "$CFG"
+echo "kernel config: softlockup + hung task + serial SysRq + PCIe port services/AER on"
+# The two detectors above do NOT come from our fragment: target/linux/generic
+# names them explicitly as "is not set", and the generic fragment wins over the
+# target one, so asking in sanechips/config-6.18 changes nothing. Flip them where
+# they are actually decided.
+GEN="$TREE/target/linux/generic/config-6.18"
+if [ -f "$GEN" ]; then
+	sed -i -e 's|^# CONFIG_SOFTLOCKUP_DETECTOR is not set$|CONFIG_SOFTLOCKUP_DETECTOR=y|' \
+		-e 's|^# CONFIG_DETECT_HUNG_TASK is not set$|CONFIG_DETECT_HUNG_TASK=y|' \
+		-e 's|^# CONFIG_DEFAULT_HUNG_TASK_TIMEOUT.*$|CONFIG_DEFAULT_HUNG_TASK_TIMEOUT=25|' \
+		-e 's|^CONFIG_DEFAULT_HUNG_TASK_TIMEOUT=.*$|CONFIG_DEFAULT_HUNG_TASK_TIMEOUT=25|' "$GEN"
+	grep -qE '^CONFIG_SOFTLOCKUP_DETECTOR=y$' "$GEN" || {
+		echo "generic config: could not turn the soft lockup detector on" >&2; exit 1; }
+	echo "generic config: soft lockup + hung task detectors on"
+fi
+# The vendor kernel runs PCIe port services with AER enabled; without them a
+# poisoned TLP or an unread completion produces a silent bus stall instead of a
+# report, which is exactly the failure being chased here.
 
 echo "overlay applied to $TREE (base $BASE_SHA)"

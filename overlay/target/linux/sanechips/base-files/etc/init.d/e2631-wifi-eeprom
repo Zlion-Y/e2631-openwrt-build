@@ -1,0 +1,60 @@
+#!/bin/sh /etc/rc.common
+# Bring up the MT7916 Wi-Fi chip: calibration first, then the driver, in that
+# order and only in that order.
+#
+# Two board facts drive this file:
+#
+# 1) This MT7916's efuse is empty. ZTE keeps the calibration as the file
+#    "caldata" in the JFFS2 "wifi" partition, and mt7915e asks for it under the
+#    name it derives from the chip id - mediatek/mt7916_eeprom.bin. Without that
+#    file the probe fails and there is no radio at all.
+# 2) The chip's two PCIe functions (14c3:7906 main, 14c3:790a ext-HIF) sit on
+#    different root ports. Only the main one is ever bound here, for two reasons
+#    that are both measured on this board:
+#
+#    - autoload lets the PCI core probe the two functions in parallel, and the
+#      main function's hif2 handshake reads the other function's BAR while its
+#      own driver is still enabling it; that window stalled the whole SoC on
+#      roughly a third of boots (no console, no ARP, power cycle only). Binding
+#      nothing automatically and attaching just the main function removes it.
+#    - claiming the ext-HIF switches the driver to dual-HIF, whose events are
+#      expected on the second root port's INTx, and that line has never been seen
+#      to assert (hwirq 110 = SPI 78, count 0 in every boot, while the main
+#      function's hwirq 95 = SPI 63 ticks normally). In dual-HIF mode starting
+#      even one 2.4G AP wedged the board within seconds; single-HIF 2.4G ran for
+#      over three minutes without a hiccup.
+#
+#    Band 2 is reached through that second function, so 5 GHz is unavailable
+#    until its interrupt works. Starting a 5G AP is a hard hang, not a graceful
+#    failure - see the uci-defaults note in this package.
+START=05
+
+bind_one() {
+	local id=$1 drv=$2 dev
+
+	for dev in /sys/bus/pci/devices/*; do
+		[ "$(cat "$dev/device" 2>/dev/null)" = "$id" ] || continue
+		[ -e "$dev/driver" ] && continue
+		echo "${dev##*/}" > "/sys/bus/pci/drivers/$drv/bind"
+	done
+}
+
+start() {
+	local fw=mediatek/mt7916_eeprom.bin
+
+	[ -e "/lib/firmware/$fw" ] || FIRMWARE=$fw /etc/hotplug.d/firmware/11-mt76-caldata
+	[ -e "/lib/firmware/$fw" ] || return 0
+
+	echo 0 > /sys/bus/pci/drivers_autoprobe
+	modprobe mt7915e
+
+	# Bind the main function while autoprobe is still off. Restoring autoprobe
+	# first is the trap: writing 1 makes the PCI core attach every pending
+	# device, so the ext-HIF lands on its driver (and therefore on hif_list)
+	# before the main device probes, and the main then claims it as hif2 - the
+	# configuration that dies on the first AP start. Measured: the flashed
+	# version of this script did exactly that, "mt7915e_hif ... enabling device"
+	# at 14.19 s against the main's 15.21 s.
+	bind_one 0x7906 mt7915e
+	echo 1 > /sys/bus/pci/drivers_autoprobe
+}
