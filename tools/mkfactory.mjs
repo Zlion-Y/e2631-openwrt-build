@@ -85,6 +85,12 @@ function assemble(hdr, kernelBuf, rootfsBuf, opts = {}) {
   if (opts.product) putStr(hdr, M.product, 52, opts.product);
   if (opts.key1 !== undefined) hdr.writeUInt32LE(parseInt(opts.key1, 16) >>> 0, M.key1);
   if (opts.key2 !== undefined) hdr.writeUInt32LE(parseInt(opts.key2, 16) >>> 0, M.key2);
+  // cspboot picks the slot with the higher serial. Stamping one in the package
+  // means the flashed slot wins the contest without the flasher having to read
+  // the other slot correctly - which it cannot do reliably from the vendor
+  // firmware, whose 4.1.25 MTD stack mis-reads blocks our kernel wrote (seen
+  // 2026-10-13: max_serial() returned 16 there while the real serial was 18).
+  if (opts.serial !== undefined) hdr.writeUInt32LE(parseInt(opts.serial, 10) >>> 0, M.serial);
 
   // Rootfs placement: the vendor packages happen to be block aligned; we can also
   // force a fixed landing offset so the board DTS partition table can be static.

@@ -687,11 +687,30 @@ static int retitle_slot(int slot, uint32_t serial)
 	struct mtd m;
 	long hpos;
 	uint32_t got;
+	int idx;
 	uint8_t hdr[VER_HDR_SIZE];
 	uint8_t old[VER_HDR_SIZE];
 	const char *why;
 
-	slot_open_or_die(&m, slot, true);
+	/*
+	 * Refuse to touch a slot this system only reaches through the whole flash.
+	 * Under the vendor firmware its 4.1.25 MTD stack reads data written by our
+	 * kernel with a different ECC/bad-block layout, so the scan can hand back
+	 * another slot's header - and bumping "the" header it found then writes a
+	 * valid-looking copy into the target slot, where cspboot prefers it over
+	 * the real one and falls back. Seen on hardware on 2026-10-13. Switching is
+	 * only dependable from OpenWrt, where each slot is its own partition.
+	 */
+	idx = slot_open(&m, slot, true);
+	if (idx < 0)
+		return 1;
+	if (m.base != 0) {
+		fprintf(stderr,
+			"e2631-fwslot: this system has no slot%d partition, so its header cannot be "
+			"located reliably; switch slots from OpenWrt instead\n", slot);
+		close(m.fd);
+		return 1;
+	}
 	hpos = slot_scan(&m, &got);
 	if (hpos < 0) {
 		fprintf(stderr, "e2631-fwslot: slot %d holds no valid firmware header\n", slot);
@@ -827,6 +846,14 @@ static int cmd_flash(const char *path)
 		die("out of memory");
 
 	serial = max_serial() + 1;
+	/*
+	 * Honour a serial stamped into the package when it is higher: from the
+	 * vendor firmware max_serial() is not trustworthy (its 4.1.25 MTD stack
+	 * mis-reads blocks our kernel wrote, and it returned 16 for a slot that
+	 * held 18), and cspboot selects the slot with the higher serial.
+	 */
+	if (rd32(p.hdr, H_SERIAL) > serial)
+		serial = rd32(p.hdr, H_SERIAL);
 	memcpy(hdr, p.hdr, VER_HDR_SIZE);
 	wr32(hdr, H_SLOT_START, slot_start[target_slot]);
 	wr32(hdr, H_SERIAL, serial);
