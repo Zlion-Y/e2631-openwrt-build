@@ -24,10 +24,10 @@
 		ethernet0 = &gmac;
 		serial0 = &serial0;
 		serial1 = &serial1;
-		led-boot = &led_power;
-		led-failsafe = &led_power;
-		led-running = &led_power;
-		led-upgrade = &led_power;
+		led-boot = &led_red;
+		led-failsafe = &led_red;
+		led-running = &led_green;
+		led-upgrade = &led_blue;
 	};
 
 	chosen {
@@ -44,40 +44,56 @@
 	leds {
 		compatible = "gpio-leds";
 
-		/* Vendor ledkey table (/proc/zte/ledkey_m/led) lists three LEDs on flat
-		 * GPIO 8/40/60; flat = controller*16 + line, the convention
-		 * gpio-zx279128s uses (six banks of 16 lines). Two samples of
-		 * CurrentOnOff taken an hour apart on the vendor system disagree about
-		 * which lamp is lit: 3 minutes after a reboot it was gpio 40, in a fully
-		 * settled system it was gpio 60, and gpio 8 was never lit. The
-		 * bootloader drives 8 and 40 high and 60 low.
+		/*
+		 * One tri-colour lamp, three channels, on flat GPIO 8 / 40 / 60
+		 * (/proc/zte/ledkey_m/led LedId 0x32 / 0x64 / 0x128; flat =
+		 * controller*16 + line, six banks of 16 lines, bases 512..592 confirmed in
+		 * our own kernel).
 		 *
-		 * So 40 is the lamp that is lit earliest, which is what a power LED
-		 * does, and its lit level is high in the U-Boot phase. That is a reasoned
-		 * call, not a measurement: these bank registers cannot be read to check
-		 * it, because reading them from the vendor system hangs the SoC and the
-		 * watchdog reboots the box (observed 2026-10-13). On first boot read the
-		 * panel: if the lamp we drive stays dark, swap this line to
-		 * GPIO_ACTIVE_LOW and try 60 (&gpio3 12) in its place.
-		 * Which of 8 and 60 is the internet / wlan lamp is still unknown.
+		 * The colours were measured, not inferred: each channel was blinked on its
+		 * own for twelve seconds with this image running while the panel was
+		 * watched. 40 came out green, 60 a warm yellow-green (the red die, with the
+		 * strong green bleeding through the diffuser), 8 cyan-blue:
+		 *
+		 *   flat 40 = green    flat 60 = red    flat 8 = blue
+		 *
+		 * All three are active-low. Writing brightness=1 to the green channel left
+		 * the panel dark, and the other two lit while the LED class held them low,
+		 * which also matches the sibling H3600 (eleven LEDs, all active-low). The
+		 * vendor's CurrentOnOff column is its own logical state, not a pin level -
+		 * and levels cannot be read back to check, because reading these bank
+		 * registers from the vendor system hangs the SoC and the watchdog reboots
+		 * the box (measured 2026-10-13).
+		 *
+		 * What the stock firmware does with them, from its manual:
+		 *   red   solid = up but no internet,  blinking = booting or faulty
+		 *   green solid = internet up,         blinking = WPS/MESH key pressed
+		 *   blue  solid = MESH satellite, weak signal
+		 *   all three blinking = software upgrade
+		 * The aliases below keep the boot/fault meaning intact, and differ where it
+		 * is useful: procd runs a slow heartbeat on green once the system is up
+		 * (stock shows solid green) and an upgrade blinks blue alone instead of all
+		 * three, so the two systems are tellable at a glance.
 		 */
-		led_power: led-power {
-			color = <LED_COLOR_ID_GREEN>;
-			function = LED_FUNCTION_POWER;
-			gpios = <&gpio2 8 GPIO_ACTIVE_HIGH>;
-			default-state = "on";
-		};
-
-		led_internet: led-internet {
-			color = <LED_COLOR_ID_GREEN>;
-			function = LED_FUNCTION_WAN;
+		led_red: led-red {
+			color = <LED_COLOR_ID_RED>;
+			function = LED_FUNCTION_STATUS;
 			gpios = <&gpio3 12 GPIO_ACTIVE_LOW>;
+			default-state = "off";
 		};
 
-		led_wlan: led-wlan {
+		led_green: led-green {
 			color = <LED_COLOR_ID_GREEN>;
-			function = LED_FUNCTION_WLAN;
+			function = LED_FUNCTION_WAN_ONLINE;
+			gpios = <&gpio2 8 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led_blue: led-blue {
+			color = <LED_COLOR_ID_BLUE>;
+			function = LED_FUNCTION_STATUS;
 			gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
+			default-state = "off";
 		};
 	};
 
