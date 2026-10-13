@@ -41,9 +41,13 @@ fi
 #   E2631_GNU_MIRROR        put a fast GNU mirror at the head of "@GNU"
 # The mirror is opt-in because the CI runner is not on such a network.
 if [ -n "${E2631_GNU_MIRROR:-}" ] && [ -f "$TREE/scripts/projectsmirrors.json" ]; then
-	grep -q "$E2631_GNU_MIRROR" "$TREE/scripts/projectsmirrors.json" ||
-		sed -i "0,/\"@GNU\": \[/s//\"@GNU\": [\n\t\t\"$E2631_GNU_MIRROR\",/" "$TREE/scripts/projectsmirrors.json"
-	head -4 "$TREE/scripts/projectsmirrors.json" | tail -2
+	# It is already in the list, just last: download.pl only rotates when curl
+	# fails, so a stalled head entry costs the whole timeout chain per package.
+	# Move the chosen mirror to the front instead of appending a duplicate.
+	m=${E2631_GNU_MIRROR//\//\\/}
+	sed -i "/$m/d" "$TREE/scripts/projectsmirrors.json"
+	sed -i "0,/\"@GNU\": \[/s//\"@GNU\": [\n\t\t\"$E2631_GNU_MIRROR\",/" "$TREE/scripts/projectsmirrors.json"
+	sed -n '/"@GNU": \[/,+2p' "$TREE/scripts/projectsmirrors.json"
 fi
 
 IMG="$TREE/target/linux/sanechips/image/Makefile"
