@@ -17,16 +17,21 @@ define Device/zte_zxhn-e2631
   DEVICE_DTS := zx279128s-zte-zxhn-e2631
   DEVICE_DTS_DIR := $(TOPDIR)/target/linux/sanechips/dts
   # The package pads the kernel region so the rootfs starts at slot +0x400000
-  # and pads the rootfs so the version header block lands on +0xc00000, which
+  # and pads the rootfs so the version header block lands on +0x1400000, which
   # is where the board DTS says both are. +0x400000 is forced by cspboot, which
   # finds the rootfs at slot + ceil(declared kernel size / 128k); the cap below
   # is the marker (32 B) plus the kernel, so an oversized kernel fails here
   # instead of sliding the rootfs out from under the partition table.
+  # The 16 MiB rootfs region is what leaves room for LuCI plus an ~8 MiB
+  # overlay: the kernel splits the erase blocks behind the squashfs off as
+  # rootfs_data, and the header's checksum stops at the squashfs, so that tail
+  # is the writable part.
   KERNEL_SIZE := 4096k
   KERNEL := kernel-bin | append-dtb | uImage none | zte-slot-marker | \
 	check-size $$(KERNEL_SIZE)
   KERNEL_INITRAMFS := kernel-bin | append-dtb | uImage-ramboot
-  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7915-firmware e2631-fwslot
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7915-firmware e2631-fwslot \
+	luci luci-i18n-base-zh-cn luci-proto-pppoe luci-app-ttyd ttyd
   # The factory package needs an official package as its version-header
   # template, and those are not redistributed, so it is only built when
   # CONFIG_E2631_VENDOR_TEMPLATE names one. CI leaves it empty and gets
@@ -50,5 +55,5 @@ define Build/e2631-factory
 	node $(TOPDIR)/tools/e2631-mkfactory.mjs pack \
 		--template $(E2631_VENDOR_TEMPLATE) \
 		--kernel $(IMAGE_KERNEL) --rootfs $(IMAGE_ROOTFS) \
-		--rootfs-at 0x400000 --header-at 0xc00000 --out $@
+		--rootfs-at 0x400000 --header-at 0x1400000 --out $@
 endef

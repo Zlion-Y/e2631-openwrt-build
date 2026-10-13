@@ -380,8 +380,8 @@
 			 *   +0x000000  32-byte slot marker
 			 *   +0x000020  kernel (plaintext legacy uImage, load 0x40008000),
 			 *                padded to fill the region up to +0x400000
-			 *   +0x400000  squashfs, then free space up to +0xc00000
-			 *   +0xc00000  the 512-byte version header block
+			 *   +0x400000  squashfs, then free space up to +0x1400000
+			 *   +0x1400000 the 512-byte version header block
 			 *
 			 * +0x400000 is not a free choice. cspboot locates the rootfs as
 			 * "slot + ceil(declared kernel size / 128k)" and ignores the header's
@@ -392,26 +392,27 @@
 			 * why KERNEL_SIZE is capped at 4096k: a kernel that outgrows this
 			 * region must fail the build, not move the rootfs under the table.
 			 *
-			 * There is deliberately no "rootfs_data" partition here. The kernel
-			 * splits one off the tail of "rootfs" by itself (measured: "1
-			 * squashfs-split partitions found on MTD device rootfs", mtd8 = the
-			 * erase blocks after the squashfs up to the end of rootfs) and fstools
-			 * mounts that as the JFFS2 overlay. Declaring one as well would only
-			 * add a second partition of the same name, which fstools silently
-			 * prefers over the split. And the version header block has to sit
-			 * outside "rootfs" for the same reason: the header's rootfs checksum
-			 * covers +0x400000..+0x400000+rSize, so the overlay must never be in
-			 * it - with the first image it was, and the very first config save
-			 * made the slot unreadable to the bootloader.
+			 * The 16 MiB rootfs window is what the web UI costs: with LuCI in the
+			 * image the squashfs is around 8 MiB, and the kernel splits the erase
+			 * blocks behind it off as the writable "rootfs_data" (measured on the
+			 * first boot: "1 squashfs-split partitions found on MTD device
+			 * rootfs"), so the overlay is whatever is left of this window - about
+			 * 8 MiB. There is deliberately no "rootfs_data" partition here:
+			 * declaring one would only add a second partition of that name, which
+			 * fstools silently prefers over the split. The version header block
+			 * has to sit outside the window for the same reason: the header's
+			 * rootfs checksum covers +0x400000..+0x400000+rSize, so the overlay
+			 * must never be in it - with the first image it was, and the very
+			 * first config save made the slot unreadable to the bootloader.
 			 *
-			 * The space behind the header block (+0xc20000 to the end of the
-			 * slot) is left unpartitioned on purpose: it is reachable through
-			 * "slot1", and the packer pads it, so nothing can write it by
+			 * The space behind the header block (+0x1420000 to the end of the
+			 * slot, ~11.9 MiB) is left unpartitioned on purpose: it is reachable
+			 * through "slot1", and the packer pads it, so nothing can write it by
 			 * accident. Making "rootfs" reach it instead would put the version
 			 * header inside the overlay.
 			 *
 			 * Those fixed addresses hold only while no erase block of
-			 * [slot start, +0xc00000) is bad; e2631-fwslot checks that and
+			 * [slot start, +0x1400000) is bad; e2631-fwslot checks that and
 			 * refuses to write when it is not.
 			 */
 			partition@700000 {
@@ -433,12 +434,12 @@
 			partition@2700000 {
 				/* squashfs at its start, overlay after it: see above */
 				label = "rootfs";
-				reg = <0x02700000 0x00800000>;
+				reg = <0x02700000 0x01000000>;
 			};
 
-			partition@2f00000 {
+			partition@3700000 {
 				label = "slot1-header";
-				reg = <0x02f00000 0x00020000>;
+				reg = <0x03700000 0x00020000>;
 				read-only;
 			};
 

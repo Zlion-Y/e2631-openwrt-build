@@ -192,7 +192,11 @@ const tail = u.subarray(64, 64 + ihSize);
 ok('zImage self-extracting header magic (LE 0x016f2818 at +0x24)',
   tail.readUInt32LE(0x24) === 0x016f2818, hx(tail.readUInt32LE(0x24)));
 let dtbOff = -1;
-for (let i = Math.max(0, tail.length - 0x80000); i + 8 <= tail.length; i += 4)
+// The FDT magic is 4-byte aligned, so the scan has to start on a 4-byte boundary
+// too: starting at tail.length - 0x80000 and stepping by four misses every aligned
+// offset whenever that start is odd, which is exactly how run 22 reported a kernel
+// with no appended dtb when the dtb was in fact the last 0x29a1 bytes of it.
+for (let i = Math.max(0, tail.length - 0x80000) & ~3; i + 8 <= tail.length; i += 4)
   if (tail.readUInt32BE(i) === 0xd00dfeed && i + tail.readUInt32BE(i + 4) === tail.length) { dtbOff = i; break; }
 ok('a .dtb is appended and ends the kernel image', dtbOff >= 0,
   dtbOff >= 0 ? `at +${hx(dtbOff)}, ${(tail.length - dtbOff).toString(16)} bytes` : 'not found');
@@ -264,7 +268,7 @@ const idxOf = (label) => table.findIndex((t) => t.label === label);
 // 2026-10-13). Our packer therefore declares the whole 4 MiB kernel region as
 // the kernel extent, so the derived position is exactly KERNEL_AT.
 const BLOCK = 0x20000, SLOT1 = 0x2300000, SPAN = 0x1c00000;
-const KERNEL_AT = 0x400000, ROOTFS_SPAN = 0x800000, HEADER_AT = KERNEL_AT + ROOTFS_SPAN;
+const KERNEL_AT = 0x400000, ROOTFS_SPAN = 0x1000000, HEADER_AT = KERNEL_AT + ROOTFS_SPAN;
 const iRoot = idxOf('rootfs'), iData = idxOf('rootfs_data'), iSlot1 = idxOf('slot1');
 const iHdr = idxOf('slot1-header');
 ok('there is a partition labelled rootfs', iRoot >= 0, `mtd${iRoot}`);
