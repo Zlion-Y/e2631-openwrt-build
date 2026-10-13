@@ -437,6 +437,12 @@ warn('cpu enable-method matches the string the compiled platsmp registers',
       ['netifd', 'LAN and WAN'],
       ['dropbear', 'ssh in to run the probe: this base tree ships no uhttpd by default'],
       ['e2631-fwslot', 'switching back to the stock slot'],
+      ['uhttpd', 'the web server the UI is served from'],
+      ['luci', 'the web UI itself'],
+      // Checked by name rather than by "some theme is present": apply.sh clones
+      // this package from GitHub, and the earlier failure mode of that feed
+      // handling was a build that succeeded and silently shipped no LuCI at all.
+      ['luci-theme-argon', 'the requested theme; without it the UI stays on bootstrap'],
     ];
     for (const [p, why] of need) ok(`${p} is installed (${why})`, pkgs.has(p), pkgs.has(p) ? '' : 'not in the manifest');
     // FEATURES on this target still says "usb", and OpenWrt's default package
