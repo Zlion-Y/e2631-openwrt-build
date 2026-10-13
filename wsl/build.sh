@@ -26,10 +26,27 @@
 set -x
 export CURL_OPTIONS="--speed-limit 20000 --speed-time 20"
 export DOWNLOAD_TOOL_CUSTOM="$HOME/e2631/wsl/segdl.sh"
-# Huawei's copy of the OpenWrt distfile mirror answers at ~48 KB/s from here
-# and holds every package source, so it goes in front of the two upstream ones.
-export DOWNLOAD_MIRROR="https://mirrors.huaweicloud.com/openwrt/sources"
 export SEGN=12
+
+# WSL is NAT, so it cannot see a proxy bound to Windows' loopback - every byte
+# of an unproxied build goes direct, which measured 13.9 KB/s from
+# sources.cdn.openwrt.org and 37 KB/s from codeload.github.com. With the client's
+# "allow LAN" on, the host gateway port reaches it: 256 KB/s and 1.13 MB/s for
+# the same two files. Domestic mirrors gain nothing (huaweicloud 26 KB/s either
+# way, tuna ~400 KB/s direct), so .cn stays out of the proxy.
+GW=$(ip route show default | cut -d' ' -f3)
+PROXY=${E2631_PROXY:-http://$GW:7897}
+PHOST=${PROXY#http://}; PHOST=${PHOST%%/*}; PHPORT=${PHOST##*:}; PHOST=${PHOST%%:*}
+# A TCP connect, not an HTTPS GET: fetching a URL through the proxy needs a TLS
+# handshake on top and 6 s was not enough, so the build silently fell back to
+# direct downloads - the exact thing this block exists to prevent.
+if [ -n "$PHOST" ] && [ -n "$PHPORT" ] && (exec 3<>"/dev/tcp/$PHOST/$PHPORT") 2>/dev/null; then
+	export http_proxy="$PROXY" https_proxy="$PROXY" all_proxy="$PROXY"
+	export no_proxy="localhost,127.0.0.1,.cn"
+	echo "PHASE proxy $PROXY"
+else
+	echo "PHASE proxy unavailable ($PHOST:$PHPORT), downloading direct"
+fi
 cd ~/openwrt || exit 1
 
 E2631_GNU_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/gnu ~/e2631/apply.sh ~/openwrt || exit 1
@@ -46,11 +63,22 @@ echo "PHASE feeds-install $(date +%T)"
 echo "PHASE seed-config $(date +%T)"
 cp ~/e2631/seed/e2631.config .config
 make defconfig > /dev/null 2>&1
+# include/download.mk does `export DOWNLOAD_TOOL_CUSTOM:=$(CONFIG_DOWNLOAD_TOOL_CUSTOM)`,
+# so the environment variable on its own is clobbered back to empty; the symbol
+# has to arrive as a make variable. `scripts/config --set-str` is not enough:
+# the running make's syncconfig rewrites .config and dropped it again. A
+# command-line assignment wins over the .config include and reaches sub-makes.
+# Not in seed/e2631.config: the path is this machine's, and CI has no such tool.
+MAKEVAR=
+if [ -x "$HOME/e2631/wsl/segdl.sh" ]; then
+	MAKEVAR="CONFIG_DOWNLOAD_TOOL_CUSTOM=$HOME/e2631/wsl/segdl.sh"
+	echo "PHASE segdl $MAKEVAR"
+fi
 grep -cE '^CONFIG_PACKAGE_luci' .config
 grep -E '^CONFIG_TARGET_DEVICE_sanechips_generic_DEVICE_zte_zxhn-e2631=|^CONFIG_SOFT_FLOAT=|^CONFIG_PACKAGE_luci=|^CONFIG_PACKAGE_luci-proto-ppp=|^CONFIG_PACKAGE_ttyd=|^CONFIG_PACKAGE_luci-app-ttyd=|^CONFIG_PACKAGE_uhttpd=' .config || echo "SEED CHECK FAILED"
 
 echo "PHASE build $(date +%T)"
-make -j"$(nproc)" world V=s > world.log 2>&1
+make -j"$(nproc)" world V=s $MAKEVAR > "$HOME/world.log" 2>&1
 rc=$?
 echo "PHASE done rc=$rc $(date +%T)"
-grep -E "^(make.*\*\*\*|.*Error [0-9])" world.log | tail -5
+grep -E "^(make.*\*\*\*|.*Error [0-9])" "$HOME/world.log" | tail -5

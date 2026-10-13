@@ -48,7 +48,9 @@ ELF=$(find "$SRC/build_dir" -type f -name e2631-fwslot -not -path '*ipk*' | head
 if [ -n "$ELF" ]; then
 	cp "$ELF" "$OUTD/payload/e2631-fwslot"
 	file "$OUTD/payload/e2631-fwslot"
-	F=$(readelf -h "$ELF" | awk '/^ *Flags:/ {print $NF}')
+	# readelf prints "Flags:  0x5000200, Version5 EABI, soft-float ABI"; take the
+	# number alone, since bash arithmetic chokes on the trailing comma.
+	F=$(readelf -h "$ELF" | sed -n 's/^ *Flags: *\(0x[0-9a-fA-F]*\).*/\1/p')
 	[ $(( F & 0x200 )) -ne 0 ] && [ $(( F & 0x400 )) -eq 0 ] ||
 		echo "WARN e2631-fwslot flags=$F is not soft-float EABI5" >&2
 else
