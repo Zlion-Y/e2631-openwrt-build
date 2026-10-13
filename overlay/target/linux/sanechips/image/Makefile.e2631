@@ -31,7 +31,7 @@ define Device/zte_zxhn-e2631
 	check-size $$(KERNEL_SIZE)
   KERNEL_INITRAMFS := kernel-bin | append-dtb | uImage-ramboot
   DEVICE_PACKAGES := kmod-mt7915e kmod-mt7915-firmware e2631-fwslot \
-	luci luci-i18n-base-zh-cn luci-proto-pppoe luci-app-ttyd ttyd
+	luci luci-i18n-base-zh-cn luci-proto-ppp luci-app-ttyd ttyd
   # The factory package needs an official package as its version-header
   # template, and those are not redistributed, so it is only built when
   # CONFIG_E2631_VENDOR_TEMPLATE names one. CI leaves it empty and gets
