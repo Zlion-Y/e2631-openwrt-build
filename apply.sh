@@ -23,6 +23,15 @@ for f in sbin/e2631-probe sbin/e2631-trial sbin/e2631-commit etc/init.d/e2631-tr
 	chmod +x "$TREE/target/linux/sanechips/base-files/$f"
 done
 
+# Only two feeds matter for this board: packages (kmod-mt7915e, ttyd) and luci.
+# Cloning routing/telephony/video costs several minutes of every local build and
+# contributes nothing but unresolved-dependency warnings (bmx7) to the log.
+# feeds.conf is regenerated from the .default, so drop any stale copy.
+if [ -f "$TREE/feeds.conf.default" ]; then
+	sed -i -E 's@^src-git (routing|telephony|video) @#src-git \1 @' "$TREE/feeds.conf.default"
+	rm -f "$TREE/feeds.conf"
+fi
+
 IMG="$TREE/target/linux/sanechips/image/Makefile"
 if ! grep -q 'Makefile.e2631' "$IMG"; then
 	# Insert before BuildImage so the Device definition is seen by image.mk.
