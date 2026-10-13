@@ -46,7 +46,7 @@ if [ -n "${E2631_GNU_MIRROR:-}" ] && [ -f "$TREE/scripts/projectsmirrors.json" ]
 	# Move the chosen mirror to the front instead of appending a duplicate.
 	# Plain sed with a | delimiter - this file is /bin/sh, so no ${var//x/y}.
 	sed -i "\|$E2631_GNU_MIRROR|d" "$TREE/scripts/projectsmirrors.json"
-	sed -i "0,/\"@GNU\": \[/s//\"@GNU\": [\n\t\t\"$E2631_GNU_MIRROR\",/" "$TREE/scripts/projectsmirrors.json"
+	sed -i "0,/\"@GNU\": \[/s||\"@GNU\": [\n\t\t\"$E2631_GNU_MIRROR\",|" "$TREE/scripts/projectsmirrors.json"
 	sed -n '/"@GNU": \[/,+2p' "$TREE/scripts/projectsmirrors.json"
 fi
 
