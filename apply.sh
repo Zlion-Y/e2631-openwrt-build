@@ -32,6 +32,20 @@ if [ -f "$TREE/feeds.conf.default" ]; then
 	rm -f "$TREE/feeds.conf"
 fi
 
+# A dead mirror is worse than a slow one: OpenWrt's curl is started with
+# --connect-timeout but no transfer watchdog, so a host that accepts the
+# connection and then sends nothing (ftpmirror.gnu.org did exactly that here,
+# 0 bytes for 6 minutes, load 0.03) blocks the build forever instead of falling
+# through to the next entry. Two knobs, both supported upstream:
+#   CURL_OPTIONS            honoured verbatim by scripts/download.pl -> rotate
+#   E2631_GNU_MIRROR        put a fast GNU mirror at the head of "@GNU"
+# The mirror is opt-in because the CI runner is not on such a network.
+if [ -n "${E2631_GNU_MIRROR:-}" ] && [ -f "$TREE/scripts/projectsmirrors.json" ]; then
+	grep -q "$E2631_GNU_MIRROR" "$TREE/scripts/projectsmirrors.json" ||
+		sed -i "0,/\"@GNU\": \[/s//\"@GNU\": [\n\t\t\"$E2631_GNU_MIRROR\",/" "$TREE/scripts/projectsmirrors.json"
+	head -4 "$TREE/scripts/projectsmirrors.json" | tail -2
+fi
+
 IMG="$TREE/target/linux/sanechips/image/Makefile"
 if ! grep -q 'Makefile.e2631' "$IMG"; then
 	# Insert before BuildImage so the Device definition is seen by image.mk.
