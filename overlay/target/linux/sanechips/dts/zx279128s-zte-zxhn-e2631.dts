@@ -238,13 +238,17 @@
  * only file there, 0x30000 bytes, mounted by the vendor at /wlan).
  *
  * One package behind both PCIe controllers, as on the H3600, whose vendor
- * driver is the same MediaTek code family. The reset GPIO number is inherited
- * from the H3600 board file and is NOT measured on this board: if nothing
- * enumerates on pci0/01, check this line first (the H3600 also drives an
- * enable-gpios on &gpio3 7, left out here on purpose until PCIe is seen).
+ * driver is the same MediaTek code family. The H3600 board file names the two
+ * board lines - reset on &gpio3 5 (active low) and enable on &gpio3 7 (active
+ * high) - and drives them once, from pcie0 only, because they reset the whole
+ * MT7915/MT7916 rather than one link. host_init's order is: reset asserted 100
+ * ms, released, then enable asserted, 200 ms, before the PHY is initialised.
+ * Without enable the chip stays powered down, so a missing endpoint looks
+ * exactly like a PHY bring-up failure; try that line first.
  */
 &pcie0 {
 	reset-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
+	enable-gpios = <&gpio3 7 GPIO_ACTIVE_HIGH>;
 	phys = <&crm1_pcie0_phy>;
 	phy-names = "pcie";
 	status = "okay";

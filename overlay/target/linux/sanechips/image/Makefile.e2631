@@ -30,7 +30,10 @@ define Device/zte_zxhn-e2631
   KERNEL := kernel-bin | append-dtb | uImage none | zte-slot-marker | \
 	check-size $$(KERNEL_SIZE)
   KERNEL_INITRAMFS := kernel-bin | append-dtb | uImage-ramboot
-  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7915-firmware e2631-fwslot \
+  # The radio is an MT7916AN + MT7976DN (Filogic 630): the mt7915e driver binds
+  # it (its id table carries 14c3:7906/790a), but the firmware it asks for is the
+  # mt7916_*.bin set, not mt7915_*.bin - hence kmod-mt7916-firmware here.
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7916-firmware e2631-fwslot \
 	luci luci-i18n-base-zh-cn luci-proto-ppp luci-app-ttyd ttyd luci-theme-argon
   # The factory package needs an official package as its version-header
   # template, and those are not redistributed, so it is only built when

@@ -443,6 +443,10 @@ warn('cpu enable-method matches the string the compiled platsmp registers',
       // this package from GitHub, and the earlier failure mode of that feed
       // handling was a build that succeeded and silently shipped no LuCI at all.
       ['luci-theme-argon', 'the requested theme; without it the UI stays on bootstrap'],
+      // The chip is an MT7916: mt7915e binds it but requests mt7916_wa/wm/
+      // rom_patch.bin, which only kmod-mt7916-firmware installs. Shipping the
+      // mt7915 set instead looks like a dead radio with no error anywhere else.
+      ['kmod-mt7916-firmware', 'the firmware MT7916 actually requests'],
     ];
     for (const [p, why] of need) ok(`${p} is installed (${why})`, pkgs.has(p), pkgs.has(p) ? '' : 'not in the manifest');
     // FEATURES on this target still says "usb", and OpenWrt's default package
