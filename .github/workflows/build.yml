@@ -83,6 +83,13 @@ jobs:
             || { echo "command line not forced: the vendor bootargs would take over"; exit 1; }
           ls ../openwrt/target/linux/sanechips/patches-6.18/029-*.patch \
              ../openwrt/target/linux/sanechips/patches-6.18/030-*.patch
+          # The first-boot safety net has to be in the tree and runnable: an
+          # overlay file without an exec bit installs, looks enabled, and then
+          # never runs - which is the worst kind of empty insurance.
+          for f in sbin/e2631-trial sbin/e2631-commit sbin/e2631-probe etc/init.d/e2631-trial; do
+            test -x "../openwrt/target/linux/sanechips/base-files/$f" \
+              || { echo "missing or not executable: base-files/$f"; exit 1; }
+          done
 
       # Run 7 lost 57 minutes to a dtc "Lexical error: Unexpected
       # 'LED_FUNCTION_INET'", a symbol that does not exist in any header. dtc
@@ -144,6 +151,15 @@ jobs:
           set -e
           echo "make world exited with $rc"
           exit $rc
+
+      # include/rootfs.mk sweeps ./etc/init.d/* and enables every service it
+      # finds, printing "Enabling <name>". That log line is the only evidence
+      # that the first-boot auto-revert is actually baked into the image rather
+      # than merely present in the tree, so a build that lost it fails here.
+      - name: the trial service is armed in the image
+        run: |
+          grep -q 'Enabling e2631-trial' build.log \
+            || { echo "the rootfs build did not enable e2631-trial: no auto-revert in this image"; exit 1; }
 
       # The sysupgrade file is a tar holding the two payloads under
       # sysupgrade-<profile>/{kernel,root}; unpacking it here gives stable

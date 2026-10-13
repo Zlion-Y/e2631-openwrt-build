@@ -1,0 +1,37 @@
+#!/bin/sh
+# First-boot safety net for this port.
+#
+# cspboot chooses a slot by comparing the serial numbers in the version headers;
+# it has no idea whether the image it started actually works. So an OpenWrt that
+# boots but cannot be reached - wrong port mapping, Wi-Fi that never comes up,
+# overlay that fails to mount - would stay in charge forever, and the only way
+# back to the stock slot would be opening the case and using the serial port.
+#
+# Unless someone accepts this image, hand the boot back: bump the stock slot's
+# serial and reboot. e2631-commit writes the acceptance file, which lives on the
+# jffs2 overlay and therefore survives reboots; a reboot before accepting it is
+# exactly the case this script exists for.
+TRIAL_TIMEOUT=${TRIAL_TIMEOUT-600}
+CONFIRM=/etc/e2631-accepted
+
+[ -f "$CONFIRM" ] && exit 0
+
+echo "e2631-trial: this boot is a trial - run e2631-commit within ${TRIAL_TIMEOUT}s to keep it"
+
+left=$TRIAL_TIMEOUT
+while [ "$left" -gt 0 ] && [ ! -f "$CONFIRM" ]; do
+	sleep 5
+	left=$((left - 5))
+done
+
+if [ -f "$CONFIRM" ]; then
+	echo "e2631-trial: accepted, staying"
+	exit 0
+fi
+
+echo "e2631-trial: nobody accepted it, handing the boot back to the stock slot"
+if e2631-fwslot switch; then
+	reboot
+else
+	echo "e2631-trial: the switch failed, staying put - fix it by hand"
+fi

@@ -15,8 +15,13 @@ zte_caldata_from_jffs2() {
 	part=$(find_mtd_part wifi)
 	[ -n "$part" ] || caldata_die "no mtd device found for partition wifi"
 
+	# Not "-o ro": jffs2 refuses a read-only mount on a device it can write,
+	# so that would only make this hook fail. The vendor system mounts the same
+	# partition read-write at /wlan (seen on the live box:
+	# /dev/mtdblock3 on /wlan type jffs2 (rw,relatime)); we only read a file
+	# out of it and unmount.
 	mkdir -p $dir
-	mount -t jffs2 -o ro $part $dir || caldata_die "failed to mount $part"
+	mount -t jffs2 $part $dir || caldata_die "failed to mount $part"
 	id=$(hexdump -v -n 2 -e '2/1 "%02x"' $dir/caldata 2>/dev/null)
 	case "$board:$id" in
 	zte,zxhn-h3600:1579)

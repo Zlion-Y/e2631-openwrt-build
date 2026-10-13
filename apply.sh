@@ -16,9 +16,12 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 cp -r "$HERE/overlay/." "$TREE/"
 mkdir -p "$TREE/tools"
 cp "$HERE/tools/mkfactory.mjs" "$TREE/tools/e2631-mkfactory.mjs"
-# The overlay is authored on a filesystem without exec bits; a script under
-# base-files/sbin has to be runnable on the device.
-chmod +x "$TREE/target/linux/sanechips/base-files/sbin/e2631-probe"
+# The overlay is authored on a filesystem without exec bits; these have to be
+# runnable on the device, and rc.common refuses to enable a service script that
+# is not executable.
+for f in sbin/e2631-probe sbin/e2631-trial sbin/e2631-commit etc/init.d/e2631-trial; do
+	chmod +x "$TREE/target/linux/sanechips/base-files/$f"
+done
 
 IMG="$TREE/target/linux/sanechips/image/Makefile"
 if ! grep -q 'Makefile.e2631' "$IMG"; then
