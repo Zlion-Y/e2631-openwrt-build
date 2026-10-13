@@ -795,7 +795,7 @@ static int cmd_check(const char *path)
 	return 0;
 }
 
-static int cmd_flash(const char *path)
+static int cmd_flash(const char *path, int want_slot, bool allow_slot0)
 {
 	struct package p;
 	int target_slot, idx;
@@ -812,10 +812,17 @@ static int cmd_flash(const char *path)
 	package_load(&p, path);
 
 	running = slot_index(running_slot_offset());
-	if (running < 0)
+	/*
+	 * The slot the running system reports is not always the slot whose bytes
+	 * it booted: after a header had been written into the wrong place, cspboot
+	 * validated slot 0's payload while recording slot 1 as the booted version,
+	 * and the derived "other slot" then pointed at the stock image. --slot
+	 * therefore exists to name the target outright.
+	 */
+	target_slot = want_slot >= 0 ? want_slot : (running < 0 ? -1 : running ^ 1);
+	if (target_slot < 0)
 		errno = ENODEV, die("cannot tell which slot is running, from /proc/cmdline or from the rootfs partition");
-	target_slot = running ^ 1;
-	if (target_slot == 0)
+	if (target_slot == 0 && !allow_slot0)
 		die("refusing to overwrite slot 0: this port keeps the stock firmware there, "
 		    "and flash is meant to be run from the vendor system");
 
@@ -1057,10 +1064,30 @@ static int cmd_info(bool json)
 int main(int argc, char **argv)
 {
 	crc_init();
-	if (argc == 3 && !strcmp(argv[1], "flash"))
-		return cmd_flash(argv[2]);
 	if (argc == 3 && !strcmp(argv[1], "check"))
 		return cmd_check(argv[2]);
+	if (argc >= 3 && !strcmp(argv[1], "flash")) {
+		/*
+		 * --slot names the target outright, for the case where the running
+		 * slot the system reports is not the slot whose payload it booted;
+		 * writing slot 0 still needs --allow-slot0, because that is the stock
+		 * image this port keeps for going back.
+		 */
+		int want = -1;
+		bool allow0 = false;
+
+		for (int i = 3; i < argc; i++) {
+			if (!strcmp(argv[i], "--allow-slot0"))
+				allow0 = true;
+			else if (!strcmp(argv[i], "--slot") && i + 1 < argc)
+				want = atoi(argv[++i]);
+			else
+				die("unknown flash option; see usage");
+		}
+		if (want < -1 || want > 1)
+			die("--slot takes 0 or 1");
+		return cmd_flash(argv[2], want, allow0);
+	}
 	if (argc == 2 && !strcmp(argv[1], "switch"))
 		return cmd_switch();
 	if (argc == 3 && !strcmp(argv[1], "boot"))
@@ -1072,12 +1099,16 @@ int main(int argc, char **argv)
 
 	fprintf(stderr,
 		"usage: e2631-fwslot check <package.bin>  verify a package without writing\n"
-		"       e2631-fwslot flash <package.bin>  write package to the inactive slot\n"
+		"       e2631-fwslot flash <package.bin> [--slot <0|1>] [--allow-slot0]\n"
+		"                                        write package to the inactive slot\n"
 		"       e2631-fwslot switch              verify the other slot and make it the next boot\n"
 		"       e2631-fwslot boot <0|1>          same, naming the slot explicitly\n"
 		"       e2631-fwslot info [-j]           show both slots, -j as JSON\n"
 		"\n"
 		"slot 0 is the vendor system on this board layout; from OpenWrt,\n"
-		"'switch' reboots into it without rewriting a byte of its body.\n");
+		"'switch' reboots into it without rewriting a byte of its body.\n"
+		"--slot exists because the booted version a system reports is not\n"
+		"always the slot whose payload it validated; --allow-slot0 exists\n"
+		"because overwriting the stock image is a decision, not an accident.\n");
 	return 1;
 }
