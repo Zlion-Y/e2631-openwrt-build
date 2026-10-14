@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo I1; ls -l /proc/597/exe /proc/1250/exe
 18000|echo I2; grep -rl VersionUpload /bin /sbin /usr /lib 2>/dev/null

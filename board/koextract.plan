@@ -1,5 +1,5 @@
 1500|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 8000|find /lib/modules -name "plat_zxylzb*"
 11000|ls /lib/modules/4.1.25/
 13000|for f in $(find /lib/modules -name "plat_zxylzb*" -o -name "mt7916*"); do cp -f $f /var/tmp/; done; ls -l /var/tmp/

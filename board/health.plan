@@ -1,5 +1,5 @@
 1500|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 7000|echo A_CMDLINE; cat /proc/cmdline
 9000|echo B_SLOT0_HEAD; busybox hexdump -C -s 0x1c60000 -n 64 /dev/mtd0
 12000|echo C_SLOT0_TAIL; busybox hexdump -C -s 0x1c601e0 -n 32 /dev/mtd0

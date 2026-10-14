@@ -1,5 +1,5 @@
 1500|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 8000|echo C1; ls -l /userconfig /usercfg /defcfg 2>&1
 14000|echo C2; for f in /userconfig/* /usercfg/*; do ls -l $f; done 2>&1
 22000|echo C3; /bin/busybox grep -a -c . /userconfig/* 2>&1

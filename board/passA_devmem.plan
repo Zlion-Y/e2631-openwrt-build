@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 7000|
 9000|echo B1_DEVMEM; devmem2 0x9a101014 word
 12000|echo B2_PROC; ls /proc/

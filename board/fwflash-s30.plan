@@ -1,5 +1,5 @@
 1500|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 7000|echo T-LOGIN; cd /var/tmp; pwd; df -k /var | busybox sed -n 1,3p
 10000|echo T-DL; /bin/curl -f -sS -m 240 -o fw.bin http://192.168.5.5:8000/e2631-openwrt-s30.bin; ls -l fw.bin
 20000|echo T-SIZE; wc -c fw.bin

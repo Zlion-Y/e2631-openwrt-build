@@ -39,6 +39,8 @@ if (mode === 'flash' && !argv.includes('--yes')) {
   process.exit(2);
 }
 for (const f of [FW, PKG]) if (!fs.existsSync(f)) { console.error(`missing ${f}`); process.exit(2); }
+// The vendor telnet password is not in this repository; set it in the environment.
+if (!process.env.ZTE_TELNET_PW) { console.error('export ZTE_TELNET_PW first - the device telnet login needs it'); process.exit(2); }
 
 const files = { 'e2631-fwslot': path.resolve(FW), 'fw.bin': path.resolve(PKG) };
 const logFile = 'out/stage-server.log';
@@ -82,7 +84,7 @@ console.log(`serving e2631-fwslot (${fs.statSync(files['e2631-fwslot']).size} B)
 
 const plan = [
   '1000|root',
-  '3000|<redacted:vendor telnet password>',
+  '3000|' + (process.env.ZTE_TELNET_PW || ''),
   '9000|',
   '12000|echo S1; rm -f /var/tmp/e2631-fwslot /var/tmp/fw.bin /var/tmp/flash.log; df -k /var /tmp; ' +
   'mount | grep -E " /var| /tmp"; which setsid nohup curl; cat /proc/mtd; ls -l /dev/mtd* 2>/dev/null',

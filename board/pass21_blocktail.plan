@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo P1; busybox hexdump -v -e '16/1 "%02x"' -s 0x1c60200 -n 256 /dev/mtdblock0; echo
 20000|echo P2; busybox hexdump -v -e '16/1 "%02x"' -s 0x1c6ff00 -n 256 /dev/mtdblock0; echo

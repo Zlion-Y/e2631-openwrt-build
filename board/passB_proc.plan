@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 7000|
 9000|echo C1_TCPHY; cat /proc/tcphy
 13000|echo C2_LANINFO; cat /proc/laninfo

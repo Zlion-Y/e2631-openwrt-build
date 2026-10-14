@@ -1,7 +1,7 @@
 EXPECT (?i)login: 
 SENDLN root
 EXPECT (?i)password: 
-SENDLN <redacted:vendor telnet password>
+SENDLN ${ZTE_TELNET_PW}
 WAIT 5000
 SENDLN 
 WAIT 4000

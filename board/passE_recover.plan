@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 7000|
 9000|echo UPTIME; cat /proc/uptime
 12000|echo MOUT_EXISTS; ls -l /tmp/m.out 2>/dev/null

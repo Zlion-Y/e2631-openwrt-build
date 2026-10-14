@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo A1; for a in dd sha256sum md5sum hexdump od head tail wc gzip tar base64 cat sync stat; do printf "%s=" $a; busybox $a --help >/dev/null 2>&1 && echo ok || echo missing; done
 45000|echo A2; busybox dd if=/dev/mtdblock0 bs=131072 skip=408 count=1 of=/var/tmp/t.bin 2>&1; ls -l /var/tmp/t.bin; busybox sha256sum /var/tmp/t.bin 2>&1

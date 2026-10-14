@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo J1; ls /kmodule
 18000|echo J2; ls /kmodule/bin /kmodule/www /kmodule/lib 2>&1

@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo U1; cat /proc/uptime; echo ---; cat /proc/zte/ledkey_m/led
 22000|exit

@@ -1,5 +1,5 @@
 1000|root
-2500|<redacted:vendor telnet password>
+2500|${ZTE_TELNET_PW}
 5000|
 7000|echo T1_ROOTLS; ls /
 10000|echo T2_WWW; ls /www 2>/dev/null; ls /userbin 2>/dev/null; ls /tmp/boaform 2>/dev/null

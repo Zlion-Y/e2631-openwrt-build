@@ -1,5 +1,5 @@
 3000|root
-9000|<redacted:vendor telnet password>
+9000|${ZTE_TELNET_PW}
 13000|id
 16000|cat /proc/mtd
 20000|echo BEGIN_SYN

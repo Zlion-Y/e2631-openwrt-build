@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo W1; /var/tmp/e2631-fwslot info -j
 60000|echo W2; dd if=/dev/mtdblock0 bs=131072 skip=408 count=1 2>/dev/null | dd bs=512 count=1 2>/dev/null | busybox hexdump -v -e '16/1 "%02x"'

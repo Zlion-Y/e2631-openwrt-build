@@ -1,5 +1,5 @@
 1500|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 8000|readlink /sys/bus/pci/devices/0000:00:00.0
 9000|readlink /sys/bus/pci/devices/0000:01:00.0
 10500|ls /sys/devices/platform/soc/

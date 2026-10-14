@@ -1,10 +1,10 @@
 # Read-only Wi-Fi evidence from the running vendor system.
-# The telnetd here asks for a login (root / <redacted:vendor telnet password>) and locks out for 60 s
+# The telnetd here asks for a login (root / ${ZTE_TELNET_PW}) and locks out for 60 s
 # after three bad attempts, so the handshake is expect-style, not blind.
 EXPECT Login:
 SENDLN root
 EXPECT Password:
-SENDLN <redacted:vendor telnet password>
+SENDLN ${ZTE_TELNET_PW}
 EXPECT #
 SENDLN echo V1_PCI; ls /sys/bus/pci/devices/; echo --drivers--; ls /sys/bus/pci/drivers/
 WAIT 3000

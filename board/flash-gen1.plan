@@ -1,6 +1,6 @@
 # Consume with: node build/host/telnet_sh.mjs 192.168.1.1 23 build/board/flash-gen1.plan out/flash-gen1.log
 #
-# Stock side (telnet root/<redacted:vendor telnet password>), now running slot 0. fw_flashing erases and
+# Stock side (telnet root/${ZTE_TELNET_PW}), now running slot 0. fw_flashing erases and
 # writes the INACTIVE slot (slot 1) and stamps its own serial, so cspboot picks
 # the new image next boot. boot_flashing is never used (it would rewrite U-Boot)
 # and syn_version is never used (it would overwrite what we just wrote).
@@ -8,7 +8,7 @@
 # No head/tail/grep here: the stock busybox does not have those applets, and the
 # log is dumped with dd, which is enough to read it back on the PC.
 0|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 7000|echo G-LOGIN; cd /var/tmp; rm -f ff.log ff.done; pwd; df -k /var
 10000|echo G-DL; /bin/curl -f -sS -m 300 -o fw.bin http://192.168.1.177:8000/e2631-openwrt-gen1.bin; ls -l fw.bin
 24000|echo G-SIZE; wc -c < fw.bin; md5sum fw.bin

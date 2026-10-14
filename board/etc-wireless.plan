@@ -1,5 +1,5 @@
 1500|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 8000|echo X1; ls -l /etc/wireless /etc/wireless/mt7916 2>&1
 14000|echo X2; ls -l /lib/firmware 2>&1; ls -d /lib/firmware 2>&1
 20000|echo X3; for f in /etc/wireless/mt7916/*; do ls -l $f; done 2>&1

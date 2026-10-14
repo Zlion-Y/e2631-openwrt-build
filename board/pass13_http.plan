@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo G1; which curl wget tftp
 18000|echo G2; curl -sf -o /tmp/probe http://192.168.5.5:8000/poll.sh; echo RC=$?; ls -l /tmp/probe

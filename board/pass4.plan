@@ -1,5 +1,5 @@
 1000|root
-2500|<redacted:vendor telnet password>
+2500|${ZTE_TELNET_PW}
 5000|
 7000|echo V1_BOOTFLASH_USAGE; boot_flashing
 11000|echo V2_BOOTFLASH_H; boot_flashing -h

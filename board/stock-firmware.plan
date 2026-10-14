@@ -1,5 +1,5 @@
 1500|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 8000|echo W1; ls -l /lib/firmware 2>&1
 12000|echo W2; ls -l /lib/firmware/mediatek 2>&1
 16000|echo W3; ls -d /wlan /etc/wlan /misc /lib/firmware/* 2>&1

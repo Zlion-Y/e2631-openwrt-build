@@ -1,5 +1,5 @@
 1500|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 8000|ls -l /kmodule/
 11000|cp -f /kmodule/plat-zxylzb_9128S.ko /var/tmp/; ls -l /var/tmp/plat-zxylzb_9128S.ko
 15000|curl -f -sS -T /var/tmp/plat-zxylzb_9128S.ko http://192.168.5.5:8001/plat-zxylzb_9128S.ko; echo rc_ko=$?

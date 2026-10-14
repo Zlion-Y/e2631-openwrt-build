@@ -1,5 +1,5 @@
 1500|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 8000|echo V1; ls /wlan 2>&1
 12000|echo V2; ls -lR /wlan 2>&1
 20000|echo V3; ls -l /lib/modules 2>&1

@@ -1,5 +1,5 @@
 1500|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 8000|echo U1; cd /etc/wireless/mt7916; pwd
 12000|echo U2; /kmodule/bin/curl -sS -m 60 -T mt7916_patch_e1_hdr.bin http://192.168.5.17:8000/put/mt7916_patch_e1_hdr.bin; echo rc=$?
 18000|echo U3; /kmodule/bin/curl -sS -m 120 -T MT7916_EEPROM.bin http://192.168.5.17:8000/put/MT7916_EEPROM.bin; echo rc=$?

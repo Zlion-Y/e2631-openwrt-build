@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo F1; ls -l /wlan
 20000|echo F2; cat /proc/mounts

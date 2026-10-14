@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 7000|
 9000|cat > /tmp/m.sh <<'EOS'
 9500|#!/bin/sh

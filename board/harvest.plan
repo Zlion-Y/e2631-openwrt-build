@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo H1; rm -f /var/tmp/fw.bin; df -k /var; sha256sum /dev/null && echo HAVE_SHA
 30000|echo H2; dd if=/dev/mtdblock0 bs=131072 skip=56 count=224 of=/var/tmp/slotA.bin 2>&1; ls -l /var/tmp/slotA.bin

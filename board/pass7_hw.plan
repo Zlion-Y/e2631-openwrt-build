@@ -1,5 +1,5 @@
 1000|root
-2500|<redacted:vendor telnet password>
+2500|${ZTE_TELNET_PW}
 6000|
 8000|echo N1_IFACES; cat /proc/net/dev
 12000|echo N2_IFCONFIG; ifconfig -a

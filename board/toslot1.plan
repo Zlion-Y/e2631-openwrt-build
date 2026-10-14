@@ -1,5 +1,5 @@
 1500|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 7000|curl -f -o /var/tmp/fw http://192.168.5.5:8000/e2631-fwslot; chmod +x /var/tmp/fw; ls -l /var/tmp/fw
 13000|/var/tmp/fw info
 16000|/var/tmp/fw boot 1

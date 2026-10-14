@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo G1; G() { devmem2 "$1" word 2>/dev/null | sed -n 's/.*): //p'; }; for b in 94407000 94407040 94407080 944070c0 94407100 94407140; do d=`printf %x $((0x$b+0x14))`; s=`printf %x $((0x$b+0x18))`; c=`printf %x $((0x$b+0x1c))`; echo "$b DIR=`G 0x$b` DATA=`G 0x$d` SET=`G 0x$s` CLR=`G 0x$c`"; done
 30000|echo G2; cat /proc/zte/ledkey_m/led; echo ---KEY---; cat /proc/zte/ledkey_m/key

@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo B1; ls /sys/class/mtd/mtd0/
 16000|echo B2; cat /sys/class/mtd/mtd0/bad_blocks 2>&1

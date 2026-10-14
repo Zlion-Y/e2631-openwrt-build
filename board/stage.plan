@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo S1; rm -f /var/tmp/e2631-fwslot /var/tmp/fw.bin /var/tmp/flash.log; df -k /var /tmp; mount | grep -E " /var| /tmp"; which setsid nohup curl; cat /proc/mtd; ls -l /dev/mtd* 2>/dev/null
 18000|echo S2; curl -f --connect-timeout 5 --max-time 240 -o /var/tmp/e2631-fwslot http://192.168.5.5:8001/e2631-fwslot; echo rc=$?; chmod +x /var/tmp/e2631-fwslot; ls -l /var/tmp/e2631-fwslot

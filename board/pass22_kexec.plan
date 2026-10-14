@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo X1; ls /proc/sys/kernel | grep -i kexec
 18000|echo X2; cat /proc/sys/kernel/kexec_loaded /proc/sys/kernel/kexec_crash_loaded 2>&1

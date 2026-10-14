@@ -1,5 +1,5 @@
 1500|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 7000|uptime
 8500|cat /proc/uptime
 10000|busybox hexdump -C -s 0x1c60000 -n 512 /dev/mtd0 | busybox sed -n "1,2p;31,33p"

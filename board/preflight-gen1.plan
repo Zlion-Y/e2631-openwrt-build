@@ -1,7 +1,7 @@
 # Read-only pre-flight on the stock system: prove the login works and that the
 # package is actually deliverable before anyone writes a byte of flash.
 0|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 7000|echo G-LOGIN; uname -a; echo slot-info; cat /proc/mtd | head -12
 12000|echo G-PING; /bin/curl -s -I http://192.168.1.177:8000/e2631-openwrt-gen1.bin
 22000|echo G-VER; /bin/fw_flashing 2>&1 | head -3

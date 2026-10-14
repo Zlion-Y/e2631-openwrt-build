@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo D1; ls -l /wlan; ls -l /proc/capability/
 25000|echo D2; for f in /wlan/*; do echo "F $f $(ls -l $f)"; done

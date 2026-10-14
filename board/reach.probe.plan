@@ -1,5 +1,5 @@
 1500|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 8000|echo C-IP; ifconfig | busybox grep -E "addr|HWaddr" | head -6
 12000|echo C-ARP; ping -c 2 -W 2 192.168.5.5 2>&1 | tail -3
 18000|echo C-GW; ip route 2>/dev/null | head -4; arp -n 2>/dev/null | head -5

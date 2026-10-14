@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo C1; rm -f /var/tmp/*; df -k /var
 25000|echo C2; cat /dev/mtdblock1 > /var/tmp/mtd1-bootloader.bin; cat /dev/mtdblock2 > /var/tmp/mtd2-tag.bin; cat /dev/mtdblock3 > /var/tmp/mtd3-wifi.bin; ls -l /var/tmp

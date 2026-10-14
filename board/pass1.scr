@@ -2,7 +2,7 @@
 EXPECT (?i)user\s?name:|login:
 SENDLN root
 EXPECT (?i)password:
-SENDLN <redacted:vendor telnet password>
+SENDLN ${ZTE_TELNET_PW}
 EXPECT [#>]\s*$
 WAIT 300
 SENDLN echo Q1_VERSIONSTATES; cat /proc/zte/verinfo/versionstates

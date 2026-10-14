@@ -1,6 +1,6 @@
 500|
 2000|root
-3500|<redacted:vendor telnet password>
+3500|${ZTE_TELNET_PW}
 6000|
 8000|id
 9500|echo MARKER_OK

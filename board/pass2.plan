@@ -1,5 +1,5 @@
 1000|root
-2500|<redacted:vendor telnet password>
+2500|${ZTE_TELNET_PW}
 5000|
 7000|echo Z1_CMDLINE; cat /proc/cmdline
 10000|echo Z2_VERSTATES; cat /proc/zte/verinfo/versionstates

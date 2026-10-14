@@ -1,5 +1,5 @@
 1500|root
-4500|<redacted:vendor telnet password>
+4500|${ZTE_TELNET_PW}
 8000|ls /sys/kernel/debug/regmap/
 11000|find / -name "*9128S*" > /var/tmp/ko_path.txt 2>/dev/null; cat /var/tmp/ko_path.txt
 18000|ls /sys/kernel/debug/regmap/94000000.topcrm/ 2>/dev/null

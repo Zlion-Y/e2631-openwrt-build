@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 9000|
 12000|echo H1; ls -l /dev/mtd0 /dev/mtdblock0 /dev/mtd6 /dev/mtd7
 18000|echo H2; for i in 0 6 7 8; do echo -n "mtd$i flags="; cat /sys/class/mtd/mtd$i/flags; echo -n "  type="; cat /sys/class/mtd/mtd$i/type; done

@@ -1,5 +1,5 @@
 1000|root
-3000|<redacted:vendor telnet password>
+3000|${ZTE_TELNET_PW}
 7000|
 9000|echo A1_MDIOLIST; ls /sys/bus/mdio_bus/devices/
 12000|echo A2_MDIOCLASS; ls /sys/class/mdio_bus/

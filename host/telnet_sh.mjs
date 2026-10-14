@@ -17,6 +17,17 @@ let stopOn = '';
 const [host, port, planPath, outPath] = argv;
 const stopRe = stopOn ? new RegExp(stopOn) : null;
 const plan = fs.readFileSync(planPath, 'utf8').split(/\r?\n/).filter(l => l.trim())
+  // The vendor telnet password is never committed. Plans carry ${ZTE_TELNET_PW} and the
+  // value is taken from the environment at run time; a plan that needs it and finds no
+  // value stops here rather than typing an empty line at the device.
+  .map((l) => {
+    if (!l.includes('\${ZTE_TELNET_PW}')) return l;
+    if (!process.env.ZTE_TELNET_PW) {
+      console.error('plan needs ${ZTE_TELNET_PW}: export ZTE_TELNET_PW first');
+      process.exit(2);
+    }
+    return l.split('\${ZTE_TELNET_PW}').join(process.env.ZTE_TELNET_PW);
+  })
   .map(l => { const i = l.indexOf('|'); return i < 0 ? { d: parseInt(l, 10), s: '' } : { d: parseInt(l.slice(0, i), 10), s: /\r/.test(l.slice(i + 1)) ? l.slice(i + 1) : l.slice(i + 1) + '\r\n' }; });
 let last = 0;
 for (const p of plan) { last = p.d; }
