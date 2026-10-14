@@ -8,8 +8,9 @@ our own fork so a force-push upstream cannot break the build.
     git -C openwrt checkout db8b8d4130457dbe46558a7cea872dd2dae539e6
     ./apply.sh openwrt
 
-Images are built by .github/workflows/build.yml, or locally inside WSL with
-wsl/build.sh (see below). Packaging into the vendor upgrade format happens on
+Images are built locally inside WSL with wsl/build.sh (see below);
+`.github/workflows/build.yml` is manual-only now and exists as the fallback for a
+machine without WSL. Packaging into the vendor upgrade format happens on
 the Windows side with tools/mkfactory.mjs, because the official package used as
 the version-header template is not uploaded here.
 

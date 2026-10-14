@@ -1,15 +1,16 @@
 name: build E2631 OpenWrt images
 
-# Compilation happens here, not on the workstation: this box has no make/gcc/dtc
-# and the WSL component stays disabled on purpose. Packaging and verification
-# (tools/mkfactory.mjs, tools/verify_hdr_crc.mjs) run locally, because the
-# official vendor package used as the version-header template never gets
-# uploaded to GitHub.
+# Manual only since 2026-10-14. The build path of record is local: wsl/build.sh
+# inside WSL against ~/openwrt, with collect.sh + tools/mkfactory.mjs packaging on
+# the Windows side (the official vendor package used as the version-header
+# template never gets uploaded here, so packaging could not happen in CI anyway).
+# Two pushes to main each started a ~40 minute build nobody asked for, which is why
+# push is no longer a trigger. This workflow stays as the fallback for a machine
+# without WSL, and as the fast native -Werror check on the slot tool: run it from
+# the Actions page (workflow_dispatch).
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 env:
   BASE_REPO: https://github.com/Zlion-Y/openwrt-sanechips-base
