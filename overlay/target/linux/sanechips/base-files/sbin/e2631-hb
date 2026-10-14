@@ -52,6 +52,19 @@ fi
 # boot that had just died, which was the one piece of evidence we went looking
 # for. The per-boot marker replaces the lost "opened" line.
 echo "=== hb opened up=$(cut -d ' ' -f1 /proc/uptime) interval=$interval sync-every=$SYNC_EVERY ===" >> "$LOGF"
+# Then bound it. /root is jffs2 on an 8 MiB overlay, a beat is ~45 B every 3 s, and
+# after two boots of uptime the file was already 1610 lines / 69 KB with no cap in
+# place. The first "no space left on device" here would also be the first lost
+# evidence, so keep the newest LIMIT lines - the tail of the boot that died is what
+# this file is read for, and tail keeps it.
+LIMIT=${LIMIT:-600}
+if [ "$(wc -l < "$LOGF" 2>/dev/null || echo 0)" -gt "$LIMIT" ]; then
+	if tail -n "$LIMIT" "$LOGF" > "$LOGF.rot" 2>/dev/null; then
+		mv -f "$LOGF.rot" "$LOGF"
+	else
+		rm -f "$LOGF.rot"
+	fi
+fi
 sync
 while :; do
 	beat
