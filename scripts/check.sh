@@ -54,11 +54,20 @@ g_ash() {	# the scripts that get put on the device, under the device's shell
 }
 
 g_slot_tool() {	# compiles with -Werror, then parses a good and a bad package
-	command -v gcc >/dev/null 2>&1 || { echo "no gcc: e2631-fwslot was not compiled"; return 77; }
-	e2631_need_cmd node "synthesize the test package first" || return 77
-	mkdir -p "$E2631_OUT/fixture"
-	node "$E2631_KIT/tools/make_fixture.mjs" "$E2631_OUT/fixture" >/dev/null || {
-		echo "make_fixture.mjs failed"; return 1; }
+	command -v gcc >/dev/null 2>&1 || { echo "no gcc: e2631-fwslot was not compiled here"; return 77; }
+	if [ ! -f "$E2631_OUT/fixture/fixture.bin" ]; then
+		if command -v node >/dev/null 2>&1; then
+			node "$E2631_KIT/tools/make_fixture.mjs" "$E2631_OUT/fixture" >/dev/null || {
+				echo "make_fixture.mjs failed"; return 1; }
+		else
+			# The split this machine has: gcc in the Linux box, node only on the
+			# Windows side. Saying PASS here would hide the two parse checks.
+			echo "no $E2631_OUT/fixture/fixture.bin and no node here: run"
+			echo "     node tools/make_fixture.mjs $E2631_OUT/fixture"
+			echo "on the side that has node, then re-run this gate."
+			return 77
+		fi
+	fi
 	bash "$E2631_KIT/wsl/check-kit.sh"
 }
 
