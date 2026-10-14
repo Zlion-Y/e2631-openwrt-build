@@ -97,8 +97,8 @@ directory you did not just unpack is a stale answer.
 
 ## Status on the real board (2026-10-14, slot 1 = `e2631-openwrt-gen1.bin`)
 
-The current package is Release **`v1.1`** (`e2631-openwrt-v1.1.bin`, sha256
-`a6295d4aea3370b135c5f22c014cafc889b7c5cd3a05fcccc62b2a687c1fd769`): it adds `/sbin/e2631-wifi-ap`
+The current package is Release **`v1.2`** (`e2631-openwrt-v1.2.bin`, sha256
+`02b35106a1259ed1aed04c35cb6b037c635b6fb68f3e2906da2931cb96d12ddc`): it adds `/sbin/e2631-wifi-ap`
 (the second gate: without it there is no /etc/config/wireless at all, and netifd marks every
 generated iface `disabled 1`) and makes the first-boot auto-revert opt-in via
 `/etc/e2631-trial-arm` instead of the default. Kernel region byte-identical to `v1.0`.
