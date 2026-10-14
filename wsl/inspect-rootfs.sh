@@ -1,11 +1,14 @@
 #!/bin/bash
-# Follow-up on final-root-check: where is the A/B switcher, is the squashfs
-# extraction complete, and what does the shipped wireless config default to?
+# What is actually inside the rootfs we are about to flash - format checks pass on
+# images that will not boot, so look at the payload itself: the A/B switcher, whether the
+# squashfs extracted completely, and what the shipped wireless config defaults to.
+#
+#   bash wsl/inspect-rootfs.sh <dir holding payload/sysupgrade-*>   (default: the newest)
 set -u
-LOG=/mnt/d/AI/Qoder/E2631-OpenWRT/out/final-root-check2.log
+LOG=/mnt/d/AI/Qoder/E2631-OpenWRT/out/inspect-rootfs.log
 exec >"$LOG" 2>&1
 W=/tmp/finalroot
-P=/mnt/d/AI/Qoder/E2631-OpenWRT/out/wifix3/payload/sysupgrade-zte_zxhn-e2631
+P=${1:-/mnt/d/AI/Qoder/E2631-OpenWRT/out/gen1/payload/sysupgrade-zte_zxhn-e2631}
 U=$(ls -d ~/openwrt/staging_dir/host/bin/unsquashfs* | head -1)
 
 echo "=== every e2631* file in the shipped rootfs ==="

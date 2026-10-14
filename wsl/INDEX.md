@@ -1,65 +1,61 @@
 # wsl/ - the build path, the patch generators, and the evidence tools
 
 Everything here runs inside the WSL build box (`~/openwrt` tree, this repo at
-`~/e2631`). `bash -n` for all of them is gated by `lint-kit.sh`.
-
-Grouped by what they are for, because the file count is the price of recording
-how each conclusion was reached:
+`~/e2631`, workspace mounted at `/mnt/d/AI/Qoder/E2631-OpenWRT`). `bash -n` for all of
+them, plus an ash gate for every script we push to the board, is `lint-kit.sh`.
+The WSL box has gcc but **no node**; the Windows side has node but no toolchain - that
+split is why some checks are two commands instead of one.
 
 ## Build path (run these in order)
 
 | script | what it does |
 |---|---|
 | `sync.sh` | copy the workspace repo into `~/e2631` so the build sees it |
-| `apply.sh` (repo root) | overlay onto the tree - run through `build.sh`, not by hand |
+| `check-kit.sh` | the gates the retired CI used to run: compile the slot tool with `-Werror`, then have it accept a synthesized package and reject one byte altered. Needs `node build/tools/make_fixture.mjs out/fixture` first (Windows side) |
 | `build.sh` | full local `make world`, with the download workarounds in README.md |
-| `collect.sh <out-dir>` | lay the result out the way the CI artifact does, for `tools/mkfactory.mjs` / release screening |
-| `status.sh`, `probe.sh` | one-line "what phase is the build in, is it still running" |
-| `kick-build.sh`, `killbuild.sh` | launch detached / stop whatever is running (patterns bracketed so the killer cannot kill itself) |
+| `build-gen1.sh` | the same, pinned to what shipped on the board: sync -> apply -> `package/kernel/mt76/{clean,download,prepare}` -> witnesses -> `target/linux/{clean,prepare}` -> witnesses -> `make world` -> `collect.sh` -> copy to `out/gen1` |
+| `collect.sh <out-dir>` | lay the result out the way the packaged artifact does (`kernel` / `root` / `e2631.dtb` / `config-6.18` / `e2631-fwslot`), for `node build/host/release.mjs --dir <out-dir>` |
+| `build-regprobe.sh` | build the FW_STATE probe module against the exact kernel we ship (the `/dev/mem` replacement) |
+| `probe.sh`, `killbuild.sh` | "which phase is the build in, is it still running" / stop it (patterns bracketed so the killer cannot kill itself) |
 | `segdl.sh`, `parget.sh` | segmented parallel GET for distfiles |
+| `pull-log.sh <wsl-path> <name>` | copy a WSL log into `out/` so it can be read |
 
 ## Patch generators (never hand-write a patch)
 
 | script | generates |
 |---|---|
-| `gen-efuse-patch.sh` | mt76 `002-mt7915-use-caldata-file-before-efuse.patch` - lands the caldata file before the efuse round-trips |
-| `gen-retrain-patch.sh` | kernel `031-pci-gate-link-retrain-speed-lift-by-vendor-device.patch` - re-gates the 2.5 GT/s speed lift by Vendor:Device |
-| `gen-fwtimeout-patch.sh` | `003-mt7915-wait-longer-for-fw-state.patch` (1 s -> 8 s) - **deferred, and falsified**: the widened wait still hung on a cold bind, so it is not in the build |
+| `gen-efuse-patch.sh` | mt76 `002-mt7915-use-caldata-file-before-efuse.patch` - load the calibration file before the efuse round-trips |
+| `gen-retrain-patch.sh` | kernel `031-pci-gate-link-retrain-speed-lift-by-vendor-device.patch` - re-gate the 2.5 GT/s speed lift |
+| `gen-fwtimeout-patch.sh` | `003-mt7915-wait-longer-for-fw-state.patch` (1 s -> 8 s) - **falsified and deferred**, kept only so the generator is not lost |
 
-Each generator writes the patch from the source the build actually uses and then
-proves `APPLIED == GENERATED`; a hand-written patch in this tree failed to apply
-once (`malformed patch at line 37`).
+Each generator writes the patch from the source the build actually uses and proves
+`APPLIED == GENERATED`; a hand-written patch in this tree failed to apply once
+("malformed patch at line 37"). `land-patch.sh` and `check-patch31.sh` are the dry-run
+and the landing step for that loop.
 
 ## Witnesses (proof the fix is in the artifact, not just the source)
 
-`check-patch31.sh` (dry-run a kernel patch before spending a build), `land-patch.sh`,
-`verify-efusefix.sh` / `2` / `3` (three iterations of the same witness - the function
-is inlined, so the final one keys off the caller's relocations),
-`verify-gen1-kernel.sh` (disassemble the booted kernel to see `bl pci_match_id`),
-`verify-fwt-ko.sh` + `stage-fwt-ko.sh` + `build-fwtimeout-ko.sh` (build only the kmod),
-`build-regprobe.sh` (the `/dev/mem` replacement - see below),
-`mt7915-readl-gap.sh`, `which-mt7915-src.sh` (the kernel tree and the feed both carry
-mt7915; only one builds the .ko), `check-apply.sh`, `debug-apply.sh`, `show-eeprom-load.sh`,
-`final-root-check.sh`, `final-root-check2.sh`, `lint-kit.sh`, `sh-lint.sh`.
+`verify-efusefix.sh` (the function is inlined, so key it off the caller's relocations),
+`verify-gen1-kernel.sh` (disassemble the booted kernel and see `bl pci_match_id`),
+`inspect-rootfs.sh <dir>` (what is really inside the rootfs: the A/B switcher, whether the
+squashfs extracted fully, what the wireless config defaults to),
+`mt7915-readl-gap.sh`, `which-mt7915-src.sh` (the kernel tree and the mt76 feed both carry
+mt7915 - only one builds the .ko we load), `check-apply`-style greps folded into
+`build-gen1.sh`'s witness lines, `lint-kit.sh`, `sh-lint.sh`.
 
-## Probes that answered a question and are kept so the answer can be re-checked
+## Probes that answered a question, kept so the answer can be re-checked
 
-`mps-static.sh`, `mps-selftest.sh`, `test-boardspeed.sh` (config-space decode, offline),
-`dwc-linkspeed.sh` (our host controller driver does not read `max-link-speed`),
-`iolock-coverage.sh`, `check-iolock.sh` (the L2 cache IO-lock patch vs mt7915's reads),
-`retrain-quirk-check.sh` (found the un-gated `pcie_failed_link_retrain()`),
+`mps-static.sh`, `mps-selftest.sh`, `test-boardspeed.sh` (config-space decode, offline, against
+bytes pulled from the live board), `dwc-linkspeed.sh` (our host controller driver does not read
+`max-link-speed`), `retrain-quirk-check.sh` (found the un-gated `pcie_failed_link_retrain()`),
+`iolock-coverage.sh`, `check-iolock.sh` (the base tree's L2 IO-lock patch vs mt7915's reads),
 `l2c-auxctl-decode.sh`, `read-mt7915-eeprom.sh`,
 `mtk-disasm.sh`, `mtk-disasm-init.sh`, `mtk-fw-symbols.sh`, `mtk-init-sequence.sh`,
 `vendor-ko-family.sh` (the stock `mt7916.ko` is MTK's proprietary driver, not mt76),
-`vendor-dtb-wdt.sh`, `wdt-check.sh`, `twd-wdt-check.sh`, `twd-driver-name.sh`
-(no watchdog can self-recover from an IRQs-off hang here),
-`failsafe-check.sh`, `failsafe-route.sh` (failsafe is the way back in without serial TX),
-`pull-log.sh` (copy a WSL log into the workspace so it can be read).
+`vendor-dtb-wdt.sh`, `twd-wdt-check.sh` (no watchdog can self-recover from an IRQs-off hang here),
+`failsafe-check.sh`, `failsafe-route.sh` (failsafe is the way back in without serial TX).
 
-`enable-devmem.sh` is kept as the record of a dead end, with the caveat that the reason
-is still unknown: the shipped kernel config (`out/gen1/config-6.18:2314`) reads
-`# CONFIG_DEVMEM is not set` while both fragments (`generic/config-6.18:1494`,
-`sanechips/config-6.18:147`) read `CONFIG_DEVMEM=y` and nothing anywhere asks for n -
-`drivers/char/Kconfig:311` is a plain "bool / default y". So the request is dropped
-somewhere in kconfig resolution; do not spend a build guessing. Read the MT7916's
-`MT_TOP_MISC` with the module `build-regprobe.sh` produces instead.
+Two conclusions are recorded in `../docs/02-...md` section P rather than in a script, and
+should not be re-litigated with a build: `/dev/mem` is unreachable from any fragment
+(`# CONFIG_DEVMEM is not set` in the built config while every fragment says `=y`), and the
+widened `FW_STATE` wait does not help (a cold bind hung with 8 s too).
