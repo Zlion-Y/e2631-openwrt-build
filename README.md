@@ -83,7 +83,26 @@ drives are mounted inside the distro, so nothing has to be piped over stdio.
 `wsl/INDEX.md` groups the other scripts in there (build path / patch generators /
 witnesses / probes) so the file count does not hide which ones to run.
 
+Publishing is the last local step, since there is no CI any more:
+`node build/host/publish.mjs --tag <t> --bin out/<package>.bin --notes out/<notes>.md`
+creates the Release, uploads the package plus a `SHA256SUMS`, and prints GitHub's own
+asset digest so the upload can be compared with the local sha256. It refuses a file whose
+first 16 bytes are not the four vendor magic words, so a half-packed package cannot be
+published by accident.
+
+One gate gotcha worth knowing: `wsl/inspect-rootfs.sh` used to read `/tmp/finalroot`
+without ever extracting into it, so it reported whatever the previous run had left there --
+it now extracts first. Any "what is really in the rootfs" answer that comes from a
+directory you did not just unpack is a stale answer.
+
 ## Status on the real board (2026-10-14, slot 1 = `e2631-openwrt-gen1.bin`)
+
+The published package is Release **`v1.0`** (`e2631-openwrt-v1.0.bin`, sha256
+`86012481bf92701bb901f8a996c84f20101babaa2f7fcfb17487742b8d408487`). Its kernel region is
+byte-identical to the `gen1` image in the table below -- already flashed and run on the box --
+and it differs only in the rootfs, which now actually carries `e2631-hb`, `e2631-wifi-on`,
+`e2631-wifi-load`, `e2631-linkspeed` and `e2631-fwstate`. That `.bin` has not been flashed
+itself yet; the rows below describe what the identical kernel + an older rootfs did on hardware.
 
 | | |
 |---|---|

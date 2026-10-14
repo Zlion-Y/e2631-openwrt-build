@@ -11,6 +11,14 @@ W=/tmp/finalroot
 P=${1:-/mnt/d/AI/Qoder/E2631-OpenWRT/out/gen1/payload/sysupgrade-zte_zxhn-e2631}
 U=$(ls -d ~/openwrt/staging_dir/host/bin/unsquashfs* | head -1)
 
+# Extract FIRST. This script used to read /tmp/finalroot without ever populating it, so every
+# report it gave was whatever an earlier run of the same script had left there -- a stale rootfs
+# was being presented as the one we are about to flash.
+rm -rf "$W"
+"$U" -no-xattrs -quiet -d "$W" "$P/root" >>"$LOG" 2>&1
+echo "=== extraction rc=$? : $(find "$W" | wc -l) paths unpacked from $P/root ==="
+echo
+
 echo "=== every e2631* file in the shipped rootfs ==="
 find "$W" -name 'e2631*' | sed "s|$W/||" | sort
 
