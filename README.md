@@ -97,17 +97,20 @@ directory you did not just unpack is a stale answer.
 
 ## Status on the real board (2026-10-14, slot 1 = `e2631-openwrt-gen1.bin`)
 
-The current package is Release **`v1.2`** (`e2631-openwrt-v1.2.bin`, sha256
-`02b35106a1259ed1aed04c35cb6b037c635b6fb68f3e2906da2931cb96d12ddc`): it adds `/sbin/e2631-wifi-ap`
-(the second gate: without it there is no /etc/config/wireless at all, and netifd marks every
-generated iface `disabled 1`) and makes the first-boot auto-revert opt-in via
-`/etc/e2631-trial-arm` instead of the default. Kernel region byte-identical to `v1.0`.
+Current package: Release **`v1.2`** -- `e2631-openwrt-v1.2.bin`, 20,972,052 B, sha256
+`02b35106a1259ed1aed04c35cb6b037c635b6fb68f3e2906da2931cb96d12ddc`.  Its kernel region is
+byte-identical to the `gen1` image in the table below (the one flashed and run on the box), so the
+boot path carries no new variable; everything that differs is in the rootfs:
 
-`v1.0` (`e2631-openwrt-v1.0.bin`, sha256 `86012481bf92701bb901f8a996c84f20101babaa2f7fcfb17487742b8d408487`). Its kernel region is
-byte-identical to the `gen1` image in the table below -- already flashed and run on the box --
-and it differs only in the rootfs, which now actually carries `e2631-hb`, `e2631-wifi-on`,
-`e2631-wifi-load`, `e2631-linkspeed` and `e2631-fwstate`. That `.bin` has not been flashed
-itself yet; the rows below describe what the identical kernel + an older rootfs did on hardware.
+| release | rootfs side |
+|---|---|
+| `v1.0` | first package that flashes and boots; no `/sbin/e2631-wifi-ap`; the 600 s trial gate still auto-reverted to the stock slot |
+| `v1.1` | adds `/sbin/e2631-wifi-ap`; the first-boot auto-revert becomes opt-in (`touch /etc/e2631-trial-arm`) |
+| `v1.2` | fixes that helper: named-section parsing (the generator writes `radioN`/`default_radioN`, not `@wifi-iface[n]`), the `+N` path suffix for a second phy on one device, and a `wifi down/up` cycle instead of a bare `wifi reload`.  Confirmed on the box: `phy1-ap0 type AP ssid E2631 channel 36 (5180 MHz)`, hostapd running, **phone sees the 5G network** |
+
+Manual radio, two commands, with the boot still silent (no `/etc/e2631-wifi-autoload`, no driver
+loaded): `/sbin/e2631-wifi-on 0` then `/sbin/e2631-wifi-ap`.  Worked on the real board; the old
+`v1.0` notes are kept only for their measured numbers, which did not change.
 
 | | |
 |---|---|
