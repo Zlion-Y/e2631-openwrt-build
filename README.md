@@ -106,8 +106,14 @@ log line behind the conclusions), `device/` (board-side helper scripts and the v
 flash plans), `tools/` (Windows-side: `release.mjs`, `stage.mjs`, serial/telnet/ssh drivers),
 `out/` (every artifact and log, including the images), and the reference clones.
 
-Two sibling repos of ours are related: `Zlion-Y/e2631-mainline-zx279128s` (mainline Linux
-port, separate effort, still the source of the real boot log evidence) and
-`Zlion-Y/e2631-openwrt` - the stage-1 initramfs scaffold, which this repo **supersedes**:
-its board DTS, `apply.sh` and seed config are older copies of what is here, and its
-`tools/*.py` screens were rewritten as `.mjs` because this machine has no usable python.
+Two sibling repos of ours are related. `Zlion-Y/e2631-mainline-zx279128s` (mainline
+Linux port) stays a separate effort - it is still where the real "this SoC boots"
+evidence comes from. `Zlion-Y/e2631-openwrt`, the stage-1 initramfs scaffold, has
+been folded in here: its history is the `stage1-scaffold` branch
+(`git log --oneline stage1-scaffold`), and `tools/PROBE.md` - the list of unknowns
+the first board file was written against - now lives on `main` with a status table
+saying which of those unknowns a flashed board closed and which it did not.
+Everything else on that branch is an older copy of what is here: its board DTS,
+`apply.sh` and seed config predate the slot geometry, the nvmem MAC wiring and the
+JFFS2 patches, and its `tools/*.py` screens were rewritten as `.mjs` because this
+machine has no usable python.
