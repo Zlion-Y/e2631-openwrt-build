@@ -10,6 +10,9 @@
 # scan looks at SHAPES, runs over `git ls-files`, and belongs to the gate list instead
 # of being something to remember at push time.
 #
+# The pattern is written with character classes rather than the value itself: this
+# file is inside the set it scans, and a gate that cannot run over its own source is
+# not a gate.
 # Two conventions when a hit is real, and they are not interchangeable:
 #   *.plan and anything typed at the device -> ${ZTE_TELNET_PW}. That line goes out
 #       verbatim, so it cannot carry a comment or a note about substitution.
@@ -27,7 +30,7 @@ LABELS=(
 	'a *_PW/_TOKEN/_SECRET assignment with a literal value'
 )
 REGEXES=(
-	'abc123'
+	'[aA][bB][cC]123'
 	'\b(ghp_|gho_|ghu_|ghs_|github_pat_)[A-Za-z0-9]{8,}'
 	'-----BEGIN [A-Z ]*PRIVATE KEY-----'
 	'\b(AKIA[0-9A-Z]{16}|LTAI[A-Za-z0-9]{12,})'
