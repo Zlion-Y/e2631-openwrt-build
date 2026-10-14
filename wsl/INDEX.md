@@ -56,7 +56,10 @@ mt7915; only one builds the .ko), `check-apply.sh`, `debug-apply.sh`, `show-eepr
 `failsafe-check.sh`, `failsafe-route.sh` (failsafe is the way back in without serial TX),
 `pull-log.sh` (copy a WSL log into the workspace so it can be read).
 
-`enable-devmem.sh` is kept as the record of a dead end: `CONFIG_DEVMEM` does not
-appear in the built kernel `.config` at all, so neither the generic nor the target
-fragment can reach it. Read the MT7916's `MT_TOP_MISC` with the module
-`build-regprobe.sh` produces instead.
+`enable-devmem.sh` is kept as the record of a dead end, with the caveat that the reason
+is still unknown: the shipped kernel config (`out/gen1/config-6.18:2314`) reads
+`# CONFIG_DEVMEM is not set` while both fragments (`generic/config-6.18:1494`,
+`sanechips/config-6.18:147`) read `CONFIG_DEVMEM=y` and nothing anywhere asks for n -
+`drivers/char/Kconfig:311` is a plain "bool / default y". So the request is dropped
+somewhere in kconfig resolution; do not spend a build guessing. Read the MT7916's
+`MT_TOP_MISC` with the module `build-regprobe.sh` produces instead.

@@ -186,9 +186,12 @@ fi
 # poisoned TLP or an unread completion produces a silent bus stall instead of a
 # report, which is exactly the failure being chased here.
 #
-# /dev/mem is NOT obtainable this way: CONFIG_DEVMEM does not appear at all in the
-# built kernel .config (out/gen1/config-6.18 -- not even as "is not set"), so the
-# symbol is not reachable from either fragment. Read the MT7916's MT_TOP_MISC
-# without a driver with the probe module instead: build/wsl/build-regprobe.sh.
+# /dev/mem is NOT reachable by editing fragments. The built kernel config
+# (out/gen1/config-6.18:2314) comes out as "# CONFIG_DEVMEM is not set" even though
+# generic/config-6.18:1494 and sanechips/config-6.18:147 both read CONFIG_DEVMEM=y and
+# nothing anywhere asks for n -- drivers/char/Kconfig:311 is a plain "bool / default y".
+# Why the request is dropped is still unexplained, so do not re-add a fragment edit on
+# the assumption that it will work. Read the MT7916's MT_TOP_MISC without a driver with
+# the probe module instead: build/wsl/build-regprobe.sh.
 
 echo "overlay applied to $TREE (base $BASE_SHA)"

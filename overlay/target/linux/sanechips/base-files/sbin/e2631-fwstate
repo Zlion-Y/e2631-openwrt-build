@@ -17,12 +17,13 @@
 # Requires CONFIG_DEVMEM with IO_STRICT_DEVMEM off; this image's busybox has no
 # devmem applet, so the access is done with dd on /dev/mem.
 #
-# STATUS: cannot run in any image we can currently build - CONFIG_DEVMEM does not
-# appear in the kernel .config at all (neither generic nor target fragment reaches
-# it). Use the regprobe module instead (build/wsl/build-regprobe.sh): it does the
-# same rmw from inside the kernel, and it also sets Memory Space Enable first,
-# which this script does not - on a cold card Command is 0x0140 and every MMIO
-# read then returns 0xffffffff, which looks exactly like a dead link.
+# STATUS: cannot run in any image we can currently build. The shipped kernel config
+# reads "# CONFIG_DEVMEM is not set" (out/gen1/config-6.18:2314) even though both
+# fragments ask for CONFIG_DEVMEM=y, so /dev/mem is simply not there. Use the regprobe
+# module instead (build/wsl/build-regprobe.sh): it does the same rmw from inside the
+# kernel, and it also sets Memory Space Enable first, which this script does not - on a
+# cold card Command is 0x0140 and every MMIO read then returns 0xffffffff, which looks
+# exactly like a dead link.
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 ROUNDS=${1:-30}
 DEV=${DEV:-0000:01:00.0}
