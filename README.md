@@ -181,7 +181,7 @@ board DTS, `apply.sh` and seed config predate the slot geometry, the nvmem MAC w
 the JFFS2 patches, and its `tools/*.py` screens were rewritten as `.mjs` because this
 machine has no usable python.
 
-The vendor telnet password is not in here either. Every plan and expect script that used to carry
+The vendor telnet password is not in here either - and `scripts/secret-scan.sh` is now the gate that keeps it that way, scanning shapes rather than one literal value. Every plan and expect script that used to carry
 it now says ${ZTE_TELNET_PW}, and host/telnet_sh.mjs plus host/stage.mjs expand that from the
 environment and refuse to run without it - verified by host/test-token-expansion.mjs, which
 puts a fake telnet endpoint on 127.0.0.1 and checks the real value arrives on the wire and

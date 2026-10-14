@@ -101,6 +101,7 @@ Five gates, each reporting PASS / FAIL / SKIP with the reason:
 | busybox ash | the scripts that get put on the *device* parse under the device's shell, with CRLF stripped - a bashism or a `\r` here only shows up on the board |
 | slot tool | `e2631-fwslot.c` compiles with `-Wall -Wextra -Werror`, then accepts a synthesized package and rejects the same package with one kernel byte changed. This is the parser that runs on the device before anything is written to flash |
 | board dts | `#include`s and every `&label` in the board file resolve against the base tree's patch series (needs the tree, so it SKIPs before bootstrap) |
+| `scripts/secret-scan.sh` | no credential shapes in any tracked file, and the evidence files that must stay ignored (the vendor harvest, the config export, the token helper) are not tracked. It exists because a scrub that searches for a value **literally** missed nine files that carry the tcl-escaped form of the same password |
 
 The two gates that read a finished artifact - `host/verify_pkg.mjs` (re-derives the
 geometry independently) and `tools/verify_img.mjs` (boot readiness) - run inside the

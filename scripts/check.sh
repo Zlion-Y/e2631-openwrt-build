@@ -62,6 +62,11 @@ g_slot_tool() {	# compiles with -Werror, then parses a good and a bad package
 	bash "$E2631_KIT/wsl/check-kit.sh"
 }
 
+g_secret() {
+	command -v git >/dev/null 2>&1 || { echo "no git: the tracked-file scan cannot run"; return 77; }
+	bash "$E2631_KIT/scripts/secret-scan.sh"
+}
+
 g_dts() {
 	e2631_need_cmd node "resolve the board dts includes" || return 77
 	# The board file includes zte/zx279128s.dtsi, which is not in this repo: patch
@@ -83,6 +88,7 @@ run "javascript (node --check)" g_js
 run "device scripts (busybox ash)" g_ash
 run "slot tool (-Werror, parse, reject)" g_slot_tool
 run "board dts cross-reference" g_dts
+run "no credential shapes" g_secret
 
 [ $rc -eq 0 ] || { echo; echo "check: FAILED"; exit 1; }
 echo
