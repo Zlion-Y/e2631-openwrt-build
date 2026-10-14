@@ -80,6 +80,10 @@ if [ -z "$secs" ]; then
 			/sys/devices/*) devpath=${dev#/sys/devices/} ;;
 			*) log "cannot resolve a PCI path for $phy (device -> ${dev:-none})"; continue ;;
 		esac
+		# the same shape /usr/share/hostap/wifi-detect.uc writes: it strips a leading
+		# platform/ on paths that go through a platform device, and appends +N when one
+		# device hosts several phys
+		case "$devpath" in platform/*/pci*) devpath=${devpath#platform/} ;; esac
 		uci -q delete "wireless.radio$n"
 		uci set "wireless.radio$n=wifi-device"
 		uci set "wireless.radio$n.type=mac80211"
