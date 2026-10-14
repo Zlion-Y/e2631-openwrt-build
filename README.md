@@ -76,3 +76,38 @@ build selects - while the selected packages waited.
 (`kernel` / `root` / `e2631.dtb` / `config-6.18` / `e2631-fwslot`), which is
 what `node tools/release.mjs --dir <out-dir>` packs and screens. The Windows
 drives are mounted inside the distro, so nothing has to be piped over stdio.
+`wsl/INDEX.md` groups the other scripts in there (build path / patch generators /
+witnesses / probes) so the file count does not hide which ones to run.
+
+## Status on the real board (2026-10-14, slot 1 = `e2631-openwrt-gen1.bin`)
+
+| | |
+|---|---|
+| flash through the vendor `supgrade.html` page | **works** - the page accepted the package as-is, wrote slot 1, serial went 33 -> 34 on its own, and rebooted into our OpenWrt |
+| switch back to the vendor system from OpenWrt | **works** - `e2631-fwslot switch` + `reboot`, also reachable from failsafe |
+| LuCI (Argon theme), `reboot`, the three-colour LED | **work** |
+| Ethernet | link trains at 1 Gbps, but throughput plateaus at ~305 Mbit/s in and ~190 Mbit/s out - the driver has no checksum/TSO/SG/RSS offload and one RX queue, and all of that work lands on CPU0 even though both cores are online |
+| Wi-Fi (MT7916) | **usable, not stable, off by default** - see below |
+
+The radio does not come up unless `/etc/e2631-wifi-autoload` exists or someone runs
+`/sbin/e2631-wifi-on 0`. That is a deliberate choice, not a workaround: with the driver
+loaded from `rc.d`, a failed experiment cost the ability to get back into the box.
+Everything up to "AP beaming, monitor interface, air RX" has been verified alive on this
+board. Two things have not: the **first firmware download after a power cycle** succeeds on
+roughly one attempt in three (three cold boots on this exact image: hung, worked, hung),
+and a **client associating** still hard-hangs the machine, silently, with no AER record and
+no oops. Both are documented with their sample data in `docs/02-...md` section P.
+
+## What lives outside this repo
+
+The workspace root (`D:\AI\Qoder\E2631-OpenWRT`) holds the parts that are not build inputs
+and so are not in here: `docs/` (the two working documents, Chinese, with every offset and
+log line behind the conclusions), `device/` (board-side helper scripts and the vendor-side
+flash plans), `tools/` (Windows-side: `release.mjs`, `stage.mjs`, serial/telnet/ssh drivers),
+`out/` (every artifact and log, including the images), and the reference clones.
+
+Two sibling repos of ours are related: `Zlion-Y/e2631-mainline-zx279128s` (mainline Linux
+port, separate effort, still the source of the real boot log evidence) and
+`Zlion-Y/e2631-openwrt` - the stage-1 initramfs scaffold, which this repo **supersedes**:
+its board DTS, `apply.sh` and seed config are older copies of what is here, and its
+`tools/*.py` screens were rewritten as `.mjs` because this machine has no usable python.
