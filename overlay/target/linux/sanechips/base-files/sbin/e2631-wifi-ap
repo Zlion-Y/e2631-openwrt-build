@@ -39,6 +39,7 @@ if [ "${1:-}" = off ]; then
 	for s in $secs; do uci set "$s.disabled=1"; done
 	uci commit wireless
 	wifi reload
+	wifi down >/dev/null 2>&1
 	log "interfaces disabled (driver still loaded; 'rmmod' is not offered because it has hung the box)"
 	exit 0
 fi
@@ -80,10 +81,19 @@ if [ -z "$secs" ]; then
 			/sys/devices/*) devpath=${dev#/sys/devices/} ;;
 			*) log "cannot resolve a PCI path for $phy (device -> ${dev:-none})"; continue ;;
 		esac
-		# the same shape /usr/share/hostap/wifi-detect.uc writes: it strips a leading
-		# platform/ on paths that go through a platform device, and appends +N when one
-		# device hosts several phys
+		# the same shape /usr/share/hostap/wifi-detect.uc writes: strip a leading platform/ on
+		# paths that go through a platform device, then add "+N" for the Nth phy on that same
+		# device.  This board has ONE pci function hosting two phys (phy0 = Band 1 = 2.4G,
+		# phy1 = Band 2 = 5G), so the plain path means the first phy and "+1" the second --
+		# getting this wrong makes netifd show the radio as "type unknown, channel 0".
 		case "$devpath" in platform/*/pci*) devpath=${devpath#platform/} ;; esac
+		ofs=0
+		for o in /sys/class/ieee80211/phy*; do
+			[ "$(readlink -f "$o/device" 2>/dev/null)" = "$dev" ] || continue
+			[ "$(basename "$o")" = "$phy" ] && break
+			ofs=$((ofs + 1))
+		done
+		[ "$ofs" -gt 0 ] && devpath="$devpath+$ofs"
 		uci -q delete "wireless.radio$n"
 		uci set "wireless.radio$n=wifi-device"
 		uci set "wireless.radio$n.type=mac80211"
@@ -132,7 +142,16 @@ for s in $secs; do
 	if [ "$enc_val" = psk2 ]; then uci set "$s.key=$KEY"; fi
 done
 uci commit wireless
-wifi reload
+# A bare `wifi reload` has left the interfaces torn down after a config change on this board;
+# the sequence that reliably brings them up is a down/up cycle.
+wifi down >/dev/null 2>&1
+sleep 1
+wifi up >/dev/null 2>&1
+sleep 3
+if ! iw dev 2>/dev/null | grep -q "type AP"; then
+	log "no AP after wifi up, retrying once"
+	wifi down >/dev/null 2>&1; sleep 2; wifi up >/dev/null 2>&1; sleep 5
+fi
 
 log "configured $(echo "$secs" | wc -w) interface(s), ssid '$SSID', encryption $enc_val"
 log "state now:"
