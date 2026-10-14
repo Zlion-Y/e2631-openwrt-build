@@ -1,0 +1,11 @@
+[connected 192.168.5.3:23]
+E2631> root
+
+Login: > <redacted:vendor telnet password>
+ro> echo Q1_VERSIONSTATES; cat /proc/zte/verinfo/versionstates
+ot> echo Q2_VERINFO_DIR; ls -l /proc/zte/verinfo/ /proc/zte/ 2>&1
+
+> echo Q3_OTHERVER; for f in /proc/zte/verinfo/*; do echo "== $f"; cat $f 2>&1; done
+Pa> echo Q4_PROCMTD; cat /proc/mtd
+ss> echo Q5_DMESG_PART; dmesg 2>/dev/null | grep -i -E "0x0000|partition|mtd|nand|spifc|denali|erase" | head -80
+wo> echo Q6_DONE; echo ALLDONE

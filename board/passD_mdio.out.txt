@@ -1,0 +1,193 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @7000ms] "\r\n"
+
+/ # 
+=== [send @9000ms] "cat > /tmp/m.sh <<'EOS'\r\n"
+cat > /tmp/m.sh <<'EOS'
+> 
+=== [send @9500ms] "#!/bin/sh\r\n"
+#!/bin/sh
+> 
+=== [send @9600ms] "# ZX279128S MDIO read-only scan. Register map from drivers/net/mdio/mdio-zx279128s.c:\r\n"
+# ZX279128S MDIO read-only scan. Register map from drivers/net/mdio/mdio-zx279
+128s.c:
+> 
+=== [send @9700ms] "#   +0x04 DATA_WR  +0x08 DATA_RD  +0x0c CFG  +0x10 STATUS(bit0=DONE)  +0x14 CMD\r\n"
+#   +0x04 DATA_WR  +0x08 DATA_RD  +0x0c CFG  +0x10 STATUS(bit0=DONE)  +0x14 CM
+D
+> 
+=== [send @9800ms] "#   CMD: reg[4:0]  addr[9:5]  WR=bit10  RD=bit11  CLK_DIV=bit12  START=bit14\r\n"
+#   CMD: reg[4:0]  addr[9:5]  WR=bit10  RD=bit11  CLK_DIV=bit12  START=bit14
+> 
+=== [send @9900ms] "# Only RD transactions are issued and every bit outside 10:0 is preserved, so\r\n"
+# Only RD transactions are issued and every bit outside 10:0 is preserved, so
+> 
+=== [send @10000ms] "# the vendor driver's clock divider setting stays exactly as it found it.\r\n"
+# the vendor driver's clock divider setting stays exactly as it found it.
+> 
+=== [send @10100ms] "B=0x9a101000\r\n"
+B=0x9a101000
+> 
+=== [send @10200ms] "CMD=$(printf '0x%x' $((B + 0x14)))\r\n"
+CMD=$(printf '0x%x' $((B + 0x14)))
+> 
+=== [send @10300ms] "STS=$(printf '0x%x' $((B + 0x10)))\r\n"
+STS=$(printf '0x%x' $((B + 0x10)))
+> 
+=== [send @10400ms] "DAT=$(printf '0x%x' $((B + 0x08)))\r\n"
+DAT=$(printf '0x%x' $((B + 0x08)))
+> 
+=== [send @10500ms] "GET() { devmem2 \"$1\" word 2>/dev/null | sed -n 's/.*): //p'; }\r\n"
+GET() { devmem2 "$1" word 2>/dev/null | sed -n 's/.*): //p'; }
+> 
+=== [send @10600ms] "SET() { devmem2 \"$1\" word \"$2\" >/dev/null 2>&1; }\r\n"
+SET() { devmem2 "$1" word "$2" >/dev/null 2>&1; }
+> 
+=== [send @10700ms] "# $1 = phy address, $2 = MII register\r\n"
+# $1 = phy address, $2 = MII register
+> 
+=== [send @10800ms] "rd() {\r\n"
+rd() {
+> 
+=== [send @10900ms] "  c=$(GET $CMD)\r\n"
+  c=$(GET $CMD)
+> 
+=== [send @11000ms] "  [ -n \"$c\" ] || { echo ERR; return 1; }\r\n"
+  [ -n "$c" ] || { echo ERR; return 1; }
+> 
+=== [send @11100ms] "  c=$(printf '0x%x' $((c & 0xfffff800)))\r\n"
+  c=$(printf '0x%x' $((c & 0xfffff800)))
+> 
+=== [send @11200ms] "  SET $CMD $c\r\n"
+  SET $CMD $c
+> 
+=== [send @11300ms] "  SET $STS 0\r\n"
+  SET $STS 0
+> 
+=== [send @11400ms] "  v=$(printf '0x%x' $((c | 0x800 | ($1 << 5) | $2)))\r\n"
+  v=$(printf '0x%x' $((c | 0x800 | ($1 << 5) | $2)))
+> 
+=== [send @11500ms] "  SET $CMD $v\r\n"
+  SET $CMD $v
+> 
+=== [send @11600ms] "  SET $CMD $(printf '0x%x' $((v | 0x4000)))\r\n"
+  SET $CMD $(printf '0x%x' $((v | 0x4000)))
+> 
+=== [send @11700ms] "  i=0; s=0\r\n"
+  i=0; s=0
+> 
+=== [send @11800ms] "  while [ $i -lt 20 ]; do\r\n"
+  while [ $i -lt 20 ]; do
+> 
+=== [send @11900ms] "    s=$(GET $STS)\r\n"
+    s=$(GET $STS)
+> 
+=== [send @12000ms] "    [ $((s & 1)) -eq 1 ] && break\r\n"
+    [ $((s & 1)) -eq 1 ] && break
+> 
+=== [send @12100ms] "    i=$((i + 1))\r\n"
+    i=$((i + 1))
+> 
+=== [send @12200ms] "  done\r\n"
+  done
+> 
+=== [send @12300ms] "  if [ $((s & 1)) -ne 1 ]; then SET $CMD $c; echo TIMEOUT; return 1; fi\r\n"
+  if [ $((s & 1)) -ne 1 ]; then SET $CMD $c; echo TIMEOUT; return 1; fi
+> 
+=== [send @12400ms] "  d=$(GET $DAT)\r\n"
+  d=$(GET $DAT)
+> 
+=== [send @12500ms] "  SET $CMD $c\r\n"
+  SET $CMD $c
+> 
+=== [send @12600ms] "  SET $STS 0\r\n"
+  SET $STS 0
+> 
+=== [send @12700ms] "  printf '%s' \"$(printf '0x%04x' $((d & 0xffff)))\"\r\n"
+  printf '%s' "$(printf '0x%04x' $((d & 0xffff)))"
+> 
+=== [send @12800ms] "}\r\n"
+}
+> 
+=== [send @12900ms] "echo \"=== CMD now: $(GET $CMD)   STATUS: $(GET $STS)   CFG: $(GET $(printf '0x%x' $((B + 0x0c))))) ===\"\r\n"
+echo "=== CMD now: $(GET $CMD)   STATUS: $(GET $STS)   CFG: $(GET $(printf '0x
+%x' $((B + 0x0c))))) ==="
+> 
+=== [send @13000ms] "echo \"-- phase 1: PHY ID1 (reg 2) on every address 0..31 --\"\r\n"
+echo "-- phase 1: PHY ID1 (reg 2) on every address 0..31 --"
+> 
+=== [send @13100ms] "a=0\r\n"
+a=0
+> 
+=== [send @13200ms] "LIVE=\"\"\r\n"
+LIVE=""
+> 
+=== [send @13300ms] "while [ $a -lt 32 ]; do\r\n"
+while [ $a -lt 32 ]; do
+> 
+=== [send @13400ms] "  v=$(rd $a 2)\r\n"
+  v=$(rd $a 2)
+> 
+=== [send @13500ms] "  case \"$v\" in\r\n"
+  case "$v" in
+> 
+=== [send @13600ms] "    0x0000|0xffff|TIMEOUT|ERR) ;;\r\n"
+    0x0000|0xffff|TIMEOUT|ERR) ;;
+> 
+=== [send @13700ms] "    *) LIVE=\"$LIVE $a\"; echo \"  addr $a ID1=$v  <== responds\" ;;\r\n"
+    *) LIVE="$LIVE $a"; echo "  addr $a ID1=$v  <== responds" ;;
+> 
+=== [send @13800ms] "  esac\r\n"
+  esac
+> 
+=== [send @13900ms] "  a=$((a + 1))\r\n"
+  a=$((a + 1))
+> 
+=== [send @14000ms] "done\r\n"
+done
+> 
+=== [send @14100ms] "echo \"-- responding addresses:$LIVE --\"\r\n"
+echo "-- responding addresses:$LIVE --"
+> 
+=== [send @14200ms] "echo \"-- phase 2: full register set for responders --\"\r\n"
+echo "-- phase 2: full register set for responders --"
+> 
+=== [send @14300ms] "for a in $LIVE; do\r\n"
+for a in $LIVE; do
+> 
+=== [send @14400ms] "  echo \"  addr $a: ID1=$(rd $a 2) ID2=$(rd $a 3) BMSR=$(rd $a 0) BMSR_status=$(rd $a 1)\"\r\n"
+  echo "  addr $a: ID1=$(rd $a 2) ID2=$(rd $a 3) BMSR=$(rd $a 0) BMSR_status=$
+(rd $a 1)"
+> 
+=== [send @14500ms] "done\r\n"
+done
+> 
+=== [send @14600ms] "echo MDIOSCAN_DONE\r\n"
+echo MDIOSCAN_DONE
+> 
+=== [send @14700ms] "EOS\r\n"
+EOS
+/ # 
+=== [send @15900ms] "wc -l < /tmp/m.sh; echo UPLOADED\r\n"
+wc -l < /tmp/m.sh; echo UPLOADED
+52
+UPLOADED
+/ # 
+=== [send @18400ms] "( sh /tmp/m.sh > /tmp/m.out 2>&1 ) &\r\n"
+( sh /tmp/m.sh > /tmp/m.out 2>&1 ) &
+/ # 
+=== [send @21400ms] "echo STARTED; wc -l < /tmp/m.out\r\n"
+
+### ERROR ECONNRESET

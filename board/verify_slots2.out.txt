@@ -1,0 +1,204 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo W1; /var/tmp/e2631-fwslot info -j\r\n"
+echo W1; /var/tmp/e2631-fwslot info -j
+W1
+{"running":0,"next":1,"slots":[{"slot":0,"mtd":0,"partition_is_slot":false,"valid":true,"intact":true,"serial":16,"header_at":"0x1560000","version":"V1.0.0.7B5.8000","build":"20250925221124","product":"ZXHN E2631 V1.0.0"},{"slot":1,"mtd":0,"partition_is_slot":false,"valid":true,"intact":true,"serial":17,"header_at":"0x1000000","version":"V1.0.0.8B8.8000","build":"20260826135759","product":"ZXHN E2631 V1.0.0"}]}
+/ # 
+=== [send @60000ms] "echo W2; dd if=/dev/mtdblock0 bs=131072 skip=408 count=1 2>/dev/null | dd bs=512 count=1 2>/dev/null | busybox hexdump -v -e '16/1 \"%02x\"'\r\n"
+echo W2; dd if=/dev/mtdblock0 bs=131072 skip=408 count=1 2>/dev/null | dd bs
+=512 count=1 2>/dev/null | busybox hexdump -v -e '16/1 "%02x"'
+W2
+/ # 
+=== [send @110000ms] "echo W3; dd if=/dev/mtdblock0 bs=131072 skip=408 count=1 2>/dev/null | dd bs=512 skip=1 count=1 2>/dev/null | busybox hexdump -v -e '16/1 \"%02x\"'\r\n"
+echo W3; dd if=/dev/mtdblock0 bs=131072 skip=408 count=1 2>/dev/null | dd bs
+=512 skip=1 count=1 2>/dev/null | busybox hexdump -v -e '16/1 "%02x"'
+W3
+/ # 
+=== [send @160000ms] "echo W4; dd if=/dev/mtdblock0 bs=131072 skip=280 count=1 2>/dev/null | dd bs=64 count=1 2>/dev/null | busybox hexdump -v -e '16/1 \"%02x\" \"\\n\"'\r\n"
+echo W4; dd if=/dev/mtdblock0 bs=131072 skip=280 count=1 2>/dev/null | dd bs
+=64 count=1 2>/dev/null | busybox hexdump -v -e '16/1 "%02x" "\n"'
+W4
+/ # 
+=== [send @190000ms] "echo W5; dd if=/dev/mtdblock0 bs=131072 skip=344 count=1 2>/dev/null | dd bs=32 count=1 2>/dev/null | busybox hexdump -v -e '16/1 \"%02x\" \"\\n\"'\r\n"
+echo W5; dd if=/dev/mtdblock0 bs=131072 skip=344 count=1 2>/dev/null | dd bs
+=32 count=1 2>/dev/null | busybox hexdump -v -e '16/1 "%02x" "\n"'
+W5
+/ # 
+=== [send @220000ms] "echo W6; dd if=/dev/mtdblock0 bs=131072 skip=227 count=1 2>/dev/null | dd bs=512 count=1 2>/dev/null | busybox hexdump -v -e '16/1 \"%02x\"'\r\n"
+echo W6; dd if=/dev/mtdblock0 bs=131072 skip=227 count=1 2>/dev/null | dd bs
+=512 count=1 2>/dev/null | busybox hexdump -v -e '16/1 "%02x"'
+W6
+/ # 
+=== [send @270000ms] "echo W7; ls -l /var/tmp; exit\r\n"
+echo W7; ls -l /var/tmp; exit
+W7
+----------    1 Z500_w9b root          8587 Oct 12 18:19 DBDC_card0.dat
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 HTTPD.webd_task_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 HTTPD.webd_task_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 HTTPD_oam
+-rw-r--r--    1 Z500_w9b root           366 Jan  1  1970 IGD.SNTP.PARMS
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 PROCESSTELNETD.telnetd_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 PROCESSTELNETD.telnetd_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 PROCESSTELNETD_oam
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.adev_task_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.adev_task_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.comm_task_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.comm_task_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.cspconfig_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.cspconfig_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.cspd_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.cspd_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.dbd_task_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.dbd_task_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.detect_task_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.detect_task_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.devtest_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.devtest_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.dhcp4c_task_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.dhcp4c_task_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.dhcp6s_task_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.dhcp6s_task_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.dhcps_task_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.dhcps_task_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.dnsurl_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.dnsurl_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.hlttest_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.hlttest_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.igmpproxy_task_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.igmpproxy_task_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.log_task_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.log_task_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.mldproxy_task_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.mldproxy_task_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.srm_task_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.srm_task_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.syslog_task_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.syslog_task_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.unified_storage_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.unified_storage_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.wanprobe_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.wanprobe_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.wlan_manage_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd.wlan_manage_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 cspd_oam
+srwxr-xr-x    1 Z500_w9b root             0 Oct 12 20:45 curl20820._snd
+-r-xr-xr-x    1 Z500_w9b root             0 Jan  1  1970 dbdns.conf
+-r-xr-xr-x    1 Z500_w9b root           143 Oct 12 18:20 default_resolv.conf
+-r-xr-xr-x    1 Z500_w9b root           154 Oct 12 18:20 default_resolv_proxy.conf
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 diagnose.lws_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 diagnose.lws_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 diagnose.remote_diag_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 diagnose.remote_diag_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 diagnose_oam
+-rw-r--r--    1 Z500_w9b root           171 Oct 13 02:11 dnscache
+-r-xr-xr-x    1 Z500_w9b root            32 Jan  1  1970 dnscomm.conf
+-rwxr-xr-x    1 Z500_w9b root         69943 Oct 13 01:50 e2631-fwslot
+-rw-r--r--    1 Z500_w9b root           159 Oct 13 01:53 flash.log
+-rw-r--r--    1 Z500_w9b root             4 Oct 13 01:50 fm_mgr_curl
+-rw-r--r--    1 Z500_w9b root      16777748 Oct 13 01:50 fw.bin
+-r-xr-xr-x    1 Z500_w9b root           181 Oct 12 23:31 hosts
+srwxrwxrwx    1 Z500_w9b root             0 Oct 12 18:19 idm_service.NO1091_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 idm_service.msg_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 idm_service.msg_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 idm_service.role_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 idm_service.role_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 idm_service_oam
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 laninfo.01_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 laninfo.01_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 laninfo_oam
+drwxr-xr-x    2 Z500_w9b root           120 Jan  1  1970 linux-igd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 log_upload.upload_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 log_upload.upload_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 log_upload_oam
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 logcat_ctrl
+srwxr-xr-x    1 Z500_w9b root             0 Jan  1  1970 logf_mgt0X00000255
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 mqtt.01_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 mqtt.01_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 mqtt.02_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 mqtt.02_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 mqtt.03_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 mqtt.03_snd
+srwxrwxrwx    1 Z500_w9b root             0 Oct 12 18:19 mqtt.NO1404_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 mqtt_oam
+-rwxr-xr-x    1 Z500_w9b root          7252 Jan  1  1970 mt7916.dbdc.b0.dat
+-rwxr-xr-x    1 Z500_w9b root          7363 Oct 12 18:19 mt7916.dbdc.b1.dat
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 multiapd.acd_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 multiapd.acd_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 multiapd.base_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 multiapd.base_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 multiapd.map_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 multiapd.map_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 multiapd.topo_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 multiapd.topo_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 multiapd_oam
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 owdplugind.exec_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 owdplugind.exec_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 owdplugind_oam
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 owjdxbplugind.exec_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 owjdxbplugind.exec_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 owjdxbplugind_oam
+srwxr-xr-x    1 Z500_w9b root             0 Jan  1  1970 pc
+drwxr-x---    2 Z500_w9b root            40 Jan  1  1970 ppp
+-r-xr-xr-x    1 Z500_w9b root            52 Oct 12 18:20 proxyserver.conf
+-rw-r--r--    1 Z500_w9b root            29 Jan  1  1970 ra_sendlog
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 remoteUGP.01_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 remoteUGP.01_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 remoteUGP_oam
+-r-xr-xr-x    1 Z500_w9b root            51 Oct 12 18:20 resolv.conf
+srwxr-xr-x    1 Z500_w9b root             0 Jan  1  1970 rpcAgent
+srwxr-xr-x    1 Z500_w9b root             0 Jan  1  1970 sbus_getset_files
+srwxr-xr-x    1 Z500_w9b root             0 Jan  1  1970 sbus_unix_socket
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec01_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec01_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec02_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec02_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec03_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec03_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec04_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec04_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec05_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec05_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec06_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec06_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec07_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec07_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec08_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec08_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor.exec_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 sbusd-adaptor_oam
+srwxr-xr-x    1 Z500_w9b root             0 Jan  1  1970 service_unix_socket_IDM_MASTER_DEV
+srwxr-xr-x    1 Z500_w9b root             0 Jan  1  1970 service_unix_socket_IDM_SLAVE_DEV
+-rw-r--r--    1 Z500_w9b root             0 Oct 13 02:07 shell__dev_ttyp1
+-r-xr-xr-x    1 Z500_w9b root             0 Oct 13 02:11 special_resolv.conf
+----------    1 Z500_w9b root            23 Oct 13 01:20 stun.conf
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 syslog_data
+srwxr-xr-x    1 Z500_w9b root             0 Jan  1  1970 syslog_mgt0X00000255
+-rw-r--r--    1 Z500_w9b root            88 Oct 13 02:11 uadd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 unix_logf_data
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 upnp.upnptask_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 upnp.upnptask_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 upnp_oam
+-rw-r--r--    1 Z500_w9b root            35 Jan  1  1970 uuplugin
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 uuplugind.exec_asy
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 uuplugind.exec_snd
+srwxrwxrwx    1 Z500_w9b root             0 Jan  1  1970 uuplugind_oam
+-rw-r--r--    1 Z500_w9b root           868 Jan  1  1970 wpa-ap0.conf
+-rw-r--r--    1 Z500_w9b root           868 Jan  1  1970 wpa-ap1.conf
+
+### CLOSED

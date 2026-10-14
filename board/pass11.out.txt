@@ -1,0 +1,111 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo E1; ls /usr /lib /var /uadd 2>&1\r\n"
+echo E1; ls /usr /lib /var /uadd 2>&1
+E1
+/lib:
+domain_policy.so                   libm-0.9.33.2.so
+ld-uClibc-0.9.33.2.so              libm.so.0
+ld-uClibc.so.0                     libmbedcrypto.so
+libatomic.a                        libmbedcrypto.so.16
+libatomic.la                       libmbedtls.so
+libatomic.so                       libmbedtls.so.21
+libatomic.so.1                     libmbedx509.so
+libatomic.so.1.1.0                 libmbedx509.so.7
+libbbx.so                          libmqtt.so
+libc.so.0                          libmtduserapi.so
+libcapability.so                   libmultiapcfapi.so
+libcfapi.so                        libmultiapcmapi.so
+libcjson.so                        libneon.so
+libcmapi.so                        libnsl-0.9.33.2.so
+libcmexpat.so                      libnsl.so.0
+libcoap-3-mbedtls.so               liboss.so
+libcoap-3-mbedtls.so.3             liboss_pub.so
+libcoap-3-mbedtls.so.3.0.0         libplugin.so
+libcoap-3.so                       libpthread-0.9.33.2.so
+libcoap.so                         libpthread.so.0
+libcommfun.so                      libresolv-0.9.33.2.so
+libcrypt-0.9.33.2.so               libresolv.so.0
+libcrypt.so.0                      librt-0.9.33.2.so
+libcrypto.so                       librt.so.0
+libcrypto.so.1.0.0                 libsbus.so
+libcrypto.so.1.1                   libsbus_adaptor.so
+libcsputil.so                      libsha256.so
+libctype.so                        libssl.so
+libcurl-3.1.0.so                   libssl.so.1.0.0
+libcurl.so                         libssl.so.1.1
+libcurl.so.4                       libstdc++.so
+libcurl.so.4.5.0                   libstdc++.so.6
+libdb.so                           libstdc++.so.6.0.20
+libdevselfcheck.so                 libtagparam.so
+libdl-0.9.33.2.so                  libtencentcloud-sdk-cpp-core.so
+libdl.so.0                         libtencentcloud-sdk-cpp-dnspod.so
+libenv.so                          libuClibc-0.9.33.2.so
+libevent.so                        libunl.so
+libevent_openssl.so                libupgrade_service.so
+libgcc_s.so                        libusermdio.so
+libgcc_s.so.1                      libutil-0.9.33.2.so
+libhardcode.so                     libutil.so.0
+libidm.so                          libutils.so
+libidmapi.so                       libwebsocket.so
+libieee1905cfapi.so                libz.so
+libieee1905cmapi.so                libz.so.1
+libiprt2.so                        libz.so.1.2.8
+libiw.so.29                        libzlink_access.so
+libjansson.so                      libzlog.so
+libjsonrpc.so                      libzte_slibc.so
+libjsonunify.so                    libzutils.so
+libkv.so                           modules
+libledkey.so                       mqtt
+liblog.so                          passpppoe.so
+liblog_service.so                  rp-pppoe.so
+liblua.so
+
+/uadd:
+
+/usr:
+bin   sbin
+
+/var:
+cache        log          run          syn_version  zebra
+ct           lua_tmp      siproxd      tmp
+iproute2     ppp          state        udhcpd
+/ # 
+=== [send @18000ms] "echo E2; for d in /proc/[0-9]*; do x=$(readlink $d/exe 2>/dev/null); case \"$x\" in *httpd*|*cspd*) echo \"$d $x\"; ls -l $d/cwd;; esac; done\r\n"
+echo E2; for d in /proc/[0-9]*; do x=$(readlink $d/exe 2>/dev/null); case "$
+x" in *httpd*|*cspd*) echo "$d $x"; ls -l $d/cwd;; esac; done
+E2
+/proc/1250 /kmodule/bin/httpd
+lrwxrwxrwx    1 Z500_w9b root             0 Oct 12 19:24 /proc/1250/cwd -> /
+/proc/597 /kmodule/bin/cspd
+lrwxrwxrwx    1 Z500_w9b root             0 Oct 12 19:24 /proc/597/cwd -> /
+/ # 
+=== [send @40000ms] "echo E3; find / -maxdepth 4 -name \"supgrade.html\" 2>/dev/null\r\n"
+echo E3; find / -maxdepth 4 -name "supgrade.html" 2>/dev/null
+E3
+/ # 
+=== [send @75000ms] "echo E4; ls -l /var/www /var/httpd /etc/httpd 2>&1\r\n"
+echo E4; ls -l /var/www /var/httpd /etc/httpd 2>&1
+E4
+ls: /var/www: No such file or directory
+ls: /var/httpd: No such file or directory
+ls: /etc/httpd: No such file or directory
+/ # 
+=== [send @76500ms] "exit\r\n"
+exit
+
+### CLOSED

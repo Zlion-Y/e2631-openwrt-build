@@ -1,6 +1,6 @@
 #!/bin/bash
 # Collect a finished local build into a directory that
-#   node tools/release.mjs --dir <this dir>
+#   node build/host/release.mjs --dir <this dir>   (run from the workspace root)
 # accepts. The file names mirror the CI workflow's "collect the artifacts"
 # step on purpose: both verifiers key off kernel / root / e2631.dtb /
 # config-<version>, so a locally built image gets screened exactly like an

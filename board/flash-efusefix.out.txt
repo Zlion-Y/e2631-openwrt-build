@@ -1,0 +1,116 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1500ms] "root\r\n"
+root
+Password: 
+=== [send @4500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @7000ms] "echo F-LOGIN; cd /var/tmp; pwd; df -k /var | busybox sed -n 1,3p\r\n"
+echo F-LOGIN; cd /var/tmp; pwd; df -k /var | busybox sed -n 1,3p
+F-LOGIN
+/var/tmp
+Filesystem           1024-blocks    Used Available Use% Mounted on
+tmpfs                       40960          136        40824   0% /var 
+/var/tmp # 
+=== [send @10000ms] "echo F-DL; /bin/curl -f -sS -m 300 -o fw.bin http://192.168.5.5:8000/e2631-openwrt-efusefix.bin; ls -l fw.bin\r\n"
+echo F-DL; /bin/curl -f -sS -m 300 -o fw.bin http://192.168.5.5:8000/
+e2631-openwrt-efusefix.bin; ls -l fw.bin
+F-DL
+-rw-r--r--    1 Z500_w9b root      20972052 Oct 14 03:53 fw.bin
+/var/tmp # 
+=== [send @24000ms] "echo F-SHA; md5sum fw.bin; wc -c fw.bin\r\n"
+echo F-SHA; md5sum fw.bin; wc -c fw.bin
+F-SHA
+95250ca5c8acf1cfef65a48e69c195cd  fw.bin
+20972052 fw.bin
+/var/tmp # 
+=== [send @32000ms] "echo F-HEAD; busybox hexdump -v -e '1/1 \"%02x\"' -n 32 fw.bin; echo\r\n"
+echo F-HEAD; busybox hexdump -v -e '1/1 "%02x"' -n 32 fw.bin; echo
+F-HEAD
+999999994444444455555555aaaaaaaa00000000000000000000000051130000
+/var/tmp # 
+=== [send @40000ms] "echo F-START; (fw_flashing -f /var/tmp/fw.bin > /var/tmp/ff.log 2>&1; echo FF-DONE >> /var/tmp/ff.log) &\r\n"
+echo F-START; (fw_flashing -f /var/tmp/fw.bin > /var/tmp/ff.log 2>&1;
+ echo FF-DONE >> /var/tmp/ff.log) &
+F-START
+/var/tmp # 
+=== [send @48000ms] "echo P1; busybox grep -c FF-DONE /var/tmp/ff.log\r\n"
+echo P1; busybox grep -c FF-DONE /var/tmp/ff.log
+P1
+0
+/var/tmp # 
+=== [send @56000ms] "echo P2; busybox grep -c FF-DONE /var/tmp/ff.log\r\n"
+echo P2; busybox grep -c FF-DONE /var/tmp/ff.log
+P2
+1
+/var/tmp # 
+=== [send @64000ms] "echo P3; busybox grep -c FF-DONE /var/tmp/ff.log\r\n"
+echo P3; busybox grep -c FF-DONE /var/tmp/ff.log
+P3
+1
+/var/tmp # 
+=== [send @72000ms] "echo P4; busybox grep -c FF-DONE /var/tmp/ff.log\r\n"
+echo P4; busybox grep -c FF-DONE /var/tmp/ff.log
+P4
+1
+/var/tmp # 
+=== [send @80000ms] "echo P5; busybox grep -c FF-DONE /var/tmp/ff.log\r\n"
+echo P5; busybox grep -c FF-DONE /var/tmp/ff.log
+P5
+1
+/var/tmp # 
+=== [send @88000ms] "echo P6; busybox grep -c FF-DONE /var/tmp/ff.log\r\n"
+echo P6; busybox grep -c FF-DONE /var/tmp/ff.log
+P6
+1
+/var/tmp # 
+=== [send @96000ms] "echo P7; busybox grep -c FF-DONE /var/tmp/ff.log\r\n"
+echo P7; busybox grep -c FF-DONE /var/tmp/ff.log
+P7
+1
+/var/tmp # 
+=== [send @104000ms] "echo P8; busybox grep -c FF-DONE /var/tmp/ff.log\r\n"
+echo P8; busybox grep -c FF-DONE /var/tmp/ff.log
+P8
+1
+/var/tmp # 
+=== [send @112000ms] "echo P9; busybox grep -c FF-DONE /var/tmp/ff.log\r\n"
+echo P9; busybox grep -c FF-DONE /var/tmp/ff.log
+P9
+1
+/var/tmp # 
+=== [send @120000ms] "echo F-LOG; cat /var/tmp/ff.log\r\n"
+echo F-LOG; cat /var/tmp/ff.log
+F-LOG
+fw_flashing name=/var/tmp/fw.bin,states.st_size =20972052
+RunningVerStartAddr:700000
+RunningHeadHighAddr:2300000
+Info:g_ver_towrite=2, g_upgrade_startaddr=0x2300000 ,g_upgrade_endaddr =0x3f00000!
+g_back_headaddr:3700000
+maxversionum:1b
+Info:force erase flag=0 g_upgrade_startaddr:0x2300000
+erase header, result:0
+start erase ,start addr=0x2300000,end addr=0x3f00000 
+start write ,firmware_size=20971520,firmware_offset=0x214,sect_size=0x20000 
+WriteVersion head!
+WriteVersion head success!
+ CheckFile success! Check fw_header success!======================OK=================================fw_flashing success==========
+FF-DONE
+/var/tmp # 
+=== [send @130000ms] "echo F-LOG2; busybox tail -20 /var/tmp/ff.log 2>/dev/null; busybox grep -c success /var/tmp/ff.log\r\n"
+echo F-LOG2; busybox tail -20 /var/tmp/ff.log 2>/dev/null; busybox gr
+ep -c success /var/tmp/ff.log
+F-LOG2
+2
+/var/tmp # 
+=== [send @140000ms] "echo F-REBOOT; reboot\r\n"
+echo F-REBOOT; reboot
+F-REBOOT
+
+### ERROR ECONNRESET

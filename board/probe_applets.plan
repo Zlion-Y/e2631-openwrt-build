@@ -1,0 +1,8 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo A1; for a in dd sha256sum md5sum hexdump od head tail wc gzip tar base64 cat sync stat; do printf "%s=" $a; busybox $a --help >/dev/null 2>&1 && echo ok || echo missing; done
+45000|echo A2; busybox dd if=/dev/mtdblock0 bs=131072 skip=408 count=1 of=/var/tmp/t.bin 2>&1; ls -l /var/tmp/t.bin; busybox sha256sum /var/tmp/t.bin 2>&1
+80000|echo A3; curl -f -sS -T /var/tmp/t.bin http://192.168.5.5:8001/probe-block408.bin; echo rc=$?
+110000|echo A4; busybox hexdump -v -e '16/1 "%02x"' -s 0x3300000 -n 64 /dev/mtdblock0; echo; rm -f /var/tmp/t.bin; exit
+140000|exit

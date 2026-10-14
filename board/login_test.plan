@@ -1,0 +1,7 @@
+1000|root
+2500|<redacted:vendor telnet password>
+5000|
+6500|id
+8000|echo MARKER_$((1+1))
+9500|cat /proc/mtd
+11000|free

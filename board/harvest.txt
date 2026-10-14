@@ -1,0 +1,143 @@
+### connected 192.168.5.3:23
+E2631
+
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo H1; rm -f /var/tmp/fw.bin; df -k /var; sha256sum /dev/null && echo HAVE_SHA\r\n"
+echo H1; rm -f /var/tmp/fw.bin; df -k /var; sha256sum /dev/null && echo HAVE
+
+_SHA
+H1
+Filesystem           1024-blocks    Used Available Use% Mounted on
+tmpfs                       40960          232        40728   1% /var 
+/bin/sh: sha256sum: not found
+/ # 
+=== [send @30000ms] "echo H2; dd if=/dev/mtdblock0 bs=131072 skip=56 count=224 of=/var/tmp/slotA.bin 2>&1; ls -l /var/tmp/slotA.bin\r\n"
+echo H2; dd if=/dev/mtdblock0 bs=131072 skip=56 count=224 of=/var/tmp/slotA.
+
+bin 2>&1; ls -l /var/tmp/slotA.bin
+H2
+/bin/sh: dd: not found
+ls: /var/tmp/slotA.bin: No such file or directory
+/ # 
+=== [send @120000ms] "echo H3; sha256sum /var/tmp/slotA.bin\r\n"
+echo H3; sha256sum /var/tmp/slotA.bin
+H3
+/bin/sh: sha256sum: not found
+/ # 
+=== [send @140000ms] "echo H4; curl -f -sS -T /var/tmp/slotA.bin http://192.168.5.5:8001/slotA.bin; echo rc=$?\r\n"
+echo H4; curl -f -sS -T /var/tmp/slotA.bin http://192.168.5.5:8001/slotA.bin
+
+; echo rc=$?
+H4
+curl: Can't open '/var/tmp/slotA.bin'!
+curl: try 'curl --help' or 'curl --manual' for more information
+rc=26
+/ # 
+=== [send @200000ms] "echo H5; rm -f /var/tmp/slotA.bin; df -k /var; for i in 1 2 3 4 5 6 7 8; do echo \"mtd$i size=$(cat /sys/class/mtd/mtd$i/size 2>/dev/null) name=$(cat /sys/class/mtd/mtd$i/name 2>/dev/null)\"; done\r\n"
+echo H5; rm -f /var/tmp/slotA.bin; df -k /var; for i in 1 2 3 4 5 6 7 8; do 
+
+echo "mtd$i size=$(cat /sys/class/mtd/mtd$i/size 2>/dev/null) name=$(cat /sys/cl
+
+ass/mtd/mtd$i/name 2>/dev/null)"; done
+H5
+Filesystem           1024-blocks    Used Available Use% Mounted on
+tmpfs                       40960          232        40728   1% /var 
+mtd1 size=1048576 name=Bootloader
+mtd2 size=1048576 name=tag
+mtd3 size=1048576 name=wifi
+mtd4 size=2097152 name=usercfg
+mtd5 size=2097152 name=defcfg
+mtd6 size=3407872 name=kernel1
+mtd7 size=3407872 name=kernel2
+mtd8 size=19005440 name=rootfs
+/ # 
+echo H6; dd if=/dev/mtdblock1 bs=131072 count=8 of=/var/tmp/mtd1-bootloader.
+
+bin 2>&1; dd if=/dev/mtdblock2 bs=131072 count=8 of=/var/tmp/mtd2-tag.bin 2>&1; 
+
+dd if=/dev/mtdblock3 bs=131072 count=8 of=/var/tmp/mtd3-wifi.bin 2>&1; dd if=/de
+
+v/mtdblock4 bs=131072 count=16 of=/var/tmp/mtd4-usercfg.bin 2>&1; dd if=/dev/mtd
+
+block5 bs=131072 count=16 of=/var/tmp/mtd5-defcfg.bin 2>&1; ls -l /var/tmp/*.bin
+
+H6
+/bin/sh: dd: not found
+/bin/sh: dd: not found
+/bin/sh: dd: not found
+/bin/sh: dd: not found
+/bin/sh: dd: not found
+ls: /var/tmp/*.bin: No such file or directory
+/ # 
+=== [send @300000ms] "echo H7; for f in /var/tmp/mtd*.bin; do echo \"UP $f\"; curl -f -sS -T \"$f\" \"http://192.168.5.5:8001/$(basename $f)\"; echo rc=$?; done; sha256sum /var/tmp/mtd*.bin; rm -f /var/tmp/mtd*.bin\r\n"
+echo H7; for f in /var/tmp/mtd*.bin; do echo "UP $f"; curl -f -sS -T "$f" "h
+
+ttp://192.168.5.5:8001/$(basename $f)"; echo rc=$?; done; sha256sum /var/tmp/mtd
+
+*.bin; rm -f /var/tmp/mtd*.bin
+H7
+UP /var/tmp/mtd*.bin
+curl: Can't open '/var/tmp/mtd*.bin'!
+curl: try 'curl --help' or 'curl --manual' for more information
+rc=26
+/bin/sh: sha256sum: not found
+/ # 
+=== [send @380000ms] "echo H8; for p in /proc/capability/* /proc/zte/ledkey_m/* /proc/zte/bbx/* /proc/zte/verinfo/*; do echo \"===== $p\"; cat $p; done\r\n"
+echo H8; for p in /proc/capability/* /proc/zte/ledkey_m/* /proc/zte/bbx/* /p
+
+roc/zte/verinfo/*; do echo "===== $p"; cat $p; done
+H8
+===== /proc/capability/boardtype
+type       : E1630
+flag       : 1
+vid        : 63
+cpuname    : ZX279128R
+cpumanu    : ZTE
+cpuprocess : 2
+cpufrequen : 1000MHZ
+totalram   : 256M
+rammanu    : Winbond
+flashsize  : 128M
+===== /proc/capability/ethernetmac
+IfName   Speed    Duplex   AutoNeg PhyMnf Port PhyType  PhyRateMsk
+eth0     1000Mbps full     1       ZTE     3       0    0
+eth1     1000Mbps full     1       ZTE     2       0    0
+eth2     1000Mbps full     1       ZTE     1       0    0
+eth3     1000Mbps full     1       ZTE     0       0    0
+wan_lport: 0
+===== /proc/capability/portinfo
+wan     : 16
+lan     : 3
+pots    : 0
+usb     : 0
+wifi    : 2
+ups     : 0
+catv    : 0
+uart    : 0
+moca    : 0
+e1      : 0
+bob     : 0
+sim     : 0
+===== /proc/capability/slicinfo
+scheme : 0
+vendor : (null)
+===== /proc/zte/ledkey_m/errcount
+=== [send @520000ms] "echo H9; dmesg\r\n"
+=== [send @600000ms] "echo H10; ls /sys/firmware/; cat /proc/cmdline; exit\r\n"
+=== [send @630000ms] "exit\r\n"
+
+=== [send @631500ms] "exit\r\n"
+exit

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Offline check of device/linkspeed.sh against config space pulled from the live
+# Offline check of board/linkspeed.sh (was device/) against config space pulled from the live
 # board (out/fake-sys/*.config, produced by node on the Windows side because NTFS
 # forbids ':' in names and WSL has no node).  Known-good decode: both ZTE root
 # ports have the PCIe cap at 0x70 and LnkSta=0x3012 => Gen2 x1, DLLLA=1.
@@ -14,7 +14,7 @@ for f in $W/out/fake-sys/*.config; do
 	cp "$f" "$T/$name/config"
 	echo "fixture $name ($(stat -c %s "$T/$name/config") bytes)"
 done
-sed 's/\r$//' $W/device/linkspeed.sh > $T/linkspeed.sh
+sed 's/\r$//' $W/build/board/linkspeed.sh > $T/linkspeed.sh
 /bin/busybox ash -n $T/linkspeed.sh && echo "ash syntax OK" || { echo "ASH FAIL"; exit 1; }
 
 echo "--- report (expect speed=2 width=1 TLS as enumerated) ---"

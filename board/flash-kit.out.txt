@@ -1,0 +1,55 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1500ms] "root\r\n"
+root
+Password: 
+=== [send @4500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @7000ms] "echo F-LOGIN; cd /var/tmp; pwd; df -k /var | busybox sed -n 1,3p\r\n"
+echo F-LOGIN; cd /var/tmp; pwd; df -k /var | busybox sed -n 1,3p
+F-LOGIN
+/var/tmp
+Filesystem           1024-blocks    Used Available Use% Mounted on
+tmpfs                       40960          180        40780   0% /var 
+/var/tmp # 
+=== [send @10000ms] "echo F-DL; /bin/curl -f -sS -m 300 -o fw.bin http://192.168.5.17:8000/e2631-openwrt-efusefix.bin; ls -l fw.bin\r\n"
+echo F-DL; /bin/curl -f -sS -m 300 -o fw.bin http://192.168.5.17:8000
+/e2631-openwrt-efusefix.bin; ls -l fw.bin
+F-DL
+-rw-r--r--    1 Z500_w9b root      20972052 Oct 14 06:21 fw.bin
+/var/tmp # 
+=== [send @24000ms] "echo F-SHA; md5sum fw.bin; wc -c fw.bin\r\n"
+echo F-SHA; md5sum fw.bin; wc -c fw.bin
+F-SHA
+95250ca5c8acf1cfef65a48e69c195cd  fw.bin
+20972052 fw.bin
+/var/tmp # 
+=== [send @32000ms] "echo F-HEAD; busybox hexdump -v -e '1/1 \"%02x\"' -n 32 fw.bin; echo\r\n"
+echo F-HEAD; busybox hexdump -v -e '1/1 "%02x"' -n 32 fw.bin; echo
+F-HEAD
+999999994444444455555555aaaaaaaa00000000000000000000000051130000
+/var/tmp # 
+=== [send @40000ms] "echo F-GATE; sz=$(wc -c < fw.bin 2>/dev/null); echo \"size=$sz want=20972052\"; if [ \"$sz\" = 20972052 ]; then (fw_flashing -f /var/tmp/fw.bin > /var/tmp/ff.log 2>&1; echo FF-DONE >> /var/tmp/ff.log) & else echo REFUSE-BAD-SIZE > /var/tmp/ff.log; fi\r\n"
+echo F-GATE; sz=$(wc -c < fw.bin 2>/dev/null); echo "size=$sz want=20
+972052"; if [ "$sz" = 20972052 ]; then (fw_flashing -f /var/tmp/fw.bin > /var/tm
+p/ff.log 2>&1; echo FF-DONE >> /var/tmp/ff.log) & else echo REFUSE-BAD-SIZE > /v
+ar/tmp/ff.log; fi
+F-GATE
+size=20972052 want=20972052
+/var/tmp # 
+=== [send @48000ms] "echo P1; busybox grep -c FF-DONE /var/tmp/ff.log\r\n"
+echo P1; busybox grep -c FF-DONE /var/tmp/ff.log
+P1
+0
+/var/tmp # 
+=== [send @56000ms] "echo P2; busybox grep -c FF-DONE /var/tmp/ff.log\r\n"
+echo P2; busybox grep -c FF-DONE /var/tmp/ff.log
+P2
+1
+/var/tmp # 

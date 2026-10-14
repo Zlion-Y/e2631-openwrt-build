@@ -1,0 +1,329 @@
+/dts-v1/;
+
+/ {
+	#address-cells = <0x01>;
+	#size-cells = <0x01>;
+	model = "ZTE ZX279128S";
+	compatible = "zte,zx279128-smp";
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	aliases {
+		i2c0 = "/soc/i2c@9a102000";
+		i2c1 = "/soc/i2c@9a103000";
+		ssp0 = "/soc/ssp@9a105000";
+		pon = "/soc/pon@92000000";
+		npp = "/soc/npp@921c0000";
+		tm = "/soc/tm@92340000";
+		pp = "/soc/pp@92380000";
+		idm = "/soc/idm@921c8000";
+		pcie = "/soc/pcie@10000000";
+		gephy = "/soc/gephy@9b000000";
+		serial0 = "/soc/serial@0x94404000";
+		serial1 = "/soc/serial@0x94405000";
+	};
+
+	memory {
+		device_type = "memory";
+		reg = <0x40000000 0x8000000>;
+	};
+
+	cpus {
+		#address-cells = <0x01>;
+		#size-cells = <0x00>;
+		enable-method = "zte,zx279128-smp";
+
+		cpu@0 {
+			compatible = "arm,cortex-a9";
+			device_type = "cpu";
+			next-level-cache = <0x01>;
+			reg = <0x00>;
+		};
+
+		cpu@1 {
+			compatible = "arm,cortex-a9";
+			device_type = "cpu";
+			next-level-cache = <0x01>;
+			reg = <0x01>;
+		};
+	};
+
+	memory@40000000 {
+		device_type = "memory";
+		reg = <0x00 0x40000000 0x00 0x20000000>;
+	};
+
+	soc {
+		#address-cells = <0x01>;
+		#size-cells = <0x01>;
+		compatible = "simple-bus";
+		interrupt-parent = <0x02>;
+		ranges;
+
+		interrupt-controller@00801000 {
+			compatible = "arm,cortex-a9-gic";
+			#interrupt-cells = <0x03>;
+			#address-cells = <0x01>;
+			#size-cells = <0x01>;
+			interrupt-controller;
+			reg = <0x801000 0x1000 0x800100 0x100>;
+			linux,phandle = <0x02>;
+			phandle = <0x02>;
+		};
+
+		timer@00800200 {
+			compatible = "arm,cortex-a9-global-timer";
+			reg = <0x800200 0x20>;
+			interrupts = <0x01 0x0b 0x04>;
+			interrupt-parent = <0x02>;
+			clocks = <0x03 0x17>;
+		};
+
+		watchdog@00800620 {
+			compatible = "arm,cortex-a9-twd-wdt";
+			reg = <0x800620 0x20>;
+			interrupts = <0x01 0x0e 0x101>;
+			clocks = <0x03 0x17>;
+			status = "okay";
+		};
+
+		mg-crm@00804000 {
+			compatible = "arm,cortex-a9-mg-crm";
+			reg = <0x804000 0x1000>;
+		};
+
+		l2-cache-controller@0x00c00000 {
+			compatible = "arm,pl310-cache";
+			reg = <0xc00000 0x1000>;
+			cache-unified;
+			cache-level = <0x02>;
+			arm,data-latency = <0x02 0x02 0x02>;
+			arm,tag-latency = <0x02 0x02 0x02>;
+			arm,double-linefill = <0x01>;
+			arm,double-linefill-incr = <0x00>;
+			linux,phandle = <0x01>;
+			phandle = <0x01>;
+		};
+
+		iram@200000 {
+			compatible = "zte,iram";
+			reg = <0x200800 0x1000>;
+			status = "enable";
+		};
+
+		nand@00d80000 {
+			#address-cells = <0x01>;
+			#size-cells = <0x01>;
+			compatible = "denali,denali-nand-dt";
+			reg = <0xd80000 0x7c00000 0xd00000 0x80000>;
+			reg-names = "nand_data\0denali_reg";
+			interrupts = <0x00 0x14 0x04>;
+			dma-mask = <0xffffffff>;
+			clocks = <0x03 0x2b>;
+			status = "okay";
+		};
+
+		dwmmc0@08980000 {
+			#address-cells = <0x01>;
+			#size-cells = <0x01>;
+			compatible = "zte,zx288080_sd";
+			reg = <0x8980000 0x1000>;
+			interrupts = <0x00 0x2b 0x04>;
+			clocks = <0x04 0x42 0x04 0x43 0x04 0x44>;
+			clock-names = "fb_sdmmc_work_clk\0fb_sdmmc_ahb_clk\0fb_sdmmc_cdet_clk";
+			fifo-depth = <0x20>;
+			clock-frequency = <0x2faf080>;
+			clock-freq-min-max = <0x61a80 0x2faf080>;
+			card-detect-delay = <0xc8>;
+			num-slots = <0x01>;
+			supports-highspeed;
+			bus-width = <0x04>;
+			broken-cd;
+			disable-wp;
+			status = "disable";
+		};
+
+		topcrm@94000000 {
+			compatible = "zte,ZX279127-topcrm\0syscon";
+			reg = <0x94000000 0x1000>;
+			#clock-cells = <0x01>;
+			linux,phandle = <0x03>;
+			phandle = <0x03>;
+		};
+
+		lsp0crpm@94400000 {
+			compatible = "zte,ZX279127-lsp0crpm";
+			reg = <0x94400000 0x1000>;
+			#clock-cells = <0x01>;
+			linux,phandle = <0x04>;
+			phandle = <0x04>;
+		};
+
+		serial@0x94404000 {
+			compatible = "zte,ZX279127-uart";
+			reg = <0x94404000 0x1000>;
+			interrupts = <0x00 0x0b 0x04>;
+			clocks = <0x04 0x0e 0x04 0x0f>;
+			clock-names = "uartclk\0apb_pclk";
+			status = "okay";
+		};
+
+		serial@0x94405000 {
+			compatible = "zte,ZX279127-uart";
+			reg = <0x94405000 0x1000>;
+			interrupts = <0x00 0x0c 0x04>;
+			clocks = <0x04 0x11 0x04 0x12>;
+			clock-names = "uartclk\0apb_pclk";
+			status = "okay";
+		};
+
+		spifc@94406000 {
+			#address-cells = <0x01>;
+			#size-cells = <0x01>;
+			compatible = "zte,ZX279127-spifc";
+			reg = <0x94406000 0x1000>;
+			reg-names = "spifc_reg";
+			interrupts = <0x00 0x0d 0x04>;
+			clocks = <0x04 0x14>;
+			status = "okay";
+		};
+
+		lsp1crpm@9a100000 {
+			compatible = "zte,ZX279127-lsp1crpm";
+			reg = <0x9a100000 0x1000>;
+			#clock-cells = <0x01>;
+			linux,phandle = <0x05>;
+			phandle = <0x05>;
+		};
+
+		i2c@9a102000 {
+			compatible = "zte,ZX279127-i2c";
+			reg = <0x9a102000 0x40>;
+			interrupts = <0x00 0x16 0x04>;
+			clocks = <0x05 0x04>;
+			status = "okay";
+		};
+
+		i2c@9a103000 {
+			compatible = "zte,zx279127-i2c";
+			reg = <0x9a103000 0x40>;
+			interrupts = <0x00 0x17 0x04>;
+			clocks = <0x05 0x07>;
+			status = "disabled";
+		};
+
+		temp@94100034 {
+			compatible = "zxic,tempsensor";
+			reg = <0x94100034 0x0c>;
+			interrupts = <0x00 0x33 0x04 0x00 0x5a 0x04 0x00 0x5b 0x04>;
+			status = "okay";
+		};
+
+		mdio@9a101000 {
+			compatible = "zte,zx279128s-mdio";
+			reg = <0x9a101000 0x18>;
+			clocks = <0x05 0x01>;
+			status = "okay";
+		};
+
+		pon@92000000 {
+			compatible = "zte,zx279128s-pon";
+			reg = <0x92000000 0x400000 0x94000000 0x100000 0x94100000 0x100000 0x94200000 0x100000 0x9fe00000 0x100000>;
+			interrupts = <0x00 0x22 0x04>;
+			status = "okay";
+		};
+
+		npp@921c0000 {
+			compatible = "zte,zx279128s-npp";
+			reg = <0x921c0000 0x8000 0x921cc000 0x34000>;
+			interrupts = <0x00 0x23 0x04 0x00 0x26 0x04>;
+			status = "okay";
+		};
+
+		tm@92340000 {
+			compatible = "zte,zx279128s-tm";
+			reg = <0x92340000 0x40000>;
+			interrupts = <0x00 0x24 0x04>;
+			status = "okay";
+		};
+
+		pp@92380000 {
+			compatible = "zte,zx279128s-pp";
+			reg = <0x92380000 0x40000>;
+			interrupts = <0x00 0x25 0x04>;
+			status = "okay";
+		};
+
+		idm@921c8000 {
+			compatible = "zte,zx279128s-idm";
+			reg = <0x921c8000 0x4000>;
+			interrupts = <0x00 0x26 0x04>;
+			status = "disabled";
+		};
+
+		gephy@9b000000 {
+			compatible = "zte,zx279128s-gephy";
+			reg = <0x9b000000 0x100000 0x9b100000 0x100000 0x9b200000 0x100000 0x9b300000 0x100000>;
+			interrupts = <0x00 0x27 0x04 0x00 0x28 0x04 0x00 0x29 0x04 0x00 0x2a 0x04>;
+			status = "okay";
+		};
+
+		ssp@9a105000 {
+			compatible = "zte,zx279127-ssp";
+			reg = <0x9a105000 0x1000>;
+			interrupts = <0x00 0x19 0x04>;
+			clocks = <0x05 0x0e>;
+			spi-num-chipselects = <0x02>;
+			status = "okay";
+
+			silicon@0 {
+				compatible = "rohm,dh2228fv";
+				reg = <0x00>;
+				spi-max-frequency = <0x1e8480>;
+			};
+		};
+
+		tdm@9a106000 {
+			compatible = "zte,ZX279127-tdm";
+			reg = <0x9a106000 0x1000>;
+			interrupts = <0x00 0x1b 0x04>;
+			clocks = <0x05 0x16>;
+			status = "okay";
+		};
+
+		pcie@10000000 {
+			compatible = "zte,ZX279127-pcie";
+			interrupts = <0x00 0x3f 0x04 0x00 0x4e 0x04 0x00 0x3b 0x04 0x00 0x4a 0x04>;
+			status = "okay";
+		};
+
+		usb@09000000 {
+			compatible = "zte,zx279127-dwc2";
+			reg = <0x9000000 0x10000>;
+			interrupts = <0x00 0x2c 0x04>;
+			dr_mode = "host";
+			status = "okay";
+		};
+
+		usb@09100000 {
+			compatible = "zte,zx279128-dwc3";
+			reg = <0x9100000 0x100000>;
+			clocks = <0x03 0x2c 0x03 0x2e 0x03 0x30>;
+			clock-names = "usb_bus_clk\0usb_ref_clk0\0usb_ref_clk1";
+			#address-cells = <0x01>;
+			#size-cells = <0x01>;
+			status = "okay";
+			ranges;
+
+			dwc3@0x09100000 {
+				compatible = "snps,dwc3";
+				reg = <0x9100000 0x100000>;
+				interrupts = <0x00 0x32 0x04>;
+				dr_mode = "host";
+				tx-fifo-resize;
+			};
+		};
+	};
+};

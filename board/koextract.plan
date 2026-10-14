@@ -1,0 +1,19 @@
+1500|root
+4500|<redacted:vendor telnet password>
+8000|find /lib/modules -name "plat_zxylzb*"
+11000|ls /lib/modules/4.1.25/
+13000|for f in $(find /lib/modules -name "plat_zxylzb*" -o -name "mt7916*"); do cp -f $f /var/tmp/; done; ls -l /var/tmp/
+18000|zcat /proc/config.gz 2>/dev/null | grep -iE "PCIE|PHY_ZTE|ZX279128|SANECHIPS|MT7916|GPIO_ZTE" > /var/tmp/vcfg.txt; wc -c /var/tmp/vcfg.txt
+23000|cat /proc/config.gz > /var/tmp/config.gz 2>/dev/null; ls -l /var/tmp/config.gz
+26000|cat /sys/kernel/debug/clk/clk_summary > /var/tmp/clks.txt; wc -c /var/tmp/clks.txt
+30000|cat /sys/kernel/debug/gpio > /var/tmp/gpios.txt; wc -c /var/tmp/gpios.txt
+33000|cat /sys/bus/pci/devices/0000:00:00.0/resource > /var/tmp/ep0res.txt; cat /sys/bus/pci/devices/0000:01:00.0/resource >> /var/tmp/ep0res.txt; wc -c /var/tmp/ep0res.txt
+37000|ls -l /var/tmp/
+40000|curl -f -sS -T /var/tmp/plat_zxylzb_9128S.ko http://192.168.5.5:8001/plat_zxylzb_9128S.ko; echo rc=$?
+45000|curl -f -sS -T /var/tmp/mt7916.ko http://192.168.5.5:8001/mt7916.ko; echo rc=$?
+50000|curl -f -sS -T /var/tmp/config.gz http://192.168.5.5:8001/vendor-config.gz; echo rc=$?
+55000|curl -f -sS -T /var/tmp/clks.txt http://192.168.5.5:8001/vendor-clk_summary.txt; echo rc=$?
+60000|curl -f -sS -T /var/tmp/gpios.txt http://192.168.5.5:8001/vendor-gpio.txt; echo rc=$?
+65000|curl -f -sS -T /var/tmp/ep0res.txt http://192.168.5.5:8001/vendor-ep-resource.txt; echo rc=$?
+70000|echo ZDONE
+72000|exit

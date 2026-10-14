@@ -1,0 +1,11 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo D1; ls -l /wlan; ls -l /proc/capability/
+25000|echo D2; for f in /wlan/*; do echo "F $f $(ls -l $f)"; done
+40000|echo D3; cat /wlan/caldata > /var/tmp/caldata.bin; ls -l /var/tmp/caldata.bin; curl -f -sS -T /var/tmp/caldata.bin http://192.168.5.5:8001/caldata.bin; echo rc=$?
+70000|echo D4; busybox hexdump -v -e '16/1 "%02x" "\n"' -n 64 /wlan/caldata
+85000|echo D5; cat /wlan/eeprom.bin > /var/tmp/eeprom.bin 2>/dev/null; ls -l /var/tmp/eeprom.bin 2>/dev/null; curl -f -sS -T /var/tmp/eeprom.bin http://192.168.5.5:8001/eeprom.bin 2>/dev/null; echo rc=$?
+105000|echo D6; ls -l /wlan/..; busybox hexdump -v -e '16/1 "%02x" "\n"' -s 0xc0000 -n 64 /dev/mtdblock3
+125000|echo D7; ls -l /var/tmp; rm -f /var/tmp/caldata.bin /var/tmp/eeprom.bin; exit
+150000|exit

@@ -1,0 +1,193 @@
+=== cmdline (root= should be the squashfs row: mtdblock7 with today's table) ===
+console=ttyAMA0,115200n8 root=/dev/mtdblock7 rootfstype=squashfs ro rootwait
+=== mtd table: numbering, sizes, bad blocks and ECC counters ===
+dev:    size   erasesize  name
+mtd0: 00100000 00020000 "bootloader"
+mtd1: 00100000 00020000 "tag"
+mtd2: 00100000 00020000 "wifi"
+mtd3: 00200000 00020000 "usercfg"
+mtd4: 00200000 00020000 "defcfg"
+mtd5: 01c00000 00020000 "slot0"
+mtd6: 01c00000 00020000 "slot1"
+mtd7: 00800000 00020000 "rootfs"
+mtd8: 003c0000 00020000 "rootfs_data"
+mtd9: 00020000 00020000 "slot1-header"
+mtd10: 00fe0000 00020000 "rootfs_data"
+mtd0   bootloader     size=1048576    erasesize=131072   bad=0   ecc_fail=0   corrected=0
+cat: can't open '/sys/class/mtd/mtd0ro/name': No such file or directory
+cat: can't open '/sys/class/mtd/mtd0ro/size': No such file or directory
+cat: can't open '/sys/class/mtd/mtd0ro/erasesize': No such file or directory
+mtd0ro                size=           erasesize=         bad=    ecc_fail=    corrected=
+mtd1   tag            size=1048576    erasesize=131072   bad=0   ecc_fail=0   corrected=0
+mtd10  rootfs_data    size=16646144   erasesize=131072   bad=0   ecc_fail=0   corrected=0
+cat: can't open '/sys/class/mtd/mtd10ro/name': No such file or directory
+cat: can't open '/sys/class/mtd/mtd10ro/size': No such file or directory
+cat: can't open '/sys/class/mtd/mtd10ro/erasesize': No such file or directory
+mtd10ro                size=           erasesize=         bad=    ecc_fail=    corrected=
+cat: can't open '/sys/class/mtd/mtd1ro/name': No such file or directory
+cat: can't open '/sys/class/mtd/mtd1ro/size': No such file or directory
+cat: can't open '/sys/class/mtd/mtd1ro/erasesize': No such file or directory
+mtd1ro                size=           erasesize=         bad=    ecc_fail=    corrected=
+mtd2   wifi           size=1048576    erasesize=131072   bad=0   ecc_fail=0   corrected=0
+cat: can't open '/sys/class/mtd/mtd2ro/name': No such file or directory
+cat: can't open '/sys/class/mtd/mtd2ro/size': No such file or directory
+cat: can't open '/sys/class/mtd/mtd2ro/erasesize': No such file or directory
+mtd2ro                size=           erasesize=         bad=    ecc_fail=    corrected=
+mtd3   usercfg        size=2097152    erasesize=131072   bad=0   ecc_fail=0   corrected=0
+cat: can't open '/sys/class/mtd/mtd3ro/name': No such file or directory
+cat: can't open '/sys/class/mtd/mtd3ro/size': No such file or directory
+cat: can't open '/sys/class/mtd/mtd3ro/erasesize': No such file or directory
+mtd3ro                size=           erasesize=         bad=    ecc_fail=    corrected=
+mtd4   defcfg         size=2097152    erasesize=131072   bad=0   ecc_fail=0   corrected=0
+cat: can't open '/sys/class/mtd/mtd4ro/name': No such file or directory
+cat: can't open '/sys/class/mtd/mtd4ro/size': No such file or directory
+cat: can't open '/sys/class/mtd/mtd4ro/erasesize': No such file or directory
+mtd4ro                size=           erasesize=         bad=    ecc_fail=    corrected=
+mtd5   slot0          size=29360128   erasesize=131072   bad=0   ecc_fail=0   corrected=0
+cat: can't open '/sys/class/mtd/mtd5ro/name': No such file or directory
+cat: can't open '/sys/class/mtd/mtd5ro/size': No such file or directory
+cat: can't open '/sys/class/mtd/mtd5ro/erasesize': No such file or directory
+mtd5ro                size=           erasesize=         bad=    ecc_fail=    corrected=
+mtd6   slot1          size=29360128   erasesize=131072   bad=0   ecc_fail=0   corrected=0
+cat: can't open '/sys/class/mtd/mtd6ro/name': No such file or directory
+cat: can't open '/sys/class/mtd/mtd6ro/size': No such file or directory
+cat: can't open '/sys/class/mtd/mtd6ro/erasesize': No such file or directory
+mtd6ro                size=           erasesize=         bad=    ecc_fail=    corrected=
+mtd7   rootfs         size=8388608    erasesize=131072   bad=0   ecc_fail=0   corrected=648
+cat: can't open '/sys/class/mtd/mtd7ro/name': No such file or directory
+cat: can't open '/sys/class/mtd/mtd7ro/size': No such file or directory
+cat: can't open '/sys/class/mtd/mtd7ro/erasesize': No such file or directory
+mtd7ro                size=           erasesize=         bad=    ecc_fail=    corrected=
+mtd8   rootfs_data    size=3932160    erasesize=131072   bad=0   ecc_fail=0   corrected=28
+cat: can't open '/sys/class/mtd/mtd8ro/name': No such file or directory
+cat: can't open '/sys/class/mtd/mtd8ro/size': No such file or directory
+cat: can't open '/sys/class/mtd/mtd8ro/erasesize': No such file or directory
+mtd8ro                size=           erasesize=         bad=    ecc_fail=    corrected=
+mtd9   slot1-header   size=131072     erasesize=131072   bad=0   ecc_fail=0   corrected=0
+cat: can't open '/sys/class/mtd/mtd9ro/name': No such file or directory
+cat: can't open '/sys/class/mtd/mtd9ro/size': No such file or directory
+cat: can't open '/sys/class/mtd/mtd9ro/erasesize': No such file or directory
+mtd9ro                size=           erasesize=         bad=    ecc_fail=    corrected=
+=== mounts: the overlay should be the jffs2 row (mtdblock9 with today's table) ===
+/dev/root /rom squashfs ro,relatime,errors=continue 0 0
+/dev/mtdblock8 /overlay jffs2 rw,noatime 0 0
+overlayfs:/overlay / overlay rw,noatime,lowerdir=/,upperdir=/overlay/upper,workdir=/overlay/work,uuid=on 0 0
+=== mdio: which PHY addresses answered (board file guesses 0xa..0xd) ===
+9a101000.mdio:0a
+9a101000.mdio:0b
+9a101000.mdio:0c
+9a101000.mdio:0d
+  /sys/bus/mdio_bus/devices/9a101000.mdio:0a/c45_phy_ids = 
+  /sys/bus/mdio_bus/devices/9a101000.mdio:0a/phy_id = 0x84b95031
+  /sys/bus/mdio_bus/devices/9a101000.mdio:0b/c45_phy_ids = 
+  /sys/bus/mdio_bus/devices/9a101000.mdio:0b/phy_id = 0x84b95031
+  /sys/bus/mdio_bus/devices/9a101000.mdio:0c/c45_phy_ids = 
+  /sys/bus/mdio_bus/devices/9a101000.mdio:0c/phy_id = 0x84b95031
+  /sys/bus/mdio_bus/devices/9a101000.mdio:0d/c45_phy_ids = 
+  /sys/bus/mdio_bus/devices/9a101000.mdio:0d/phy_id = 0x84b95031
+=== netdevs and their PHYs ===
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN qlen 1000\    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: lan3: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel master br-lan state DOWN qlen 1000\    link/ether 0a:b2:d9:15:03:1e brd ff:ff:ff:ff:ff:ff
+3: lan2: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel master br-lan state DOWN qlen 1000\    link/ether 42:01:19:11:2e:f1 brd ff:ff:ff:ff:ff:ff
+4: lan1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master br-lan state UP qlen 1000\    link/ether a2:48:a7:d1:d5:47 brd ff:ff:ff:ff:ff:ff
+5: wan: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN qlen 1000\    link/ether ee:b1:35:e1:4f:e9 brd ff:ff:ff:ff:ff:ff
+6: br-lan: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP qlen 1000\    link/ether a2:48:a7:d1:d5:47 brd ff:ff:ff:ff:ff:ff
+=== pci: does the Wi-Fi chip enumerate (MediaTek vendor 0x14c3) ===
+mt7915_rom_patch.bin
+mt7915_wa.bin
+mt7915_wm.bin
+=== modules actually loaded (mt7915e needs firmware to have arrived first) ===
+cfg80211              376832  4 mt7915e,mt76_connac_lib,mt76,mac80211
+cmac                   12288  0 
+compat                 16384  2 mac80211,cfg80211
+crc_ccitt              12288  1 ppp_async
+drbg                   24576  0 
+geniv                  12288  1 seqiv
+gpio_button_hotplug    12288  0 
+hmac                   12288  0 
+hwmon                  20480  1 mt7915e
+i2c_dev                16384  0 
+jitterentropy_rng      16384  0 
+leds_gpio              12288  0 
+libsha512              20480  1 sha512
+mac80211              700416  3 mt7915e,mt76_connac_lib,mt76
+mt76                   77824  2 mt7915e,mt76_connac_lib
+mt76_connac_lib        53248  1 mt7915e
+mt7915e               131072  0 
+nf_conntrack           90112  7 nft_flow_offload,nf_flow_table,nft_redir,nft_nat,nft_masq,nft_ct,nf_nat
+nf_defrag_ipv4         12288  1 nf_conntrack
+nf_defrag_ipv6         16384  1 nf_conntrack
+nf_flow_table          36864  2 nft_flow_offload,nf_flow_table_inet
+nf_flow_table_inet     12288  0 
+nf_log_syslog          16384  0 
+nf_nat                 36864  4 nft_redir,nft_nat,nft_masq,nft_chain_nat
+nf_reject_ipv4         12288  2 nft_reject_ipv4,nft_reject_inet
+nf_reject_ipv6         12288  2 nft_reject_ipv6,nft_reject_inet
+nf_tables             212992209 nft_flow_offload,nft_fib_inet,nf_flow_table_inet,nf_flow_table,nft_reject_ipv6,nft_reject_ipv4,nft_reject_inet,nft_reject,nft_redir,nft_quota,nft_numgen,nft_nat,nft_masq,nft_log,nft_limit,nft_hash,nft_fib_ipv6,nft_fib_ipv4,nft_fib,nft_ct,nft_chain_nat
+nfnetlink              16384  1 nf_tables
+nft_chain_nat          12288  2 
+nft_ct                 16384  4 
+nft_fib                12288  3 nft_fib_inet,nft_fib_ipv6,nft_fib_ipv4
+nft_fib_inet           12288  0 
+nft_fib_ipv4           12288  1 nft_fib_inet
+nft_fib_ipv6           12288  1 nft_fib_inet
+nft_flow_offload       12288  0 
+nft_hash               12288  0 
+nft_limit              12288  5 
+nft_log                12288  0 
+nft_masq               12288  1 
+nft_nat                12288  0 
+nft_numgen             12288  0 
+nft_quota              12288  0 
+nft_redir              12288  0 
+nft_reject             12288  3 nft_reject_ipv6,nft_reject_ipv4,nft_reject_inet
+nft_reject_inet        12288  2 
+nft_reject_ipv4        12288  0 
+nft_reject_ipv6        12288  0 
+ppp_async              16384  0 
+ppp_generic            36864  3 pppoe,ppp_async,pppox
+pppoe                  20480  0 
+pppox                  12288  1 pppoe
+seqiv                  12288  0 
+sha3_generic           12288  0 
+sha512                 16384  0 
+slhc                   12288  1 ppp_generic
+=== gpio chips (LEDs claim &gpio2 8 / &gpio0 8 / &gpio3 12, keys &gpio1 2 and 4) ===
+  gpiochip512 base=512 ngpio=16 label=94407000.gpio
+  gpiochip528 base=528 ngpio=16 label=94407040.gpio
+  gpiochip544 base=544 ngpio=16 label=94407080.gpio
+  gpiochip560 base=560 ngpio=16 label=944070c0.gpio
+  gpiochip576 base=576 ngpio=16 label=94407100.gpio
+  gpiochip592 base=592 ngpio=16 label=94407140.gpio
+green:power
+green:wan
+green:wlan
+=== kernel log: flash, wifi, vfp, errors ===
+[    0.000000] Booting Linux on physical CPU 0x0
+[    0.000000] Kernel command line: console=ttyAMA0,115200n8 root=/dev/mtdblock7 rootfstype=squashfs ro rootwait
+[    0.057915] squashfs: version 4.0 (2009/01/31) Phillip Lougher
+[    0.057924] jffs2: version 2.2 (NAND) (SUMMARY) (ZLIB) (LZMA) (RTIME) (CMODE_PRIORITY) (c) 2001-2006 Red Hat, Inc.
+[    0.069768] spi-nand spi0.0: SkyHigh SPI NAND was found.
+[    0.069779] spi-nand spi0.0: 128 MiB, block size: 128 KiB, page size: 2048, OOB size: 64
+[    0.070326] 10 fixed-partitions partitions found on MTD device spi0.0
+[    0.070347] Creating 10 MTD partitions on "spi0.0":
+[    0.111545] mtd: setting mtd7 (rootfs) as root device
+[    0.112047] 1 squashfs-split partitions found on MTD device rootfs
+[    0.181521] zx279128s-eth 92000000.ethernet lan3 (uninitialized): PHY [9a101000.mdio:0a] driver [Generic PHY] (irq=POLL)
+[    0.182417] zx279128s-eth 92000000.ethernet lan2 (uninitialized): PHY [9a101000.mdio:0b] driver [Generic PHY] (irq=POLL)
+[    0.183444] zx279128s-eth 92000000.ethernet lan1 (uninitialized): PHY [9a101000.mdio:0c] driver [Generic PHY] (irq=POLL)
+[    0.184315] zx279128s-eth 92000000.ethernet wan (uninitialized): PHY [9a101000.mdio:0d] driver [Generic PHY] (irq=POLL)
+[    0.214472] Warning: unable to open an initial console.
+[    0.215203] check access for rdinit=/init failed: -2, ignoring
+[    0.215418] mtdblock: MTD device 'rootfs' is NAND, please consider using UBI block devices instead.
+[    0.222223] VFS: Mounted root (squashfs filesystem) readonly on device 31:7.
+[    4.979808] zx279128s-eth 92000000.ethernet lan1: configuring for phy/internal link mode
+[   20.274604] jffs2: NAND pages can be programmed once: clean markers are in the data, 2048 bytes
+[   20.306037] jffs2: notice: (2746) jffs2_build_xattr_subsystem: complete building xattr subsystem, 0 of xdatum (0 unchecked, 0 orphan) and 0 of xref (0 dead, 0 orphan) found.
+[   20.545441] zx279128s-eth 92000000.ethernet lan1: configuring for phy/internal link mode
+[   20.571094] zx279128s-eth 92000000.ethernet lan2: configuring for phy/internal link mode
+[   20.589356] zx279128s-eth 92000000.ethernet lan3: configuring for phy/internal link mode
+[   20.611355] zx279128s-eth 92000000.ethernet wan: configuring for phy/internal link mode
+[   22.236986] platform f000000.pcie: deferred probe pending: zx279128s-pcie: failed to get pcie phy
+[   22.237001] platform f100000.pcie: deferred probe pending: zx279128s-pcie: failed to get pcie phy
+=== done ===

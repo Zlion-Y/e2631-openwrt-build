@@ -1,0 +1,9 @@
+1500|root
+4500|<redacted:vendor telnet password>
+8000|echo U1; cd /etc/wireless/mt7916; pwd
+12000|echo U2; /kmodule/bin/curl -sS -m 60 -T mt7916_patch_e1_hdr.bin http://192.168.5.17:8000/put/mt7916_patch_e1_hdr.bin; echo rc=$?
+18000|echo U3; /kmodule/bin/curl -sS -m 120 -T MT7916_EEPROM.bin http://192.168.5.17:8000/put/MT7916_EEPROM.bin; echo rc=$?
+24000|echo U4; /kmodule/bin/curl -sS -m 120 -T l1profile.dat.dbdc http://192.168.5.17:8000/put/l1profile.dat.dbdc; /kmodule/bin/curl -sS -m 120 -T mt7916.dbdc.b0.dat http://192.168.5.17:8000/put/mt7916.dbdc.b0.dat; /kmodule/bin/curl -sS -m 120 -T mt7916.dbdc.b1.dat http://192.168.5.17:8000/put/mt7916.dbdc.b1.dat; echo rc=$?
+36000|echo U5; /kmodule/bin/curl -sS -m 240 -T 7916_WACPU_RAM_CODE_release.bin http://192.168.5.17:8000/put/7916_WACPU_RAM_CODE_release.bin; echo rc=$?
+60000|echo U6; /kmodule/bin/curl -sS -m 300 -T WIFI_RAM_CODE_MT7916.bin http://192.168.5.17:8000/put/WIFI_RAM_CODE_MT7916.bin; echo rc=$?
+120000|echo U7; ls -l /etc/wireless/mt7916; exit

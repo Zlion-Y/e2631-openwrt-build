@@ -1,0 +1,50 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo W1; ls -l /wlan/; mount | grep -i -E \"wlan|wifi\"\r\n"
+echo W1; ls -l /wlan/; mount | grep -i -E "wlan|wifi"
+W1
+-rw-r--r--    1 Z500_w9b root        196608 Sep 22 18:03 caldata
+/dev/mtdblock3 on /wlan type jffs2 (rw,relatime)
+/ # 
+=== [send @40000ms] "echo W2; for f in /wlan/*; do echo \"F $f $(ls -l $f)\"; done\r\n"
+echo W2; for f in /wlan/*; do echo "F $f $(ls -l $f)"; done
+W2
+F /wlan/caldata -rw-r--r--    1 Z500_w9b root        196608 Sep 22 18:03 /wlan/caldata
+/ # 
+=== [send @70000ms] "echo W3; cat /wlan/caldata > /var/tmp/caldata.bin; ls -l /var/tmp/caldata.bin; busybox hexdump -v -n 16 -e '16/1 \"%02x\"' /var/tmp/caldata.bin; echo\r\n"
+echo W3; cat /wlan/caldata > /var/tmp/caldata.bin; ls -l /var/tmp/caldata.bi
+n; busybox hexdump -v -n 16 -e '16/1 "%02x"' /var/tmp/caldata.bin; echo
+W3
+-rw-r--r--    1 Z500_w9b root        196608 Oct 13 04:19 /var/tmp/caldata.bin
+16790000000c43266000000000000000
+/ # 
+=== [send @110000ms] "echo W4; curl -f -sS -T /var/tmp/caldata.bin http://192.168.5.5:8001/caldata.bin; echo rc=$?\r\n"
+echo W4; curl -f -sS -T /var/tmp/caldata.bin http://192.168.5.5:8001/caldata
+.bin; echo rc=$?
+W4
+ok
+rc=0
+/ # 
+=== [send @150000ms] "echo W5; busybox hexdump -v -n 16 -e '16/1 \"%02x\"' /wlan/caldata; echo; df -k /var; rm -f /var/tmp/caldata.bin; exit\r\n"
+echo W5; busybox hexdump -v -n 16 -e '16/1 "%02x"' /wlan/caldata; echo; df -
+k /var; rm -f /var/tmp/caldata.bin; exit
+W5
+16790000000c43266000000000000000
+Filesystem           1024-blocks    Used Available Use% Mounted on
+tmpfs                       40960          264        40696   1% /var 
+
+### CLOSED

@@ -1,0 +1,5 @@
+1500|echo FAILSAFE-HERE-$(cut -d" " -f1 /proc/uptime)
+3000|e2631-fwslot info
+6000|e2631-fwslot switch
+9000|e2631-fwslot info
+12000|echo SWITCH-DONE

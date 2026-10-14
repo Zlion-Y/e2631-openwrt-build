@@ -1,18 +1,21 @@
 # OpenWrt for the ZTE ZXHN E2631 (Sanechips ZX279128S)
 
-Overlay-only repo: it carries the E2631 board files and CI, not an OpenWrt tree.
-The base is the sanechips target from openwrt/openwrt#25469, pinned to a SHA on
-our own fork so a force-push upstream cannot break the build.
+This one repository holds the whole port: the overlay that turns the base tree into an
+E2631 build (`overlay/`), the local build path (`wsl/`, grouped in `wsl/INDEX.md`), the
+board-side scripts and the vendor-side flash plans (`board/`), the Windows-side tooling
+(`host/`), and the two working documents with the evidence notes (`docs/`). There is no
+CI any more - the build happens in WSL on this machine, and `wsl/check-kit.sh` plus
+`node build/host/release.mjs` are the gates that used to live in a workflow.
 
     git clone --branch pr-zte-zxhn-h3600 https://github.com/Zlion-Y/openwrt-sanechips-base openwrt
     git -C openwrt checkout db8b8d4130457dbe46558a7cea872dd2dae539e6
     ./apply.sh openwrt
 
-Images are built locally inside WSL with wsl/build.sh (see below);
-`.github/workflows/build.yml` is manual-only now and exists as the fallback for a
-machine without WSL. Packaging into the vendor upgrade format happens on
-the Windows side with tools/mkfactory.mjs, because the official package used as
-the version-header template is not uploaded here.
+Packaging into the vendor upgrade format happens on the Windows side with
+`node build/host/release.mjs --dir out/<build>` (run from the workspace root, because
+`out/` and the official template package in `升级包/` are not in git): it packs, then
+re-derives the geometry independently and screens the artifact for the things that stop a
+boot. The official package used as the version-header template is never uploaded here.
 
 Three screens run before the forty-minute build is allowed to be the test:
 `tools/dts_lint.mjs` resolves the board file's includes, `&labels` and
@@ -75,7 +78,7 @@ build selects - while the selected packages waited.
 
 `wsl/collect.sh <out-dir>` then lays the build out the way the CI artifact does
 (`kernel` / `root` / `e2631.dtb` / `config-6.18` / `e2631-fwslot`), which is
-what `node tools/release.mjs --dir <out-dir>` packs and screens. The Windows
+what `node build/host/release.mjs --dir out/<dir>` packs and screens. The Windows
 drives are mounted inside the distro, so nothing has to be piped over stdio.
 `wsl/INDEX.md` groups the other scripts in there (build path / patch generators /
 witnesses / probes) so the file count does not hide which ones to run.
@@ -99,22 +102,28 @@ roughly one attempt in three (three cold boots on this exact image: hung, worked
 and a **client associating** still hard-hangs the machine, silently, with no AER record and
 no oops. Both are documented with their sample data in `docs/02-...md` section P.
 
-## What lives outside this repo
+## What is deliberately not in here
 
-The workspace root (`D:\AI\Qoder\E2631-OpenWRT`) holds the parts that are not build inputs
-and so are not in here: `docs/` (the two working documents, Chinese, with every offset and
-log line behind the conclusions), `device/` (board-side helper scripts and the vendor-side
-flash plans), `tools/` (Windows-side: `release.mjs`, `stage.mjs`, serial/telnet/ssh drivers),
-`out/` (every artifact and log, including the images), and the reference clones.
+`out/` stays at the workspace root (`D:\AI\Qoder\E2631-OpenWRT\out`): every build
+directory, packed image, log and one-off experiment script. It is 1.1 GB of things that
+are either regenerable or evidence with a filename quoted in `docs/`, and `docs/` says so
+inline - a path written as `out/xxx.log` means the workspace root, not this repo. Also
+excluded by `.gitignore`: `board/harvest-H8.txt` (a 356 MB vendor system harvest),
+`board/backup/` and `board/web/` (mtd and driver dumps, the scraped vendor UI),
+`board/config18.xml` and `board/webcreds.out.txt` (a vendor config export and a deliberate
+grep for password fields - neither belongs on GitHub), and `host/askpass.bat` (a
+git-credential helper whose only job is to hand a token to git).
 
 Two sibling repos of ours are related. `Zlion-Y/e2631-mainline-zx279128s` (mainline
 Linux port) stays a separate effort - it is still where the real "this SoC boots"
-evidence comes from. `Zlion-Y/e2631-openwrt`, the stage-1 initramfs scaffold, has
-been folded in here: its history is the `stage1-scaffold` branch
-(`git log --oneline stage1-scaffold`), and `tools/PROBE.md` - the list of unknowns
-the first board file was written against - now lives on `main` with a status table
-saying which of those unknowns a flashed board closed and which it did not.
-Everything else on that branch is an older copy of what is here: its board DTS,
-`apply.sh` and seed config predate the slot geometry, the nvmem MAC wiring and the
-JFFS2 patches, and its `tools/*.py` screens were rewritten as `.mjs` because this
+evidence comes from, and since 2026-10-14 it holds nothing but the kernel: the TFTP /
+U-Boot bring-up path it used to ship was retired to that repo's `v0.1.1` tag.
+`Zlion-Y/e2631-openwrt`, the stage-1 initramfs scaffold, has been folded in here: its
+history is the `stage1-scaffold` branch (`git log --oneline stage1-scaffold`), and
+`tools/PROBE.md` - the list of unknowns the first board file was written against - now
+lives on `main` with a status table saying which of those unknowns a flashed board closed
+and which it did not. Everything else on that branch is an older copy of what is here: its
+board DTS, `apply.sh` and seed config predate the slot geometry, the nvmem MAC wiring and
+the JFFS2 patches, and its `tools/*.py` screens were rewritten as `.mjs` because this
 machine has no usable python.
+

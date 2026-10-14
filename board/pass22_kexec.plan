@@ -1,0 +1,9 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo X1; ls /proc/sys/kernel | grep -i kexec
+18000|echo X2; cat /proc/sys/kernel/kexec_loaded /proc/sys/kernel/kexec_crash_loaded 2>&1
+24000|echo X3; grep -c -i kexec /proc/kallsyms
+32000|echo X4; ls /bin /sbin | grep -i kexec
+38000|echo X5; busybox 2>&1 | busybox head -c 1200; echo
+52000|echo X6; ls -l /proc/1/exe; cat /proc/1/cmdline; echo

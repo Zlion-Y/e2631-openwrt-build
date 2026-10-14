@@ -1,0 +1,109 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1500ms] "root\r\n"
+root
+Password: 
+=== [send @4500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @8000ms] "readlink /sys/bus/pci/devices/0000:00:00.0\r\n"
+readlink /sys/bus/pci/devices/0000:00:00.0
+../../../devices/pci0000:00/0000:00:00.0
+/ # 
+=== [send @9000ms] "readlink /sys/bus/pci/devices/0000:01:00.0\r\n"
+readlink /sys/bus/pci/devices/0000:01:00.0
+../../../devices/pci0000:01/0000:01:00.0
+/ # 
+=== [send @10500ms] "ls /sys/devices/platform/soc/\r\n"
+ls /sys/devices/platform/soc/
+800200.timer                 9a100000.lsp1crpm
+800620.watchdog              9a101000.mdio
+801000.interrupt-controller  9a102000.i2c
+804000.mg-crm                9a105000.ssp
+9000000.usb                  9a106000.tdm
+9100000.usb                  9b000000.gephy
+92000000.pon                 c00000.l2-cache-controller
+921c0000.npp                 d80000.nand
+92340000.tm                  driver_override
+92380000.pp                  modalias
+94000000.topcrm              of_node
+94100034.temp                power
+94400000.lsp0crpm            soc:pcie@10000000
+94404000.serial              subsystem
+94405000.serial              uevent
+94406000.spifc
+/ # 
+=== [send @13000ms] "cat /sys/bus/pci/devices/0000:00:00.0/resource | head -4\r\n"
+cat /sys/bus/pci/devices/0000:00:00.0/resource | head -4
+/bin/sh: head: not found
+cat: write error: Broken pipe
+/ # 
+=== [send @15000ms] "grep -iE \"pcie|f000000|f100000|94000\" /proc/iomem\r\n"
+grep -iE "pcie|f000000|f100000|94000" /proc/iomem
+10000000-17ffffff : pcie0 mem space
+20000000-27ffffff : pcie1 mem space
+/ # 
+=== [send @17500ms] "ls /sys/kernel/debug/ 2>/dev/null\r\n"
+ls /sys/kernel/debug/ 2>/dev/null
+bdi                 gpio                pm_qos              ubi
+clk                 hid                 ras
+extfrag             memblock            regmap
+fault_around_bytes  pinctrl             sleep_time
+/ # 
+=== [send @19000ms] "cat /sys/kernel/debug/clk/clk_summary 2>/dev/null | grep -iE \"pcie|phy|crm\" | head -20\r\n"
+cat /sys/kernel/debug/clk/clk_summary 2>/dev/null | grep -iE "pcie|phy|crm" 
+| head -20
+/bin/sh: head: not found
+/ # 
+=== [send @22000ms] "cat /sys/kernel/debug/gpio 2>/dev/null | tail -25\r\n"
+cat /sys/kernel/debug/gpio 2>/dev/null | tail -25
+/bin/sh: tail: not found
+/ # 
+=== [send @25000ms] "ls /sys/bus/pci/drivers/mt_drv_7916/ /sys/bus/pci/drivers/mt_pci_slave/\r\n"
+ls /sys/bus/pci/drivers/mt_drv_7916/ /sys/bus/pci/drivers/mt_pci_slave/
+/sys/bus/pci/drivers/mt_drv_7916/:
+0000:00:00.0  module        remove_id     unbind
+bind          new_id        uevent
+
+/sys/bus/pci/drivers/mt_pci_slave/:
+0000:01:00.0  module        remove_id     unbind
+bind          new_id        uevent
+/ # 
+=== [send @27000ms] "cat /sys/module/mt_drv_7916/parameters/* 2>/dev/null | head -5\r\n"
+cat /sys/module/mt_drv_7916/parameters/* 2>/dev/null | head -5
+/bin/sh: head: not found
+/ # 
+=== [send @28500ms] "lsmod\r\n"
+lsmod
+
+xdpi 882299 0 - Live 0xbf6d8000 (O)
+mt7916 4506386 5 - Live 0xbf1f9000 (O)
+idmfdb 64461 0 - Live 0xbf1e4000 (O)
+switch 172680 1 idmfdb, Live 0xbf1ab000 (O)
+tm 1179936 2 mt7916,switch, Live 0xbf04d000 (O)
+plat_zxylzb_9128S 167427 4 mt7916,idmfdb,switch,tm, Live 0xbf018000 (O)
+zx_ponreg 2256 2 switch,tm, Live 0xbf014000 (O)
+patch 2057 0 - Live 0xbf010000 (O)
+shellproc 47932 1 patch,[permanent], Live 0xbf000000 (O)
+/ # 
+=== [send @30500ms] "find /lib/modules/4.1.25 -name \"*7916*\" -o -name \"*pcie*\" 2>/dev/null | head\r\n"
+find /lib/modules/4.1.25 -name "*7916*" -o -name "*pcie*" 2>/dev/null | head
+/bin/sh: head: not found
+/ # 
+=== [send @33000ms] "cat /proc/irq/*- 2>/dev/null | head -0\r\n"
+cat /proc/irq/*- 2>/dev/null | head -0
+/bin/sh: head: not found
+/ # 
+=== [send @33500ms] "echo ZDONE\r\n"
+echo ZDONE
+ZDONE
+/ # 
+=== [send @35000ms] "exit\r\n"
+exit
+
+### CLOSED

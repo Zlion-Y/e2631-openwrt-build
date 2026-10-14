@@ -1,0 +1,4 @@
+500|
+1500|cat /proc/loadavg; free; ps | grep -E 'hostapd|netifd|wifi' | grep -v grep
+4000|logread | tail -30
+9000|iw dev

@@ -1,0 +1,11 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo L1; ifconfig -a
+45000|echo L2; ls -l /sys/class/net/
+70000|echo L3; for d in /sys/class/net/*; do echo "$d state=$(cat $d/operstate) speed=$(cat $d/speed 2>/dev/null) mac=$(cat $d/address)"; done
+95000|echo L4; ls /sys/bus/mdio_bus/devices 2>/dev/null; echo ---; for f in /sys/bus/mdio_bus/devices/*; do echo "$f"; done
+120000|echo L5; cat /proc/capability/ethernetmac
+140000|echo L6; which ethtool swconfig; swconfig dev switch0 show 2>/dev/null
+180000|echo L7; cat /proc/device-tree/mdio*/ethernet-phy*/reg 2>/dev/null | busybox hexdump -v -e '4/1 "%d " "\n"'; echo ---; ls /proc/device-tree/mdio*/ ; exit
+210000|exit

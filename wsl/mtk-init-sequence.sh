@@ -1,5 +1,5 @@
 #!/bin/bash
-# Mine the stock MTK driver (device/backup/mt7916.ko) for its firmware bring-up
+# Mine the stock MTK driver (board/backup/mt7916.ko) for its firmware bring-up
 # so we can compare it with the mt76 path that keeps hanging this board.
 #
 # What we want: what it does around "download ROM patch / WM / WA, then wait for

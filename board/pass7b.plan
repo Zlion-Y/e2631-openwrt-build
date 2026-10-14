@@ -1,0 +1,7 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo M1; brctl show
+20000|echo M2; ifconfig -a
+32000|echo M3; ls -l /sys/class/net/
+40000|echo M4; ls /sys/bus/mdio_bus/devices

@@ -1,0 +1,11 @@
+1000|root
+3000|<redacted:vendor telnet password>
+7000|
+9000|echo UPTIME; cat /proc/uptime
+12000|echo MOUT_EXISTS; ls -l /tmp/m.out 2>/dev/null
+15000|echo MOUT; cat /tmp/m.out 2>/dev/null
+25000|echo LANINFO_DIR; ls /proc/laninfo/
+28000|echo LANINFO_FILES; for f in /proc/laninfo/*; do echo "==$f"; cat "$f" 2>&1; done
+40000|echo TCPHY; cat /proc/tcphy
+43000|echo TCPHY_WR_TEST; ls -l /proc/tcphy
+46000|echo END_MARK

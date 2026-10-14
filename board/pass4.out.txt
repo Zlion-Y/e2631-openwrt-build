@@ -1,0 +1,171 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @2500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @5000ms] "\r\n"
+
+/ # 
+=== [send @7000ms] "echo V1_BOOTFLASH_USAGE; boot_flashing\r\n"
+echo V1_BOOTFLASH_USAGE; boot_flashing
+V1_BOOTFLASH_USAGE
+InitAppComm OSS_OK ! 
+*******************************
+g_delay_time = 0
+g_reboot_enable = 0
+sFwDirName = 
+*******************************
+FW_FILE: is not exist!
+boot_flashing error 
+asend message to UPGRADE_MGR_PID   OK!!!!!!
+/ # 
+=== [send @11000ms] "echo V2_BOOTFLASH_H; boot_flashing -h\r\n"
+echo V2_BOOTFLASH_H; boot_flashing -h
+V2_BOOTFLASH_H
+InitAppComm OSS_OK ! 
+boot_flashing: invalid option -- h
+boot_flashing:no parameter
+*******************************
+g_delay_time = 0
+g_reboot_enable = 0
+sFwDirName = 
+*******************************
+FW_FILE: is not exist!
+boot_flashing error 
+asend message to UPGRADE_MGR_PID   OK!!!!!!
+/ # 
+=== [send @14000ms] "echo V3_FWFLASH_USAGE; fw_flashing\r\n"
+echo V3_FWFLASH_USAGE; fw_flashing
+V3_FWFLASH_USAGE
+/ # 
+=== [send @18000ms] "echo V4_FWFLASH_H; fw_flashing -h\r\n"
+echo V4_FWFLASH_H; fw_flashing -h
+V4_FWFLASH_H
+fw_flashing: invalid option -- h
+fw_flashing:no parameter==========fw_flashing error========== / # 
+=== [send @22000ms] "echo V5_SYNVER; syn_version\r\n"
+echo V5_SYNVER; syn_version
+V5_SYNVER
+ flash block size is 0x20000)
+Start preparing for sync version...............
+g_zte_current_version_number = 1
+g_zte_current_version_base_address = 0x700000
+g_zte_current_version_physical_address = 0x700000
+g_zte_current_version_head_address = 0x1c60000
+g_zte_current_version_low_address = 0x700000
+g_zte_current_version_high_address = 0x2300000
+g_zte_current_version_serial_num = 16
+g_zte_current_version_isbad = 0
+g_zte_other_version_base_address = 0x2300000
+g_zte_other_version_head_address = 0x3ca0000
+g_zte_other_version_serial_num = 15
+g_zte_other_version_isbad = 0
+Image1 - > Image2 ...............
+Start erasing Image2 head...
+syn_version erase  high area :0x2300000,len = 0x1c00000
+Start copy jffs ,kernel...
+src:700000 dst:2300000 header:1c60000
+
+=== [send @25000ms] "echo V6_UPGRADETEST; upgradetest -h\r\n"
+echo V6_UPGRADETEST; upgradetest -h
+
+=== [send @29000ms] "echo V7_DECRYPT_PROOF; busybox hexdump -C -n 32 /dev/mtdblock8; busybox hexdump -C -s 0xa40000 -n 32 /dev/mtdblock0; busybox hexdump -C -s 0x2640000 -n 32 /dev/mtdblock0\r\n"
+echo V7_DECRYPT_PROOF; busybox hexdump -C -n 32 /dev/mtdblock8; busybox hexdump -C -s 0xa40000 -n 32 /dev/mtdblock0; busybox hexdump -C -s 0x2640000 -n 32 /dev/mtdblock0
+
+=== [send @35000ms] "echo V8_KALLSYMS; busybox grep -i -E \"aes|crypt|decrypt|encrypt|slot|verinfo|verhdr|zteboot\" /proc/kallsyms | busybox head -60\r\n"
+echo V8_KALLSYMS; busybox grep -i -E "aes|crypt|decrypt|encrypt|slot|verinfo|verhdr|zteboot" /proc/kallsyms | busybox head -60
+Start copy version head...
+
+=== [send @40000ms] "echo V9_IOMEM; cat /proc/iomem\r\n"
+echo V9_IOMEM; cat /proc/iomem
+==========syn_version over!==========
+/ # echo V6_UPGRADETEST; upgradetest -h
+V6_UPGRADETEST
+function not found!!! 
+/ # echo V7_DECRYPT_PROOF; busybox hexdump -C -n 32 /dev/mtdblock8; busybox hexd
+ump -C -s 0xa40000 -n 32 /dev/mtdblock0; busybox hexdump -C -s 0x2640000 -n 32 /
+dev/mtdblock0
+V7_DECRYPT_PROOF
+00000000  85 19 01 e0 31 00 00 00  1d d9 82 42 01 00 00 00  |....1......B....|
+00000010  00 00 00 00 02 00 00 00  6e 43 d5 68 09 04 00 00  |........nC.h....|
+00000020
+00a40000  20 7c a1 cc 09 2a b5 46  40 75 5e c6 9d 1d 46 8e  | |...*.F@u^...F.|
+00a40010  a2 d0 0f 8f 0b 47 13 9f  b6 1b 99 79 d9 9b c2 c6  |.....G.....y....|
+00a40020
+02640000  20 7c a1 cc 09 2a b5 46  40 75 5e c6 9d 1d 46 8e  | |...*.F@u^...F.|
+02640010  a2 d0 0f 8f 0b 47 13 9f  b6 1b 99 79 d9 9b c2 c6  |.....G.....y....|
+02640020
+/ # echo V8_KALLSYMS; busybox grep -i -E "aes|crypt|decrypt|encrypt|slot|verinfo
+|verhdr|zteboot" /proc/kallsyms | busybox head -60
+V8_KALLSYMS
+head: applet not found
+/ # echo V9_IOMEM; cat /proc/iomem
+V9_IOMEM
+00800620-0080063f : /soc/watchdog@00800620
+10000000-17ffffff : pcie0 mem space
+  10000000-100fffff : 0000:00:00.0
+    10000000-100fffff : 0000:00:00.0
+  10100000-10107fff : 0000:00:00.0
+    10100000-10107fff : 0000:00:00.0
+  10108000-10108fff : 0000:00:00.0
+    10108000-10108fff : 0000:00:00.0
+20000000-27ffffff : pcie1 mem space
+  20000000-200fffff : 0000:01:00.0
+    20000000-200fffff : 0000:01:00.0
+  20100000-20107fff : 0000:01:00.0
+    20100000-20107fff : 0000:01:00.0
+  20108000-20108fff : 0000:01:00.0
+    20108000-20108fff : 0000:01:00.0
+40000000-4fffffff : System RAM
+  40008000-405e0a37 : Kernel code
+  40618000-407d419b : Kernel data
+94100034-9410003f : /soc/temp@94100034
+94404000-94404fff : /soc/serial@0x94404000
+94405000-94405fff : /soc/serial@0x94405000
+94406000-94406fff : spifc_reg
+9a102000-9a10203f : /soc/i2c@9a102000
+9a105000-9a105fff : /soc/ssp@9a105000
+/ # 
+=== [send @45000ms] "echo V10_LSMOD; lsmod\r\n"
+echo V10_LSMOD; lsmod
+V10_LSMOD
+
+xdpi 882299 0 - Live 0xbf6d8000 (O)
+mt7916 4506386 4 - Live 0xbf1f9000 (O)
+idmfdb 64461 0 - Live 0xbf1e4000 (O)
+switch 172680 1 idmfdb, Live 0xbf1ab000 (O)
+tm 1179936 2 mt7916,switch, Live 0xbf04d000 (O)
+plat_zxylzb_9128S 167427 4 mt7916,idmfdb,switch,tm, Live 0xbf018000 (O)
+zx_ponreg 2256 2 switch,tm, Live 0xbf014000 (O)
+patch 2057 0 - Live 0xbf010000 (O)
+shellproc 47932 1 patch,[permanent], Live 0xbf000000 (O)
+/ # 
+=== [send @50000ms] "echo V11_FDT; ls -l /sys/firmware/ /proc/device-tree/\r\n"
+echo V11_FDT; ls -l /sys/firmware/ /proc/device-tree/
+V11_FDT
+/proc/device-tree/:
+-r--r--r--    1 Z500_w9b root             4 Oct 12 07:42 #address-cells
+-r--r--r--    1 Z500_w9b root             4 Oct 12 07:42 #size-cells
+drwxr-xr-x    2 Z500_w9b root             0 Oct 12 07:42 aliases
+drwxr-xr-x    2 Z500_w9b root             0 Oct 12 07:42 chosen
+-r--r--r--    1 Z500_w9b root            17 Oct 12 07:42 compatible
+drwxr-xr-x    4 Z500_w9b root             0 Oct 12 07:42 cpus
+drwxr-xr-x    2 Z500_w9b root             0 Oct 12 07:42 memory
+drwxr-xr-x    2 Z500_w9b root             0 Oct 12 07:42 memory@40000000
+-r--r--r--    1 Z500_w9b root            14 Oct 12 07:42 model
+-r--r--r--    1 Z500_w9b root             1 Oct 12 07:42 name
+drwxr-xr-x   31 Z500_w9b root             0 Oct 12 07:42 soc
+
+/sys/firmware/:
+drwxr-xr-x    3 Z500_w9b root             0 Oct 12 07:42 devicetree
+-r--------    1 Z500_w9b root          6715 Oct 12 11:27 fdt
+/ # 
+### TIMEOUT

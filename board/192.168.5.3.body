@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="expires" content="0">
+<link rel="shortcut icon" href="/img/favicon.ico">
+<title>中兴智能路由器</title>
+<link rel=stylesheet href=jquery/static/js/bootstrap/bootstrap.min.css>
+<style>#loginWrapper {display: none!important;}#mobile_chgpwd {display: none!important;}#ieVersionTip {text-align: center;font-weight: bold;padding: 50px 0;display: none;}</style>
+<script>
+var g_sessionTmpToken;
+</script>
+</head>
+<body>
+<!DOCTYPE html><html><head><link href=/jquery/static/css/app.31101d1.css rel=stylesheet></head><body data-theme=light><div id=app></div><script type=text/javascript src=/jquery/static/js/manifest.46deeb4.js></script><script type=text/javascript src=/jquery/static/js/vendor.de0a868.js></script><script type=text/javascript src=/jquery/static/js/app.ad49aa5.js></script></body></html><script>if ('production' === 'development') {
+   var g_sessionTmpToken = ""
+  }</script>
+</body>
+</html>

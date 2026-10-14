@@ -1,0 +1,6 @@
+1000|root
+3000|abc123\!@#
+7000|
+9000|ps
+14000|echo Q1_USERS; ls /proc | grep -c "^[0-9]"
+18000|exit

@@ -1,0 +1,7 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo E1; ls /usr /lib /var /uadd 2>&1
+18000|echo E2; for d in /proc/[0-9]*; do x=$(readlink $d/exe 2>/dev/null); case "$x" in *httpd*|*cspd*) echo "$d $x"; ls -l $d/cwd;; esac; done
+40000|echo E3; find / -maxdepth 4 -name "supgrade.html" 2>/dev/null
+75000|echo E4; ls -l /var/www /var/httpd /etc/httpd 2>&1

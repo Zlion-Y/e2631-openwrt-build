@@ -1,0 +1,10 @@
+3000|echo V1_MODULES; cat /proc/modules | cut -d' ' -f1 | tr '\n' ' '
+6000|echo V2_PCISYS; ls /sys/bus/pci/devices/; echo ---; ls /sys/bus/pci/drivers/
+9000|echo V3_PCIIDENT; for d in /sys/bus/pci/devices/*; do echo "$d $(cat $d/vendor 2>/dev/null):$(cat $d/device 2>/dev/null) irq=$(cat $d/irq 2>/dev/null) class=$(cat $d/class 2>/dev/null)"; done
+13000|echo V4_DMESG; dmesg | grep -iE "pcie|phy|link|mt7|14c3|eeprom|wlan" | head -30
+18000|echo V5_IF; ls /sys/class/net/; echo ---; cat /sys/class/net/wlan0/operstate 2>&1; cat /sys/class/net/wlan0/address 2>&1
+21000|echo V6_WIFI; ls /wlan 2>/dev/null | head -8; echo ---; cat /proc/capability/portinfo 2>/dev/null | head -4
+25000|echo V7_MTDS; cat /proc/mtd
+28000|echo V8_RSTSEQ; ls -l /sys/kernel/debug/ 2>/dev/null | head -3; cat /sys/kernel/debug/gpio 2>/dev/null | head -30
+32000|echo V9_END
+34000|exit

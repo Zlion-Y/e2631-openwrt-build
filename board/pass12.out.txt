@@ -1,0 +1,85 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo F1; ls -l /wlan\r\n"
+echo F1; ls -l /wlan
+F1
+-rw-r--r--    1 Z500_w9b root        196608 Sep 22 18:03 caldata
+/ # 
+=== [send @20000ms] "echo F2; cat /proc/mounts\r\n"
+echo F2; cat /proc/mounts
+F2
+/dev/root / jffs2 ro,relatime 0 0
+/dev/loop0 /kmodule squashfs ro,relatime 0 0
+proc /proc proc rw,relatime 0 0
+tmpfs /var tmpfs rw,relatime,size=40960k 0 0
+tmpfs /tmp tmpfs rw,relatime,size=20480k 0 0
+tmpfs /tracelog tmpfs rw,relatime,size=2048k 0 0
+tmpfs /DPITMP tmpfs rw,relatime,size=61440k 0 0
+tmpfs /uadd tmpfs rw,relatime,size=1024k 0 0
+tmpfs /owjdxbplugin/tmp tmpfs rw,relatime,size=3072k 0 0
+sysfs /sys sysfs rw,relatime 0 0
+debugfs /sys/kernel/debug debugfs rw,relatime 0 0
+tmpfs /mnt tmpfs rw,relatime,size=16k 0 0
+/dev/mtdblock3 /wlan jffs2 rw,relatime 0 0
+/dev/mtdblock4 /usercfg jffs2 rw,relatime 0 0
+/dev/mtdblock5 /defcfg jffs2 rw,relatime 0 0
+/dev/mtdblock9 /UUPlugin jffs2 rw,relatime 0 0
+/dev/mtdblock10 /owdptsplugin/bin jffs2 rw,relatime 0 0
+tmpfs /owdptsplugin/tmp tmpfs rw,relatime,size=2048k 0 0
+/dev/mtdblock11 /status jffs2 rw,relatime 0 0
+/dev/mtdblock12 /DPIPlugin jffs2 rw,relatime 0 0
+/dev/mtdblock13 /UnifiedStorage jffs2 rw,relatime 0 0
+/dev/mtdblock14 /owjdxbplugin/bin jffs2 rw,relatime 0 0
+/ # 
+=== [send @26000ms] "echo F3; lsmod\r\n"
+echo F3; lsmod
+F3
+
+xdpi 882299 0 - Live 0xbf6d8000 (O)
+mt7916 4506386 4 - Live 0xbf1f9000 (O)
+idmfdb 64461 0 - Live 0xbf1e4000 (O)
+switch 172680 1 idmfdb, Live 0xbf1ab000 (O)
+tm 1179936 2 mt7916,switch, Live 0xbf04d000 (O)
+plat_zxylzb_9128S 167427 4 mt7916,idmfdb,switch,tm, Live 0xbf018000 (O)
+zx_ponreg 2256 2 switch,tm, Live 0xbf014000 (O)
+patch 2057 0 - Live 0xbf010000 (O)
+shellproc 47932 1 patch,[permanent], Live 0xbf000000 (O)
+/ # 
+=== [send @34000ms] "echo F4; ls /lib/firmware /lib/firmware/mediatek 2>&1\r\n"
+echo F4; ls /lib/firmware /lib/firmware/mediatek 2>&1
+F4
+ls: /lib/firmware: No such file or directory
+ls: /lib/firmware/mediatek: No such file or directory
+/ # 
+=== [send @44000ms] "echo F5; busybox hexdump -v -n 8 -e '8/1 \"%02x \"' /wlan/caldata; echo\r\n"
+echo F5; busybox hexdump -v -n 8 -e '8/1 "%02x "' /wlan/caldata; echo
+F5
+16 79 00 00 00 0c 43 26
+/ # 
+=== [send @50000ms] "echo F6; cat /sys/kernel/debug/gpio 2>&1\r\n"
+echo F6; cat /sys/kernel/debug/gpio 2>&1
+F6
+/ # 
+=== [send @62000ms] "echo F7; ls /sys/class/gpio 2>&1\r\n"
+echo F7; ls /sys/class/gpio 2>&1
+F7
+export    unexport
+/ # 
+=== [send @63500ms] "exit\r\n"
+exit
+
+### CLOSED

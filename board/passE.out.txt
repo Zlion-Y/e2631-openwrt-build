@@ -1,0 +1,62 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @7000ms] "\r\n"
+
+/ # 
+=== [send @9000ms] "echo UPTIME; cat /proc/uptime\r\n"
+echo UPTIME; cat /proc/uptime
+UPTIME
+121.77 197.33
+/ # 
+=== [send @12000ms] "echo MOUT_EXISTS; ls -l /tmp/m.out 2>/dev/null\r\n"
+echo MOUT_EXISTS; ls -l /tmp/m.out 2>/dev/null
+MOUT_EXISTS
+/ # 
+=== [send @15000ms] "echo MOUT; cat /tmp/m.out 2>/dev/null\r\n"
+echo MOUT; cat /tmp/m.out 2>/dev/null
+MOUT
+/ # 
+=== [send @25000ms] "echo LANINFO_DIR; ls /proc/laninfo/\r\n"
+echo LANINFO_DIR; ls /proc/laninfo/
+LANINFO_DIR
+portspeed
+/ # 
+=== [send @28000ms] "echo LANINFO_FILES; for f in /proc/laninfo/*; do echo \"==$f\"; cat \"$f\" 2>&1; done\r\n"
+echo LANINFO_FILES; for f in /proc/laninfo/*; do echo "==$f"; cat "$f" 2>&1;
+ done
+LANINFO_FILES
+==/proc/laninfo/portspeed
+eth0 rx_bps:0 tx_bps:0
+eth1 rx_bps:0 tx_bps:0
+eth2 rx_bps:0 tx_bps:0
+eth3 rx_bps:0 tx_bps:0
+/ # 
+=== [send @40000ms] "echo TCPHY; cat /proc/tcphy\r\n"
+echo TCPHY; cat /proc/tcphy
+TCPHY
+0
+/ # 
+=== [send @43000ms] "echo TCPHY_WR_TEST; ls -l /proc/tcphy\r\n"
+echo TCPHY_WR_TEST; ls -l /proc/tcphy
+TCPHY_WR_TEST
+-rwxrwxrwx    1 Z500_w9b root             0 Oct 12 18:21 /proc/tcphy
+/ # 
+=== [send @46000ms] "echo END_MARK\r\n"
+echo END_MARK
+END_MARK
+/ # 
+=== [send @47500ms] "exit\r\n"
+exit
+
+### CLOSED

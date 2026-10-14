@@ -1,0 +1,44 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo P1; busybox hexdump -v -e '16/1 \"%02x\"' -s 0x1c60200 -n 256 /dev/mtdblock0; echo\r\n"
+echo P1; busybox hexdump -v -e '16/1 "%02x"' -s 0x1c60200 -n 256 /dev/mtdblo
+ck0; echo
+P1
+29faf4057813130975e13ba52d8ef4c1e16ac76dc98b74bf7543ab5bfb46cefeca9e98416bbe891f9ca70a7c6a691a07bb6141a4a2156384f8440a820e88470765f1b2639aa5a448206f5fd1af0273e1e125a05869559810a76214188d0276799fb5e9761a2456f0d0cccc946c0946f69e43bea00883981b95bba444e574389bc3afc7acaea241552a9fd0ee1b3363626ca4aeabbc9524e6b50a85ee38b01e5ea9e47787d08965ca0e12e56652996d2b63b2192f08ffd60dca6c17ab43e5f0a7690a2e4e746e9598ea11fd2564fd3c4a877f493a939056d9678b4025026026a2b773084a59bc4bf931881f02a76a7bf37a0de0d488da0fe56e15a0b9cbf64409
+/ # 
+=== [send @20000ms] "echo P2; busybox hexdump -v -e '16/1 \"%02x\"' -s 0x1c6ff00 -n 256 /dev/mtdblock0; echo\r\n"
+echo P2; busybox hexdump -v -e '16/1 "%02x"' -s 0x1c6ff00 -n 256 /dev/mtdblo
+ck0; echo
+P2
+21e2740ceced83a3bc5cbdd2327a599b76af82ebddbfc48319de0941446c588f976a5b45c87da1701967257b3a28f9dbba38ff81268f3eb489c9f9e4e66094012855150acf39c3fbd3c5867116881211815eb73541a92fa5b01977826e907c41b08e6b243fb055034677646e56018718ff75ebbd40987be9a4805d39bea8f982f1a7bfda707613b8edea8aa0a04f71c4bd5e47fe67a089b0fdbe533a0e9be012717b627afd8fc09a12c7802391c7df1a07b1e205cf8b78110f2d9796034edc2ea0a913d54e10fdec5a8f5c766500e5c1964e2f4383e73aeff3ea3ba58cbee98bbd0981860366e1b26541ef2ab65f5bec0917e3ee94cadaa11a2427366af7bb46
+/ # 
+=== [send @28000ms] "echo P3; busybox hexdump -v -e '16/1 \"%02x\"' -s 0x1c80000 -n 64 /dev/mtdblock0; echo\r\n"
+echo P3; busybox hexdump -v -e '16/1 "%02x"' -s 0x1c80000 -n 64 /dev/mtdbloc
+k0; echo
+P3
+ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+/ # 
+=== [send @36000ms] "echo P4; busybox hexdump -v -e '16/1 \"%02x\"' -s 0x386ff00 -n 256 /dev/mtdblock0; echo\r\n"
+echo P4; busybox hexdump -v -e '16/1 "%02x"' -s 0x386ff00 -n 256 /dev/mtdblo
+ck0; echo
+P4
+21e2740ceced83a3bc5cbdd2327a599b76af82ebddbfc48319de0941446c588f976a5b45c87da1701967257b3a28f9dbba38ff81268f3eb489c9f9e4e66094012855150acf39c3fbd3c5867116881211815eb73541a92fa5b01977826e907c41b08e6b243fb055034677646e56018718ff75ebbd40987be9a4805d39bea8f982f1a7bfda707613b8edea8aa0a04f71c4bd5e47fe67a089b0fdbe533a0e9be012717b627afd8fc09a12c7802391c7df1a07b1e205cf8b78110f2d9796034edc2ea0a913d54e10fdec5a8f5c766500e5c1964e2f4383e73aeff3ea3ba58cbee98bbd0981860366e1b26541ef2ab65f5bec0917e3ee94cadaa11a2427366af7bb46
+/ # 
+=== [send @37500ms] "exit\r\n"
+exit
+
+### CLOSED

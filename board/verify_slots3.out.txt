@@ -1,0 +1,62 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo X1; busybox hexdump -v -e '16/1 \"%02x\"' -s 0x3300000 -n 512 /dev/mtdblock0; echo\r\n"
+echo X1; busybox hexdump -v -e '16/1 "%02x"' -s 0x3300000 -n 512 /dev/mtdblo
+ck0; echo
+X1
+0000000000000000511300001152000056312e302e302e3842382e38303030000000000000000000000000000100000000000001f8bd3400340200008e09551300008000140280003bf02957000070000000c0010000000000000001000030020000c00100000000000000015a58484e2045323633312056312e302e30000000000000000000000000000000000000000000000000000000000000000100000001000000afb64cc93230323630383236313335373539000000000000ffffffffffffffff000000080000010000000000000000000000000000000000000000000000000000000000000000000000000000000000333333336666666699999999cccccccc00000000000000000000000056312e312e31000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0f00000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000700000003002000030020000f003000030021100000001000000f7c03c19
+/ # 
+=== [send @45000ms] "echo X2; busybox hexdump -v -e '16/1 \"%02x\"' -s 0x2300000 -n 64 /dev/mtdblock0; echo\r\n"
+echo X2; busybox hexdump -v -e '16/1 "%02x"' -s 0x2300000 -n 64 /dev/mtdbloc
+k0; echo
+X2
+33333333cccccccc88888888ddddddddffffffffffffffffffffffffffffffff27051956e2e8634d6acd15840034bdb84000800040008000d319887605020200
+/ # 
+=== [send @80000ms] "echo X3; busybox hexdump -v -e '16/1 \"%02x\"' -s 0x2b00000 -n 32 /dev/mtdblock0; echo\r\n"
+echo X3; busybox hexdump -v -e '16/1 "%02x"' -s 0x2b00000 -n 32 /dev/mtdbloc
+k0; echo
+X3
+68737173990300008415cd6a000004001f00000004001200c006010004000000
+/ # 
+=== [send @115000ms] "echo X4; busybox hexdump -v -e '16/1 \"%02x\"' -s 0x3300200 -n 64 /dev/mtdblock0; echo\r\n"
+echo X4; busybox hexdump -v -e '16/1 "%02x"' -s 0x3300200 -n 64 /dev/mtdbloc
+k0; echo
+X4
+ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+/ # 
+=== [send @150000ms] "echo X5; busybox hexdump -v -e '16/1 \"%02x\"' -s 0x1c60000 -n 512 /dev/mtdblock0; echo\r\n"
+echo X5; busybox hexdump -v -e '16/1 "%02x"' -s 0x1c60000 -n 512 /dev/mtdblo
+ck0; echo
+X5
+0000000000000000511300001152000056312e302e302e3742352e38303030000000000000000000000000000100000000005601ccfd33003402000046c2f79e0000220114023400e25ef83d000070000000c0010000000000000001000030020000c00100000000000000015a58484e2045323633312056312e302e30000000000000000000000000000000000000000000000000000000000000000100000001000000dbdf616e3230323530393235323231313234000000000000ffffffffffffffff000000080000010000000000000000000000000000000000000000000000000000000000000000000000000000000000333333336666666699999999cccccccc00000000000000000000000056312e302e30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0700000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000700000003002000030020000f00300007000100000000100000030e5fc1b
+/ # 
+=== [send @190000ms] "echo X6; busybox hexdump -v -e '16/1 \"%02x\"' -s 0x32ffe00 -n 512 /dev/mtdblock0; echo\r\n"
+echo X6; busybox hexdump -v -e '16/1 "%02x"' -s 0x32ffe00 -n 512 /dev/mtdblo
+ck0; echo
+X6
+ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+/ # 
+=== [send @220000ms] "echo X7; busybox hexdump -v -e '16/1 \"%02x\"' -s 0x3320000 -n 32 /dev/mtdblock0; echo\r\n"
+echo X7; busybox hexdump -v -e '16/1 "%02x"' -s 0x3320000 -n 32 /dev/mtdbloc
+k0; echo
+X7
+ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+/ # 
+=== [send @250000ms] "exit\r\n"
+exit
+
+### CLOSED

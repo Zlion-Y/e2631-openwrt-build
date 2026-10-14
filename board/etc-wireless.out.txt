@@ -1,0 +1,74 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1500ms] "root\r\n"
+root
+Password: 
+=== [send @4500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @8000ms] "echo X1; ls -l /etc/wireless /etc/wireless/mt7916 2>&1\r\n"
+echo X1; ls -l /etc/wireless /etc/wireless/mt7916 2>&1
+X1
+/etc/wireless:
+drwxr-xr-x    2 Z500_w9b 34463            0 Sep 25  2025 mt7916
+
+/etc/wireless/mt7916:
+-rwxr-xr-x    1 Z500_w9b 34463       458112 Sep 25  2025 7916_WACPU_RAM_CODE_release.bin
+-rwxr-xr-x    1 Z500_w9b 34463         4096 Sep 25  2025 MT7916_EEPROM.bin
+-rwxr-xr-x    1 Z500_w9b 34463      1759340 Sep 25  2025 WIFI_RAM_CODE_MT7916.bin
+-rwxr-xr-x    1 Z500_w9b 34463         1309 Sep 25  2025 dump_wfdma_debug_CR_DMA0.sh
+-rwxr-xr-x    1 Z500_w9b 34463          560 Sep 25  2025 l1profile.dat.dbdc
+-rwxr-xr-x    1 Z500_w9b 34463         7297 Sep 25  2025 mt7916.dbdc.b0.dat
+-rwxr-xr-x    1 Z500_w9b 34463         7382 Sep 25  2025 mt7916.dbdc.b1.dat
+-rwxr-xr-x    1 Z500_w9b 34463         3730 Sep 25  2025 mt7916_Debug.sh
+-rwxr-xr-x    1 Z500_w9b 34463         8672 Sep 25  2025 mt7916_patch_e1_hdr.bin
+/ # 
+=== [send @14000ms] "echo X2; ls -l /lib/firmware 2>&1; ls -d /lib/firmware 2>&1\r\n"
+echo X2; ls -l /lib/firmware 2>&1; ls -d /lib/firmware 2>&1
+X2
+ls: /lib/firmware: No such file or directory
+ls: /lib/firmware: No such file or directory
+/ # 
+=== [send @20000ms] "echo X3; for f in /etc/wireless/mt7916/*; do ls -l $f; done 2>&1\r\n"
+echo X3; for f in /etc/wireless/mt7916/*; do ls -l $f; done 2>&1
+X3
+-rwxr-xr-x    1 Z500_w9b 34463       458112 Sep 25  2025 /etc/wireless/mt7916/7916_WACPU_RAM_CODE_release.bin
+-rwxr-xr-x    1 Z500_w9b 34463         4096 Sep 25  2025 /etc/wireless/mt7916/MT7916_EEPROM.bin
+-rwxr-xr-x    1 Z500_w9b 34463      1759340 Sep 25  2025 /etc/wireless/mt7916/WIFI_RAM_CODE_MT7916.bin
+-rwxr-xr-x    1 Z500_w9b 34463         1309 Sep 25  2025 /etc/wireless/mt7916/dump_wfdma_debug_CR_DMA0.sh
+-rwxr-xr-x    1 Z500_w9b 34463          560 Sep 25  2025 /etc/wireless/mt7916/l1profile.dat.dbdc
+-rwxr-xr-x    1 Z500_w9b 34463         7297 Sep 25  2025 /etc/wireless/mt7916/mt7916.dbdc.b0.dat
+-rwxr-xr-x    1 Z500_w9b 34463         7382 Sep 25  2025 /etc/wireless/mt7916/mt7916.dbdc.b1.dat
+-rwxr-xr-x    1 Z500_w9b 34463         3730 Sep 25  2025 /etc/wireless/mt7916/mt7916_Debug.sh
+-rwxr-xr-x    1 Z500_w9b 34463         8672 Sep 25  2025 /etc/wireless/mt7916/mt7916_patch_e1_hdr.bin
+/ # 
+=== [send @34000ms] "echo X4; for f in /etc/wireless/mt7916/*.bin; do md5sum $f; done 2>&1\r\n"
+echo X4; for f in /etc/wireless/mt7916/*.bin; do md5sum $f; done 2>&1
+X4
+967fa140cea53cc6d420d3c790e0b757  /etc/wireless/mt7916/7916_WACPU_RAM_CODE_release.bin
+632aa59809c99d4f52721f23c93d7f8d  /etc/wireless/mt7916/MT7916_EEPROM.bin
+9a3fb936a95eacbe860375c3b02aad1b  /etc/wireless/mt7916/WIFI_RAM_CODE_MT7916.bin
+ae74c1430ee511b2033035accd49512a  /etc/wireless/mt7916/mt7916_patch_e1_hdr.bin
+/ # 
+=== [send @58000ms] "echo X5; for f in /etc/wireless/mt7916/*; do sha256sum $f; done 2>&1\r\n"
+echo X5; for f in /etc/wireless/mt7916/*; do sha256sum $f; done 2>&1
+X5
+/bin/sh: sha256sum: not found
+/bin/sh: sha256sum: not found
+/bin/sh: sha256sum: not found
+/bin/sh: sha256sum: not found
+/bin/sh: sha256sum: not found
+/bin/sh: sha256sum: not found
+/bin/sh: sha256sum: not found
+/bin/sh: sha256sum: not found
+/bin/sh: sha256sum: not found
+/ # 
+=== [send @86000ms] "exit\r\n"
+exit
+
+### CLOSED

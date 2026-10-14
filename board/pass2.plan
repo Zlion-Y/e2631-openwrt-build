@@ -1,0 +1,11 @@
+1000|root
+2500|<redacted:vendor telnet password>
+5000|
+7000|echo Z1_CMDLINE; cat /proc/cmdline
+10000|echo Z2_VERSTATES; cat /proc/zte/verinfo/versionstates
+14000|echo Z3_VERLIST; ls /proc/zte/verinfo/; for f in /proc/zte/verinfo/*; do echo "==$f=="; cat $f; done
+20000|echo Z4_CPUINFO; cat /proc/cpuinfo
+23000|echo Z5_MEMINFO; head -5 /proc/meminfo
+26000|echo Z6_DMESG_MTD; dmesg | grep -i -E "mtd|partition|0x0|nand|spifc| erase|bad" | head -60
+32000|echo Z7_MOUNT; mount
+35000|echo Z8_DF; df -k

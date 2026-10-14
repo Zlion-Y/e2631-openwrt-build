@@ -6,7 +6,7 @@
 // leave the box in a slot it cannot fall back from, so they are checked here,
 // before anything is written.
 //
-//   node tools/verify_img.mjs <dir> [--tree <openwrt tree>]
+//   node build/tools/verify_img.mjs <dir> [--tree <openwrt tree>]
 //     <dir>/payload/kernel          uImage with the 32-byte ZTE slot marker
 //     <dir>/payload/root            squashfs root filesystem
 //     <dir>/e2631.dtb               the board .dtb as the kernel sees it

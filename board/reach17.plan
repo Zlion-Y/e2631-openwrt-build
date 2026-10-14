@@ -1,0 +1,4 @@
+1500|root
+4500|<redacted:vendor telnet password>
+8000|echo P-DL; /bin/curl -m 12 -s -o /dev/null -w 'code=%{http_code} bytes=%{size_download}\n' http://192.168.5.17:8000/e2631-openwrt-efusefix.bin
+24000|exit

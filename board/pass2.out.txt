@@ -1,0 +1,196 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @2500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @5000ms] "\r\n"
+
+/ # 
+=== [send @7000ms] "echo Z1_CMDLINE; cat /proc/cmdline\r\n"
+echo Z1_CMDLINE; cat /proc/cmdline
+Z1_CMDLINE
+console=ttyAMA0,115200n8 root=/dev/mtdblock8 ro rootfstype=jffs2 mem=256M init=/bin/sh -c "exec /bin/sh"; U-Boot V1.0.0 20250325110003 0x700000 0x0 0xaf 0xa3
+/ # 
+=== [send @10000ms] "echo Z2_VERSTATES; cat /proc/zte/verinfo/versionstates\r\n"
+echo Z2_VERSTATES; cat /proc/zte/verinfo/versionstates
+Z2_VERSTATES
+=========================Version Information=========================
+curverBootStartPhyAddr: 0x00700000
+currentverphyaddr: 0x00700000
+curverheaderaddr: 0x01c60000
+curverSerialNumber: 0x00000010
+IsCurrentVersion: 0x00000001
+curverIsBad: 0x00000000
+curverheader_lowstart: 0x00700000
+curverheader_lowendstart: 0x02300000
+curverheader_highstart: 0x02300000
+curverheader_highendStart: 0x03f00000
+curversignsize: 0x00000000
+curFirmwareForm: 0x00000001
+curFirmwareType: 0x00000000
+curUpgradeKey1: 0x00001351
+curUpgradeKey2: 0x00005211
+backverphyaddr: 0x02300000
+backverheaderaddr: 0x03ca0000
+backverSerialNumber: 0x0000000f
+IsCurrentVersion: 0x00000000
+backverIsBad: 0x00000000
+maxversionum: 0x00000010
+=====================================================================
+/ # 
+=== [send @14000ms] "echo Z3_VERLIST; ls /proc/zte/verinfo/; for f in /proc/zte/verinfo/*; do echo \"==$f==\"; cat $f; done\r\n"
+echo Z3_VERLIST; ls /proc/zte/verinfo/; for f in /proc/zte/verinfo/*; do ech
+o "==$f=="; cat $f; done
+Z3_VERLIST
+bootVersion         hardVersion         softReversion       versionstates
+cspversion          loadtype            softVersion
+cspversionheader    otherbootVersion    verdate
+fwdescription       othersoftVersion    versionopenorclose
+==/proc/zte/verinfo/bootVersion==
+V1.0.0
+==/proc/zte/verinfo/cspversion==
+CSP_BUILD_TIME : Thu Sep 25 21:28:46 CST 2025
+CSP_VERSION    : V4.0.00
+==/proc/zte/verinfo/cspversionheader==
+0200000010000000000000000100000000000000000070000000c6010100000000007000000070000000a4000000000000000000511300001152000056312e302e302e3742352e38303030000000000000000000000000000100000000005601ccfd33003402000046c2f79e0000220114023400e25ef83d000070000000c0010000000000000001000030020000c00100000000000000015a58484e2045323633312056312e302e30000000000000000000000000000000000000000000000000000000000000000100000001000000dbdf616e3230323530393235323231313234000000000000ffffffffffffffff000000080000010000000000000000000000000000000000000000000000000000000000000000000000000000000000333333336666666699999999cccccccc00000000000000000000000056312e302e30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0700000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000700000003002000030020000f00300007000100000000100000030e5fc1b00000000000030020000ca03000000000000300200003002000064020000000000000000511300001152000056312e302e302e3642352e38303030000000000000000000000000000100000000009a01ccfd330034020000e8f26603000066011402340085f7a278000070000000c0010000000000000001000030020000c00100000000000000015a58484e2045323633312056312e302e3000000000000000000000000000000000000000000000000000000000000000010000000100000050e93c6f3230323430393235313530353130000000000000ffffffffffffffff000000080000010000000000000000000000000000000000000000000000000000000000000000000000000000000000333333336666666699999999cccccccc00000000000000000000000056312e302e30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0700000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000700000003002000030020000f003000030020f000000010000004d580aa2
+==/proc/zte/verinfo/fwdescription==
+FwDescription: ZXHN E2631 V1.0.0
+==/proc/zte/verinfo/hardVersion==
+V1.0.0
+==/proc/zte/verinfo/loadtype==
+3
+==/proc/zte/verinfo/otherbootVersion==
+V1.0.0
+==/proc/zte/verinfo/othersoftVersion==
+V1.0.0.6B5.8000
+==/proc/zte/verinfo/softReversion==
+�����������
+==/proc/zte/verinfo/softVersion==
+V1.0.0.7B5.8000
+==/proc/zte/verinfo/verdate==
+20250925221124
+==/proc/zte/verinfo/versionopenorclose==
+close
+==/proc/zte/verinfo/versionstates==
+=========================Version Information=========================
+curverBootStartPhyAddr: 0x00700000
+currentverphyaddr: 0x00700000
+curverheaderaddr: 0x01c60000
+curverSerialNumber: 0x00000010
+IsCurrentVersion: 0x00000001
+curverIsBad: 0x00000000
+curverheader_lowstart: 0x00700000
+curverheader_lowendstart: 0x02300000
+curverheader_highstart: 0x02300000
+curverheader_highendStart: 0x03f00000
+curversignsize: 0x00000000
+curFirmwareForm: 0x00000001
+curFirmwareType: 0x00000000
+curUpgradeKey1: 0x00001351
+curUpgradeKey2: 0x00005211
+backverphyaddr: 0x02300000
+backverheaderaddr: 0x03ca0000
+backverSerialNumber: 0x0000000f
+IsCurrentVersion: 0x00000000
+backverIsBad: 0x00000000
+maxversionum: 0x00000010
+=====================================================================
+/ # 
+=== [send @20000ms] "echo Z4_CPUINFO; cat /proc/cpuinfo\r\n"
+echo Z4_CPUINFO; cat /proc/cpuinfo
+Z4_CPUINFO
+processor       : 0
+model name      : ARMv7 Processor rev 1 (v7l)
+BogoMIPS        : 1987.37
+Features        : half fastmult edsp tls 
+CPU implementer : 0x41
+CPU architecture: 7
+CPU variant     : 0x4
+CPU part        : 0xc09
+CPU revision    : 1
+
+processor       : 1
+model name      : ARMv7 Processor rev 1 (v7l)
+BogoMIPS        : 1993.93
+Features        : half fastmult edsp tls 
+CPU implementer : 0x41
+CPU architecture: 7
+CPU variant     : 0x4
+CPU part        : 0xc09
+CPU revision    : 1
+
+Hardware        : ZTE ZX279128S (Device Tree)
+Revision        : 0020
+Serial          : 0000000000000000
+/ # 
+=== [send @23000ms] "echo Z5_MEMINFO; head -5 /proc/meminfo\r\n"
+echo Z5_MEMINFO; head -5 /proc/meminfo
+Z5_MEMINFO
+/bin/sh: head: not found
+/ # 
+=== [send @26000ms] "echo Z6_DMESG_MTD; dmesg | grep -i -E \"mtd|partition|0x0|nand|spifc| erase|bad\" | head -60\r\n"
+echo Z6_DMESG_MTD; dmesg | grep -i -E "mtd|partition|0x0|nand|spifc| erase|b
+ad" | head -60
+Z6_DMESG_MTD
+/bin/sh: head: not found
+/bin/sh: dmesg: not found
+/ # 
+=== [send @32000ms] "echo Z7_MOUNT; mount\r\n"
+echo Z7_MOUNT; mount
+Z7_MOUNT
+/dev/root on / type jffs2 (ro,relatime)
+/dev/loop0 on /kmodule type squashfs (ro,relatime)
+proc on /proc type proc (rw,relatime)
+tmpfs on /var type tmpfs (rw,relatime,size=40960k)
+tmpfs on /tmp type tmpfs (rw,relatime,size=20480k)
+tmpfs on /tracelog type tmpfs (rw,relatime,size=2048k)
+tmpfs on /DPITMP type tmpfs (rw,relatime,size=61440k)
+tmpfs on /uadd type tmpfs (rw,relatime,size=1024k)
+tmpfs on /owjdxbplugin/tmp type tmpfs (rw,relatime,size=3072k)
+sysfs on /sys type sysfs (rw,relatime)
+debugfs on /sys/kernel/debug type debugfs (rw,relatime)
+tmpfs on /mnt type tmpfs (rw,relatime,size=16k)
+/dev/mtdblock3 on /wlan type jffs2 (rw,relatime)
+/dev/mtdblock4 on /usercfg type jffs2 (rw,relatime)
+/dev/mtdblock5 on /defcfg type jffs2 (rw,relatime)
+/dev/mtdblock9 on /UUPlugin type jffs2 (rw,relatime)
+/dev/mtdblock10 on /owdptsplugin/bin type jffs2 (rw,relatime)
+tmpfs on /owdptsplugin/tmp type tmpfs (rw,relatime,size=2048k)
+/dev/mtdblock11 on /status type jffs2 (rw,relatime)
+/dev/mtdblock12 on /DPIPlugin type jffs2 (rw,relatime)
+/dev/mtdblock13 on /UnifiedStorage type jffs2 (rw,relatime)
+/dev/mtdblock14 on /owjdxbplugin/bin type jffs2 (rw,relatime)
+/ # 
+=== [send @35000ms] "echo Z8_DF; df -k\r\n"
+echo Z8_DF; df -k
+Z8_DF
+Filesystem           1024-blocks    Used Available Use% Mounted on
+/dev/root                   18560        18560            0 100% / 
+/dev/loop0                  12288        12288            0 100% /kmodule 
+tmpfs                       40960          168        40792   0% /var 
+tmpfs                       20480           32        20448   0% /tmp 
+tmpfs                        2048            0         2048   0% /tracelog 
+tmpfs                       61440            8        61432   0% /DPITMP 
+tmpfs                        1024            0         1024   0% /uadd 
+tmpfs                        3072            0         3072   0% /owjdxbplugin/tmp 
+tmpfs                          16            0           16   0% /mnt 
+/dev/mtdblock3               1024          440          584  43% /wlan 
+/dev/mtdblock4               2048          492         1556  24% /usercfg 
+/dev/mtdblock5               2048          404         1644  20% /defcfg 
+/dev/mtdblock9               5120         1556         3564  30% /UUPlugin 
+/dev/mtdblock10               640          388          252  61% /owdptsplugin/bin 
+tmpfs                        2048            0         2048   0% /owdptsplugin/tmp 
+/dev/mtdblock11              5120          464         4656   9% /status 
+/dev/mtdblock12              3072          388         2684  13% /DPIPlugin 
+/dev/mtdblock13              1024          472          552  46% /UnifiedStorage 
+/dev/mtdblock14              1536          384         1152  25% /owjdxbplugin/bin 
+/ # 
+### TIMEOUT

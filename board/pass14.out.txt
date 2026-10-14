@@ -1,0 +1,60 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo H1; ls -l /dev/mtd0 /dev/mtdblock0 /dev/mtd6 /dev/mtd7\r\n"
+echo H1; ls -l /dev/mtd0 /dev/mtdblock0 /dev/mtd6 /dev/mtd7
+H1
+crw-r--r--    1 Z500_w9b root       90,   0 Sep 25  2025 /dev/mtd0
+crw-r--r--    1 Z500_w9b root       90,  12 Sep 25  2025 /dev/mtd6
+crw-r--r--    1 Z500_w9b root       90,  14 Sep 25  2025 /dev/mtd7
+brw-r--r--    1 Z500_w9b root       31,   0 Sep 25  2025 /dev/mtdblock0
+/ # 
+=== [send @18000ms] "echo H2; for i in 0 6 7 8; do echo -n \"mtd$i flags=\"; cat /sys/class/mtd/mtd$i/flags; echo -n \"  type=\"; cat /sys/class/mtd/mtd$i/type; done\r\n"
+echo H2; for i in 0 6 7 8; do echo -n "mtd$i flags="; cat /sys/class/mtd/mtd
+$i/flags; echo -n "  type="; cat /sys/class/mtd/mtd$i/type; done
+H2
+mtd0 flags=0x400
+  type=nand
+mtd6 flags=0x400
+  type=nand
+mtd7 flags=0x400
+  type=nand
+mtd8 flags=0x400
+  type=nand
+/ # 
+=== [send @26000ms] "echo H3; ls -l /sbin | grep -i -E \"env|fw_|boot|syn_|version\"\r\n"
+echo H3; ls -l /sbin | grep -i -E "env|fw_|boot|syn_|version"
+H3
+lrwxrwxrwx    1 Z500_w9b 34463           12 Sep 25  2025 reboot -> /bin/busybox
+/ # 
+=== [send @34000ms] "echo H4; which fw_printenv printenv fw_setenv; ls /etc/fw_env.config 2>&1\r\n"
+echo H4; which fw_printenv printenv fw_setenv; ls /etc/fw_env.config 2>&1
+H4
+ls: /etc/fw_env.config: No such file or directory
+/ # 
+=== [send @42000ms] "echo H5; cat /proc/mtd | grep -c mtd\r\n"
+echo H5; cat /proc/mtd | grep -c mtd
+H5
+15
+/ # 
+=== [send @48000ms] "echo H6; ls /bin | grep -i -E \"flash|mtd|erase|dd\"\r\n"
+echo H6; ls /bin | grep -i -E "flash|mtd|erase|dd"
+H6
+/ # 
+=== [send @49500ms] "exit\r\n"
+exit
+
+### CLOSED

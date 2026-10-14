@@ -1,0 +1,11 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo W1; /var/tmp/e2631-fwslot info -j
+60000|echo W2; dd if=/dev/mtdblock0 bs=131072 skip=408 count=1 2>/dev/null | dd bs=512 count=1 2>/dev/null | busybox hexdump -v -e '16/1 "%02x"'
+110000|echo W3; dd if=/dev/mtdblock0 bs=131072 skip=408 count=1 2>/dev/null | dd bs=512 skip=1 count=1 2>/dev/null | busybox hexdump -v -e '16/1 "%02x"'
+160000|echo W4; dd if=/dev/mtdblock0 bs=131072 skip=280 count=1 2>/dev/null | dd bs=64 count=1 2>/dev/null | busybox hexdump -v -e '16/1 "%02x" "\n"'
+190000|echo W5; dd if=/dev/mtdblock0 bs=131072 skip=344 count=1 2>/dev/null | dd bs=32 count=1 2>/dev/null | busybox hexdump -v -e '16/1 "%02x" "\n"'
+220000|echo W6; dd if=/dev/mtdblock0 bs=131072 skip=227 count=1 2>/dev/null | dd bs=512 count=1 2>/dev/null | busybox hexdump -v -e '16/1 "%02x"'
+270000|echo W7; ls -l /var/tmp; exit
+290000|exit

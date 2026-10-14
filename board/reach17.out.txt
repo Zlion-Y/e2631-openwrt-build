@@ -1,0 +1,23 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1500ms] "root\r\n"
+root
+Password: 
+=== [send @4500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @8000ms] "echo P-DL; /bin/curl -m 12 -s -o /dev/null -w 'code=%{http_code} bytes=%{size_download}\\n' http://192.168.5.17:8000/e2631-openwrt-efusefix.bin\r\n"
+echo P-DL; /bin/curl -m 12 -s -o /dev/null -w 'code=%{http_code} bytes=%{siz
+e_download}\n' http://192.168.5.17:8000/e2631-openwrt-efusefix.bin
+P-DL
+code=200 bytes=20972052
+/ # 
+=== [send @24000ms] "exit\r\n"
+exit
+
+### CLOSED

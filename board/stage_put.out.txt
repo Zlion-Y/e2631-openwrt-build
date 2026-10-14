@@ -1,0 +1,155 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo S1; rm -f /var/tmp/e2631-fwslot /var/tmp/fw.bin /var/tmp/flash.log; df -k /var /tmp; mount | grep -E \" /var| /tmp\"; which setsid nohup curl; cat /proc/mtd; ls -l /dev/mtd* 2>/dev/null\r\n"
+echo S1; rm -f /var/tmp/e2631-fwslot /var/tmp/fw.bin /var/tmp/flash.log; df 
+-k /var /tmp; mount | grep -E " /var| /tmp"; which setsid nohup curl; cat /proc/
+mtd; ls -l /dev/mtd* 2>/dev/null
+S1
+Filesystem           1024-blocks    Used Available Use% Mounted on
+tmpfs                       40960          160        40800   0% /var 
+tmpfs                       20480            0        20480   0% /tmp 
+tmpfs on /var type tmpfs (rw,relatime,size=40960k)
+tmpfs on /tmp type tmpfs (rw,relatime,size=20480k)
+/usr/bin/setsid
+/bin/curl
+dev:    size   erasesize  name
+mtd0: 08000000 00020000 "Whole flash"
+mtd1: 00100000 00020000 "Bootloader"
+mtd2: 00100000 00020000 "tag"
+mtd3: 00100000 00020000 "wifi"
+mtd4: 00200000 00020000 "usercfg"
+mtd5: 00200000 00020000 "defcfg"
+mtd6: 00340000 00020000 "kernel1"
+mtd7: 00340000 00020000 "kernel2"
+mtd8: 01220000 00020000 "rootfs"
+mtd9: 00500000 00020000 "UUPlugin"
+mtd10: 000a0000 00020000 "owdptsbin"
+mtd11: 00500000 00020000 "status"
+mtd12: 00300000 00020000 "DPIPlugin"
+mtd13: 00100000 00020000 "UNIFIED"
+mtd14: 00180000 00020000 "JDXBPLUGIN"
+crw-r--r--    1 Z500_w9b root       90,   0 Sep 25  2025 /dev/mtd0
+crw-r--r--    1 Z500_w9b root       90,   2 Sep 25  2025 /dev/mtd1
+crw-r--r--    1 Z500_w9b root       90,  20 Sep 25  2025 /dev/mtd10
+crw-r--r--    1 Z500_w9b root       90,  22 Sep 25  2025 /dev/mtd11
+crw-r--r--    1 Z500_w9b root       90,  24 Sep 25  2025 /dev/mtd12
+crw-r--r--    1 Z500_w9b root       90,  26 Sep 25  2025 /dev/mtd13
+crw-r--r--    1 Z500_w9b root       90,  28 Sep 25  2025 /dev/mtd14
+crw-r--r--    1 Z500_w9b root       90,   4 Sep 25  2025 /dev/mtd2
+crw-r--r--    1 Z500_w9b root       90,   6 Sep 25  2025 /dev/mtd3
+crw-r--r--    1 Z500_w9b root       90,   8 Sep 25  2025 /dev/mtd4
+crw-r--r--    1 Z500_w9b root       90,  10 Sep 25  2025 /dev/mtd5
+crw-r--r--    1 Z500_w9b root       90,  12 Sep 25  2025 /dev/mtd6
+crw-r--r--    1 Z500_w9b root       90,  14 Sep 25  2025 /dev/mtd7
+crw-r--r--    1 Z500_w9b root       90,  16 Sep 25  2025 /dev/mtd8
+crw-r--r--    1 Z500_w9b root       90,  18 Sep 25  2025 /dev/mtd9
+brw-r--r--    1 Z500_w9b root       31,   0 Sep 25  2025 /dev/mtdblock0
+brw-r--r--    1 Z500_w9b root       31,   1 Sep 25  2025 /dev/mtdblock1
+brw-r--r--    1 Z500_w9b root       31,  10 Sep 25  2025 /dev/mtdblock10
+brw-r--r--    1 Z500_w9b root       31,  11 Sep 25  2025 /dev/mtdblock11
+brw-r--r--    1 Z500_w9b root       31,  12 Sep 25  2025 /dev/mtdblock12
+brw-r--r--    1 Z500_w9b root       31,  13 Sep 25  2025 /dev/mtdblock13
+brw-r--r--    1 Z500_w9b root       31,  14 Sep 25  2025 /dev/mtdblock14
+brw-r--r--    1 Z500_w9b root       31,   2 Sep 25  2025 /dev/mtdblock2
+brw-r--r--    1 Z500_w9b root       31,   3 Sep 25  2025 /dev/mtdblock3
+brw-r--r--    1 Z500_w9b root       31,   4 Sep 25  2025 /dev/mtdblock4
+brw-r--r--    1 Z500_w9b root       31,   5 Sep 25  2025 /dev/mtdblock5
+brw-r--r--    1 Z500_w9b root       31,   6 Sep 25  2025 /dev/mtdblock6
+brw-r--r--    1 Z500_w9b root       31,   7 Sep 25  2025 /dev/mtdblock7
+brw-r--r--    1 Z500_w9b root       31,   8 Sep 25  2025 /dev/mtdblock8
+brw-r--r--    1 Z500_w9b root       31,   9 Sep 25  2025 /dev/mtdblock9
+/ # 
+=== [send @18000ms] "echo S2; curl -f --connect-timeout 5 --max-time 240 -o /var/tmp/e2631-fwslot http://192.168.5.5:8000/e2631-fwslot; echo rc=$?; chmod +x /var/tmp/e2631-fwslot; ls -l /var/tmp/e2631-fwslot\r\n"
+echo S2; curl -f --connect-timeout 5 --max-time 240 -o /var/tmp/e2631-fwslot
+ http://192.168.5.5:8000/e2631-fwslot; echo rc=$?; chmod +x /var/tmp/e2631-fwslo
+t; ls -l /var/tmp/e2631-fwslot
+S2
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100 69943  100 69943    0     0  2008k      0 --:--:-- --:--:-- --:--:-- 2069k
+rc=0
+-rwxr-xr-x    1 Z500_w9b root         69943 Oct 13 15:47 /var/tmp/e2631-fwslot
+/ # 
+=== [send @24000ms] ":\r\n"
+:
+/ # 
+=== [send @36000ms] ":\r\n"
+:
+/ # 
+=== [send @46000ms] "echo S3; curl -f --connect-timeout 5 --max-time 240 -o /var/tmp/fw.bin http://192.168.5.5:8000/fw.bin; echo rc=$?; ls -l /var/tmp/fw.bin\r\n"
+echo S3; curl -f --connect-timeout 5 --max-time 240 -o /var/tmp/fw.bin http:
+//192.168.5.5:8000/fw.bin; echo rc=$?; ls -l /var/tmp/fw.bin
+S3
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0 62 20.0M   62 12.4M    0     0  14.1M      0  0:00:01 --:--:--  0:00:01 14.1M100 20.0M  100 20.0M    0     0  15.1M      0  0:00:01  0:00:01 --:--:-- 15.1M
+rc=0
+-rw-r--r--    1 Z500_w9b root      20972052 Oct 13 15:48 /var/tmp/fw.bin
+/ # 
+=== [send @48000ms] ":\r\n"
+:
+/ # 
+=== [send @60000ms] ":\r\n"
+:
+/ # 
+=== [send @72000ms] ":\r\n"
+:
+/ # 
+=== [send @84000ms] ":\r\n"
+:
+/ # 
+=== [send @96000ms] ":\r\n"
+:
+/ # 
+=== [send @108000ms] ":\r\n"
+:
+/ # 
+=== [send @120000ms] ":\r\n"
+:
+/ # 
+=== [send @132000ms] ":\r\n"
+:
+/ # 
+=== [send @144000ms] ":\r\n"
+:
+/ # 
+=== [send @156000ms] ":\r\n"
+:
+/ # 
+=== [send @168000ms] ":\r\n"
+:
+/ # 
+=== [send @180000ms] "echo S4; /var/tmp/e2631-fwslot info\r\n"
+
+=== [send @180000ms] ":\r\n"
+echo S4; /var/tmp/e2631-fwslot info
+S4
+:
+running slot: 1
+slot 0: base 0x700000 span 0x1c00000 mtd0 (viewed through the whole-flash mtd) header@0x1560000 serial=20 version="V1.0.0.7B5.8000" [next boot]
+slot 1: base 0x2300000 span 0x1c00000 mtd0 (viewed through the whole-flash mtd) header@0x1560000 serial=19 version="V1.0.0.7B5.8000" [running]
+/ # :
+/ # 
+=== [send @192000ms] "echo S5; /var/tmp/e2631-fwslot check /var/tmp/fw.bin\r\n"
+
+=== [send @192000ms] ":\r\n"
+echo S5; /var/tmp/e2631-fwslot check /var/tmp/fw.bin
+S5
+:
+ok: valid E2631 package for ZXHN E2631 V1.0.0
+
+### --stop-on matched, ending early

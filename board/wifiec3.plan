@@ -1,0 +1,17 @@
+1500|root
+4500|<redacted:vendor telnet password>
+8000|readlink /sys/bus/pci/devices/0000:00:00.0
+9000|readlink /sys/bus/pci/devices/0000:01:00.0
+10500|ls /sys/devices/platform/soc/
+13000|cat /sys/bus/pci/devices/0000:00:00.0/resource | head -4
+15000|grep -iE "pcie|f000000|f100000|94000" /proc/iomem
+17500|ls /sys/kernel/debug/ 2>/dev/null
+19000|cat /sys/kernel/debug/clk/clk_summary 2>/dev/null | grep -iE "pcie|phy|crm" | head -20
+22000|cat /sys/kernel/debug/gpio 2>/dev/null | tail -25
+25000|ls /sys/bus/pci/drivers/mt_drv_7916/ /sys/bus/pci/drivers/mt_pci_slave/
+27000|cat /sys/module/mt_drv_7916/parameters/* 2>/dev/null | head -5
+28500|lsmod
+30500|find /lib/modules/4.1.25 -name "*7916*" -o -name "*pcie*" 2>/dev/null | head
+33000|cat /proc/irq/*- 2>/dev/null | head -0
+33500|echo ZDONE
+35000|exit

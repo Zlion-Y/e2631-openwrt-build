@@ -1,0 +1,8 @@
+[connected 192.168.5.3:23]
+E2631> root
+
+Login: > <redacted:vendor telnet password>
+> id
+> /var/tmp/fw info
+> echo ZDONE
+> exit

@@ -3,7 +3,7 @@
 // dts files extracted from the target's patch series, then diffs the labels the
 // board file references against the labels that are actually defined.
 //
-//   node tools/dts_lint.mjs <board.dts> <patches-dir> [...more dirs]
+//   node build/tools/dts_lint.mjs <board.dts> <patches-dir> [...more dirs]
 import fs from 'node:fs';
 import path from 'node:path';
 

@@ -1,0 +1,49 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo V1; /var/tmp/e2631-fwslot info\r\n"
+echo V1; /var/tmp/e2631-fwslot info
+V1
+running slot: 0
+slot 0: base 0x700000 span 0x1c00000 mtd0 (viewed through the whole-flash mtd) header@0x1560000 serial=16 version="V1.0.0.7B5.8000" [running]
+slot 1: base 0x2300000 span 0x1c00000 mtd0 (viewed through the whole-flash mtd) header@0x1000000 serial=17 version="V1.0.0.8B8.8000" [next boot]
+/ # 
+=== [send @60000ms] "echo V2; dd if=/dev/mtdblock0 bs=131072 skip=408 count=1 2>/dev/null | busybox hexdump -v -n 512 -e '16/1 \"%02x\"'\r\n"
+echo V2; dd if=/dev/mtdblock0 bs=131072 skip=408 count=1 2>/dev/null | busyb
+ox hexdump -v -n 512 -e '16/1 "%02x"'
+V2
+/ # 
+=== [send @120000ms] "echo V3; dd if=/dev/mtdblock0 bs=131072 skip=280 count=1 2>/dev/null | busybox hexdump -v -n 64 -e '16/1 \"%02x\" \"\\n\"'\r\n"
+echo V3; dd if=/dev/mtdblock0 bs=131072 skip=280 count=1 2>/dev/null | busyb
+ox hexdump -v -n 64 -e '16/1 "%02x" "\n"'
+V3
+/ # 
+=== [send @150000ms] "echo V4; dd if=/dev/mtdblock0 bs=131072 skip=344 count=1 2>/dev/null | busybox hexdump -v -n 32 -e '16/1 \"%02x\" \"\\n\"'\r\n"
+echo V4; dd if=/dev/mtdblock0 bs=131072 skip=344 count=1 2>/dev/null | busyb
+ox hexdump -v -n 32 -e '16/1 "%02x" "\n"'
+V4
+/ # 
+=== [send @180000ms] "echo V5; dd if=/dev/mtdblock0 bs=131072 skip=227 count=1 2>/dev/null | busybox hexdump -v -n 512 -e '16/1 \"%02x\"'\r\n"
+echo V5; dd if=/dev/mtdblock0 bs=131072 skip=227 count=1 2>/dev/null | busyb
+ox hexdump -v -n 512 -e '16/1 "%02x"'
+V5
+/ # 
+=== [send @240000ms] "echo V6; cat /proc/cmdline; exit\r\n"
+echo V6; cat /proc/cmdline; exit
+V6
+console=ttyAMA0,115200n8 root=/dev/mtdblock8 ro rootfstype=jffs2 mem=256M init=/bin/sh -c "exec /bin/sh"; U-Boot V1.0.0 20250325110003 0x700000 0x0 0xaf 0xa3
+
+### CLOSED

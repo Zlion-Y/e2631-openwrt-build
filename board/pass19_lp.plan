@@ -1,0 +1,7 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo M1; cat /kmodule/home/httpd/webmodules/modules/hidden_upgrade_firmware_t.lp
+24000|echo M2; cat /kmodule/home/httpd/webmodules/modules/hidden_upgrade_firmware_js.lp
+40000|echo M3; wc -c /kmodule/home/httpd/webmodules/modules/file_upload_logic.lua
+46000|echo M4; cat /kmodule/home/httpd/webmodules/modules/file_upload_logic.lua 

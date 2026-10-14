@@ -1,0 +1,10 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo F1; ls -l /wlan
+20000|echo F2; cat /proc/mounts
+26000|echo F3; lsmod
+34000|echo F4; ls /lib/firmware /lib/firmware/mediatek 2>&1
+44000|echo F5; busybox hexdump -v -n 8 -e '8/1 "%02x "' /wlan/caldata; echo
+50000|echo F6; cat /sys/kernel/debug/gpio 2>&1
+62000|echo F7; ls /sys/class/gpio 2>&1

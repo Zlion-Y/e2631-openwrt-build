@@ -1,0 +1,9 @@
+EXPECT (?i)login: 
+SENDLN root
+EXPECT (?i)password: 
+SENDLN <redacted:vendor telnet password>
+WAIT 5000
+SENDLN 
+WAIT 4000
+SENDLN echo MARKER_$((1+1))
+WAIT 3000

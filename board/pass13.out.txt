@@ -1,0 +1,45 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo G1; which curl wget tftp\r\n"
+echo G1; which curl wget tftp
+G1
+/bin/curl
+/usr/bin/wget
+/usr/bin/tftp
+/ # 
+=== [send @18000ms] "echo G2; curl -sf -o /tmp/probe http://192.168.5.5:8000/poll.sh; echo RC=$?; ls -l /tmp/probe\r\n"
+echo G2; curl -sf -o /tmp/probe http://192.168.5.5:8000/poll.sh; echo RC=$?;
+ ls -l /tmp/probe
+G2
+RC=0
+-rw-r--r--    1 Z500_w9b root          1016 Oct 12 19:48 /tmp/probe
+/ # 
+=== [send @30000ms] "echo G3; busybox sha256sum /tmp/probe 2>&1\r\n"
+echo G3; busybox sha256sum /tmp/probe 2>&1
+G3
+sha256sum: applet not found
+/ # 
+=== [send @36000ms] "echo G4; curl -s -o /dev/null -w 'code=%{http_code} size=%{size_download}\\n' http://192.168.5.5:8000/t-rootfs.bin\r\n"
+echo G4; curl -s -o /dev/null -w 'code=%{http_code} size=%{size_download}\n'
+ http://192.168.5.5:8000/t-rootfs.bin
+G4
+code=200 size=4194304
+/ # 
+=== [send @37500ms] "exit\r\n"
+exit
+
+### CLOSED

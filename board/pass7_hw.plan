@@ -1,0 +1,12 @@
+1000|root
+2500|<redacted:vendor telnet password>
+6000|
+8000|echo N1_IFACES; cat /proc/net/dev
+12000|echo N2_IFCONFIG; ifconfig -a
+16000|echo N3_MDIODEVS; ls /sys/bus/mdio_bus/devices 2>/dev/null; ls /sys/devices/platform/soc/*mdio*/ 2>/dev/null
+20000|echo N4_NETSYS; ls /sys/class/net; for d in /sys/class/net/*; do echo "-- $d"; cat $d/address 2>/dev/null; cat $d/speed 2>/dev/null; cat $d/type 2>/dev/null; done
+26000|echo N5_BRIDGE; brctl show
+30000|echo N6_ZTEPROC; ls /proc/zte/ /proc/csp/ 2>/dev/null
+34000|echo N7_PORTCAP; cat /proc/csp/portinfo /proc/csp/boardtype /proc/csp/ethernetmac /capability/portinfo 2>/dev/null
+38000|echo N8_USB; ls /sys/bus/platform/devices/ 2>/dev/null | busybox grep -i -E "usb|dwc"; ls /dev/ | busybox grep -i -E "usb|tty"
+42000|echo N9_LOGDIR; ls /var/log/ 2>/dev/null

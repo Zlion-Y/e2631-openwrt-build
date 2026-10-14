@@ -1,0 +1,28 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1500ms] "root\r\n"
+root
+Password: 
+=== [send @4500ms] "abc123\\!@#\r\n"
+
+User name or Password is incorrect
+
+Login: 
+=== [send @7000ms] "/var/tmp/fw info\r\n"
+/var/tmp/fw info
+Password: 
+=== [send @11000ms] "reboot\r\n"
+
+User name or Password is incorrect
+
+Login: 
+=== [send @14000ms] "exit\r\n"
+exit
+Password: 
+=== [send @15500ms] "exit\r\n"
+
+User name or Password is incorrect
+Login fail,exceed 3 times! wait 60 seconds!
+
+### CLOSED

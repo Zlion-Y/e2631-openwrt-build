@@ -1,0 +1,9 @@
+500|
+2000|root
+3500|<redacted:vendor telnet password>
+6000|
+8000|id
+9500|echo MARKER_OK
+11000|echo $HOME; pwd
+12500|printenv
+14000|cat /proc/mtd

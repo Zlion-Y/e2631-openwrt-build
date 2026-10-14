@@ -1,0 +1,8 @@
+1000|root
+2500|<redacted:vendor telnet password>
+5000|
+7000|echo T1_ROOTLS; ls /
+10000|echo T2_WWW; ls /www 2>/dev/null; ls /userbin 2>/dev/null; ls /tmp/boaform 2>/dev/null
+14000|echo T3_CSPD_UPG; busybox tr -c '[:print:]' '\n' < /bin/cspd | busybox grep -i -m 60 -E 'supgrade|fw.bin|upgrade|action=|cgi|upload'
+22000|echo T4_FWFLASH_STR; busybox tr -c '[:print:]' '\n' < /bin/fw_flashing | busybox grep -i -m 60 -E 'usage|option|slot|version|header|switch|erase|write|startaddr|crc'
+28000|echo T5_BOOTFLASH_STR; busybox tr -c '[:print:]' '\n' < /bin/boot_flashing | busybox grep -i -m 40 -E 'usage|slot|version|header|switch|serial|erase'

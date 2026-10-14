@@ -1,0 +1,7 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo R1; busybox hexdump -v -e '16/1 "%02x"' -s 0x2f00000 -n 512 /dev/mtdblock0; echo
+25000|echo R2; busybox hexdump -v -e '16/1 "%02x" "\n"' -s 0x2300000 -n 48 /dev/mtdblock0; echo R3; busybox hexdump -v -e '16/1 "%02x" "\n"' -s 0x2700000 -n 32 /dev/mtdblock0
+40000|echo R4; busybox hexdump -v -e '16/1 "%02x" "\n"' -s 0x2f20000 -n 32 /dev/mtdblock0; echo R5; busybox hexdump -v -e '16/1 "%02x" "\n"' -s 0x1c60000 -n 32 /dev/mtdblock0
+55000|exit

@@ -1,0 +1,8 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo L1; ls /kmodule/home/httpd/webmodules/modules | grep -i -E "upg|hidden|firm"
+20000|echo L2; wc -c /kmodule/home/httpd/webmodules/modules/do_firmware_upgrade.lua /kmodule/home/httpd/webmodules/modules/hidden_upgrade_firmware_js.lp /kmodule/home/httpd/webmodules/modules/hidden_upgrade_firmware_t.lp
+28000|echo L3; cat /kmodule/home/httpd/webmodules/modules/do_firmware_upgrade.lua
+40000|echo L4; busybox head -c 5000 /kmodule/home/httpd/webmodules/modules/hidden_upgrade_firmware_js.lp
+55000|echo L5; busybox head -c 3000 /kmodule/home/httpd/webmodules/modules/hidden_upgrade_firmware_t.lp

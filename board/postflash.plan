@@ -1,0 +1,8 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo Z1; /var/tmp/e2631-fwslot info -j
+60000|echo Z2; busybox hexdump -v -e '16/1 "%02x"' -s 0x3300000 -n 512 /dev/mtdblock0; echo
+95000|echo Z3; busybox hexdump -v -e '16/1 "%02x"' -s 0x1c60000 -n 512 /dev/mtdblock0; echo
+130000|echo Z4; busybox hexdump -v -e '16/1 "%02x" "\n"' -s 0x2b00000 -n 16 /dev/mtdblock0; echo; exit
+160000|exit

@@ -1,0 +1,87 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo B1; ls /sys/class/mtd/mtd0/\r\n"
+echo B1; ls /sys/class/mtd/mtd0/
+B1
+bad_blocks         ecc_step_size      numeraseregions    subsystem
+bbt_blocks         ecc_strength       offset             type
+bitflip_threshold  erasesize          oobsize            uevent
+corrected_bits     flags              power              writesize
+dev                mtdblock0          size
+ecc_failures       name               subpagesize
+/ # 
+=== [send @16000ms] "echo B2; cat /sys/class/mtd/mtd0/bad_blocks 2>&1\r\n"
+echo B2; cat /sys/class/mtd/mtd0/bad_blocks 2>&1
+B2
+0
+/ # 
+=== [send @20000ms] "echo B3; cat /proc/mtd\r\n"
+echo B3; cat /proc/mtd
+B3
+dev:    size   erasesize  name
+mtd0: 08000000 00020000 "Whole flash"
+mtd1: 00100000 00020000 "Bootloader"
+mtd2: 00100000 00020000 "tag"
+mtd3: 00100000 00020000 "wifi"
+mtd4: 00200000 00020000 "usercfg"
+mtd5: 00200000 00020000 "defcfg"
+mtd6: 00340000 00020000 "kernel1"
+mtd7: 00340000 00020000 "kernel2"
+mtd8: 01220000 00020000 "rootfs"
+mtd9: 00500000 00020000 "UUPlugin"
+mtd10: 000a0000 00020000 "owdptsbin"
+mtd11: 00500000 00020000 "status"
+mtd12: 00300000 00020000 "DPIPlugin"
+mtd13: 00100000 00020000 "UNIFIED"
+mtd14: 00180000 00020000 "JDXBPLUGIN"
+/ # 
+=== [send @30000ms] "echo B4; dmesg 2>&1 | grep -i -E \"bad|bbt|HYF|spinand|spif\" | head -40\r\n"
+echo B4; dmesg 2>&1 | grep -i -E "bad|bbt|HYF|spinand|spif" | head -40
+B4
+/bin/sh: head: not found
+/ # 
+=== [send @45000ms] "echo B5; busybox hexdump -C -s 0x3300000 -n 64 /dev/mtdblock0\r\n"
+echo B5; busybox hexdump -C -s 0x3300000 -n 64 /dev/mtdblock0
+B5
+03300000  e3 68 17 e0 59 8f f0 e5  ef 91 75 cc 37 31 ad 33  |.h..Y.....u.71.3|
+03300010  6a 66 27 53 be ac 82 a7  5c 61 1b ee e2 b9 7e 97  |jf'S....\a....~.|
+03300020  f4 3b ef 8a 40 25 ce 3c  4e f0 c5 61 d5 4a 32 24  |.;..@%.<N..a.J2$|
+03300030  d9 11 49 3d f7 69 9e eb  e9 b9 8f ab 31 45 f3 3b  |..I=.i......1E.;|
+03300040
+/ # 
+=== [send @50000ms] "echo B6; busybox hexdump -C -s 0x2300000 -n 48 /dev/mtdblock0\r\n"
+echo B6; busybox hexdump -C -s 0x2300000 -n 48 /dev/mtdblock0
+B6
+02300000  33 33 33 33 cc cc cc cc  88 88 88 88 dd dd dd dd  |3333............|
+02300010  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  |................|
+02300020  27 05 19 56 ca b7 41 94  68 d5 44 16 00 33 29 a6  |'..V..A.h.D..3).|
+02300030
+/ # 
+=== [send @55000ms] "echo B7; cat /proc/zte/verinfo/versionstates 2>&1 | head -30\r\n"
+echo B7; cat /proc/zte/verinfo/versionstates 2>&1 | head -30
+B7
+/bin/sh: head: not found
+/ # 
+=== [send @70000ms] "echo B8; cat /proc/cmdline\r\n"
+echo B8; cat /proc/cmdline
+B8
+console=ttyAMA0,115200n8 root=/dev/mtdblock8 ro rootfstype=jffs2 mem=256M init=/bin/sh -c "exec /bin/sh"; U-Boot V1.0.0 20250325110003 0x700000 0x0 0xaf 0xa3
+/ # 
+=== [send @71500ms] "exit\r\n"
+exit
+
+### CLOSED

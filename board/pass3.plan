@@ -1,0 +1,11 @@
+1000|root
+2500|<redacted:vendor telnet password>
+5000|
+7000|echo W1_HDR_SLOTA; busybox hexdump -C -s 0x1c60000 -n 512 /dev/mtdblock0
+12000|echo W2_HDR_SLOTB; busybox hexdump -C -s 0x3ca0000 -n 512 /dev/mtdblock0
+17000|echo W3_BINLIST; ls /bin
+21000|echo W4_SBIN; ls /sbin
+25000|echo W5_UBIN; ls /usr/bin
+29000|echo W6_USRabin2; ls /usr/sbin
+33000|echo W7_MOUNTS; cat /proc/mounts
+37000|echo W8_DMESG; busybox dmesg | busybox grep -m 70 -i -E "mtd|nand|spifc|partit|bad|erase|slot|crypto|aes|decrypt|fdt|dtb"

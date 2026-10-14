@@ -3,20 +3,20 @@
 # parses under busybox ash.  Without this, a Windows-authored CRLF shows up on
 # the device as a baffling "unexpected newline (expecting ")")".
 set -u
-cd /mnt/d/AI/Qoder/E2631-OpenWRT || exit 1
+cd /mnt/d/AI/Qoder/E2631-OpenWRT/build || exit 1   # the repo root; out/ lives one level above
 FILES="
-device/fw-ab.sh
-device/hb.sh
-device/mpscfg.sh
-device/stages.sh
-device/linkspeed.sh
-build/overlay/target/linux/sanechips/base-files/sbin/e2631-hb
-build/overlay/target/linux/sanechips/base-files/sbin/e2631-wifi-on
-build/overlay/target/linux/sanechips/base-files/sbin/e2631-linkspeed
-build/overlay/target/linux/sanechips/base-files/sbin/e2631-fwstate
-build/overlay/target/linux/sanechips/base-files/etc/init.d/e2631-wifi-eeprom
-build/overlay/target/linux/sanechips/base-files/etc/init.d/e2631-wifi-load
-build/overlay/target/linux/sanechips/base-files/etc/init.d/e2631-hb
+board/fw-ab.sh
+board/hb.sh
+board/mpscfg.sh
+board/stages.sh
+board/linkspeed.sh
+overlay/target/linux/sanechips/base-files/sbin/e2631-hb
+overlay/target/linux/sanechips/base-files/sbin/e2631-wifi-on
+overlay/target/linux/sanechips/base-files/sbin/e2631-linkspeed
+overlay/target/linux/sanechips/base-files/sbin/e2631-fwstate
+overlay/target/linux/sanechips/base-files/etc/init.d/e2631-wifi-eeprom
+overlay/target/linux/sanechips/base-files/etc/init.d/e2631-wifi-load
+overlay/target/linux/sanechips/base-files/etc/init.d/e2631-hb
 "
 rc=0
 for f in $FILES; do
@@ -32,7 +32,7 @@ for f in $FILES; do
 done
 # apply.sh and the wsl/ helpers run under WSL bash, not ash: same CRLF problem,
 # different parser.  Check them separately so one gate does not hide the other.
-for f in build/apply.sh build/wsl/*.sh; do
+for f in apply.sh wsl/*.sh; do
 	sed -i 's/\r$//' "$f"
 	if bash -n "$f" 2>/tmp/lintb.err; then
 		echo "bash-OK  $f"

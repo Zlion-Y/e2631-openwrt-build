@@ -1,0 +1,79 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1500ms] "root\r\n"
+root
+Password: 
+=== [send @4500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @8000ms] "echo U1; cd /etc/wireless/mt7916; pwd\r\n"
+echo U1; cd /etc/wireless/mt7916; pwd
+U1
+/etc/wireless/mt7916
+/etc/wireless/mt7916 # 
+=== [send @12000ms] "echo U2; /kmodule/bin/curl -sS -m 60 -T mt7916_patch_e1_hdr.bin http://192.168.5.17:8000/put/mt7916_patch_e1_hdr.bin; echo rc=$?\r\n"
+echo U2; /kmodule/bin/curl -sS -m 60 -T mt7916_patch_e1_h
+dr.bin http://192.168.5.17:8000/put/mt7916_patch_e1_hdr.bin; echo rc=$?
+U2
+ok 8672
+rc=0
+/etc/wireless/mt7916 # 
+=== [send @18000ms] "echo U3; /kmodule/bin/curl -sS -m 120 -T MT7916_EEPROM.bin http://192.168.5.17:8000/put/MT7916_EEPROM.bin; echo rc=$?\r\n"
+echo U3; /kmodule/bin/curl -sS -m 120 -T MT7916_EEPROM.bi
+n http://192.168.5.17:8000/put/MT7916_EEPROM.bin; echo rc=$?
+U3
+ok 4096
+rc=0
+/etc/wireless/mt7916 # 
+=== [send @24000ms] "echo U4; /kmodule/bin/curl -sS -m 120 -T l1profile.dat.dbdc http://192.168.5.17:8000/put/l1profile.dat.dbdc; /kmodule/bin/curl -sS -m 120 -T mt7916.dbdc.b0.dat http://192.168.5.17:8000/put/mt7916.dbdc.b0.dat; /kmodule/bin/curl -sS -m 120 -T mt7916.dbdc.b1.dat http://192.168.5.17:8000/put/mt7916.dbdc.b1.dat; echo rc=$?\r\n"
+echo U4; /kmodule/bin/curl -sS -m 120 -T l1profile.dat.db
+dc http://192.168.5.17:8000/put/l1profile.dat.dbdc; /kmodule/bin/curl -sS -m 120
+ -T mt7916.dbdc.b0.dat http://192.168.5.17:8000/put/mt7916.dbdc.b0.dat; /kmodule
+/bin/curl -sS -m 120 -T mt7916.dbdc.b1.dat http://192.168.5.17:8000/put/mt7916.d
+bdc.b1.dat; echo rc=$?
+U4
+
+=== [send @36000ms] "echo U5; /kmodule/bin/curl -sS -m 240 -T 7916_WACPU_RAM_CODE_release.bin http://192.168.5.17:8000/put/7916_WACPU_RAM_CODE_release.bin; echo rc=$?\r\n"
+echo U5; /kmodule/bin/curl -sS -m 240 -T 7916_WACPU_RAM_CODE_release.bin http://192.168.5.17:8000/put/7916_WACPU_RAM_CODE_release.bin; echo rc=$?
+
+=== [send @60000ms] "echo U6; /kmodule/bin/curl -sS -m 300 -T WIFI_RAM_CODE_MT7916.bin http://192.168.5.17:8000/put/WIFI_RAM_CODE_MT7916.bin; echo rc=$?\r\n"
+echo U6; /kmodule/bin/curl -sS -m 300 -T WIFI_RAM_CODE_MT7916.bin http://192.168.5.17:8000/put/WIFI_RAM_CODE_MT7916.bin; echo rc=$?
+
+=== [send @120000ms] "echo U7; ls -l /etc/wireless/mt7916; exit\r\n"
+echo U7; ls -l /etc/wireless/mt7916; exit
+
+=== [send @121500ms] "exit\r\n"
+exit
+curl: (28) Connection timed out after 120014 milliseconds
+ok 7297
+ok 7382
+rc=0
+/etc/wireless/mt7916 # echo U5; /kmodule/bin/curl -sS -m 240 -T 7916_WACPU_RAM_C
+ODE_release.bin http://192.168.5.17:8000/put/7916_WACPU_RAM_CODE_release.bin; ec
+ho rc=$?
+U5
+ok 458112
+rc=0
+/etc/wireless/mt7916 # echo U6; /kmodule/bin/curl -sS -m 300 -T WIFI_RAM_CODE_MT
+7916.bin http://192.168.5.17:8000/put/WIFI_RAM_CODE_MT7916.bin; echo rc=$?
+U6
+ok 1759340
+rc=0
+/etc/wireless/mt7916 # echo U7; ls -l /etc/wireless/mt7916; exit
+U7
+-rwxr-xr-x    1 Z500_w9b 34463       458112 Sep 25  2025 7916_WACPU_RAM_CODE_release.bin
+-rwxr-xr-x    1 Z500_w9b 34463         4096 Sep 25  2025 MT7916_EEPROM.bin
+-rwxr-xr-x    1 Z500_w9b 34463      1759340 Sep 25  2025 WIFI_RAM_CODE_MT7916.bin
+-rwxr-xr-x    1 Z500_w9b 34463         1309 Sep 25  2025 dump_wfdma_debug_CR_DMA0.sh
+-rwxr-xr-x    1 Z500_w9b 34463          560 Sep 25  2025 l1profile.dat.dbdc
+-rwxr-xr-x    1 Z500_w9b 34463         7297 Sep 25  2025 mt7916.dbdc.b0.dat
+-rwxr-xr-x    1 Z500_w9b 34463         7382 Sep 25  2025 mt7916.dbdc.b1.dat
+-rwxr-xr-x    1 Z500_w9b 34463         3730 Sep 25  2025 mt7916_Debug.sh
+-rwxr-xr-x    1 Z500_w9b 34463         8672 Sep 25  2025 mt7916_patch_e1_hdr.bin
+
+### CLOSED

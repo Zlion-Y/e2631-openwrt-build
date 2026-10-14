@@ -1,0 +1,14 @@
+1500|root
+4500|<redacted:vendor telnet password>
+7000|echo A_CMDLINE; cat /proc/cmdline
+9000|echo B_SLOT0_HEAD; busybox hexdump -C -s 0x1c60000 -n 64 /dev/mtd0
+12000|echo C_SLOT0_TAIL; busybox hexdump -C -s 0x1c601e0 -n 32 /dev/mtd0
+15000|echo D_SLOT0_BODY; busybox hexdump -C -s 0x700000 -n 48 /dev/mtd0
+18000|echo E_SLOT1_BODY; busybox hexdump -C -s 0x2300000 -n 48 /dev/mtd0
+21000|echo F_SLOT1_OURHDR; busybox hexdump -C -s 0x3700000 -n 32 /dev/mtd0
+24000|echo G_SLOT1_HIJACK; busybox hexdump -C -s 0x3860000 -n 64 /dev/mtd0
+27000|echo H_HIJACK_TAIL; busybox hexdump -C -s 0x38601e0 -n 32 /dev/mtd0
+30000|echo I_MTD; cat /proc/mtd
+33000|echo J_UPTIME; cat /proc/uptime
+35000|echo ZDONE
+37000|exit

@@ -1,0 +1,25 @@
+# Consume with: node build/host/telnet_sh.mjs 192.168.1.1 23 build/board/flash-gen1.plan out/flash-gen1.log
+#
+# Stock side (telnet root/<redacted:vendor telnet password>), now running slot 0. fw_flashing erases and
+# writes the INACTIVE slot (slot 1) and stamps its own serial, so cspboot picks
+# the new image next boot. boot_flashing is never used (it would rewrite U-Boot)
+# and syn_version is never used (it would overwrite what we just wrote).
+#
+# No head/tail/grep here: the stock busybox does not have those applets, and the
+# log is dumped with dd, which is enough to read it back on the PC.
+0|root
+4500|<redacted:vendor telnet password>
+7000|echo G-LOGIN; cd /var/tmp; rm -f ff.log ff.done; pwd; df -k /var
+10000|echo G-DL; /bin/curl -f -sS -m 300 -o fw.bin http://192.168.1.177:8000/e2631-openwrt-gen1.bin; ls -l fw.bin
+24000|echo G-SIZE; wc -c < fw.bin; md5sum fw.bin
+32000|echo G-HEAD; busybox hexdump -v -e '1/1 "%02x"' -n 32 fw.bin; echo
+40000|echo G-GATE; sz=$(wc -c < fw.bin 2>/dev/null); if [ "$sz" = 20972052 ]; then echo SIZE-OK; (fw_flashing -f /var/tmp/fw.bin > /var/tmp/ff.log 2>&1; echo FF-DONE > /var/tmp/ff.done) & else echo REFUSE-BAD-SIZE-$sz > /var/tmp/ff.log; echo FF-DONE > /var/tmp/ff.done; fi
+50000|echo G-P1; ls -l /var/tmp/ff.done 2>/dev/null; echo p1-end
+62000|echo G-P2; ls -l /var/tmp/ff.done 2>/dev/null; echo p2-end
+74000|echo G-P3; ls -l /var/tmp/ff.done 2>/dev/null; echo p3-end
+86000|echo G-P4; ls -l /var/tmp/ff.done 2>/dev/null; echo p4-end
+98000|echo G-P5; ls -l /var/tmp/ff.done 2>/dev/null; echo p5-end
+110000|echo G-P6; ls -l /var/tmp/ff.done 2>/dev/null; echo p6-end
+120000|echo G-LOG; dd if=/var/tmp/ff.log bs=4096 2>/dev/null; echo LOG-END
+130000|echo G-REBOOT; reboot
+140000|exit

@@ -1,0 +1,6 @@
+2000|mount -t jffs2 /dev/mtdblock8 /mnt
+4000|grep -c "disabled" /mnt/upper/etc/config/wireless
+6000|sed -i "s/option disabled .0./option disabled 1/" /mnt/upper/etc/config/wireless
+8000|grep -n disabled /mnt/upper/etc/config/wireless
+10000|sync; umount /mnt
+12000|reboot

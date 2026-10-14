@@ -1,0 +1,12 @@
+1500|root
+4500|<redacted:vendor telnet password>
+8000|echo W1; ls -l /lib/firmware 2>&1
+12000|echo W2; ls -l /lib/firmware/mediatek 2>&1
+16000|echo W3; ls -d /wlan /etc/wlan /misc /lib/firmware/* 2>&1
+22000|echo W4; find / -maxdepth 6 -name '*.bin' -size +50k 2>/dev/null
+40000|echo W5; find / -maxdepth 6 -iname 'mt7*' 2>/dev/null
+52000|echo W6; find / -maxdepth 6 -iname '*rebb*' -o -maxdepth 6 -iname 'WAN_*' 2>/dev/null
+62000|echo W7; ls -l /lib/modules 2>&1; ls /lib/modules/*/ 2>&1 | sed -n 1,12p
+75000|echo W8; for f in $(find / -maxdepth 6 -name '*.bin' -size +100k 2>/dev/null); do md5sum $f; done
+110000|echo W9; cat /proc/modules | sed -n 1,12p
+120000|exit

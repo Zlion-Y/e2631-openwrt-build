@@ -1,0 +1,143 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo C1; rm -f /var/tmp/*; df -k /var\r\n"
+echo C1; rm -f /var/tmp/*; df -k /var
+C1
+rm: /var/tmp/linux-igd: is a directory
+rm: /var/tmp/ppp: is a directory
+Filesystem           1024-blocks    Used Available Use% Mounted on
+tmpfs                       40960           68        40892   0% /var 
+/ # 
+=== [send @25000ms] "echo C2; cat /dev/mtdblock1 > /var/tmp/mtd1-bootloader.bin; cat /dev/mtdblock2 > /var/tmp/mtd2-tag.bin; cat /dev/mtdblock3 > /var/tmp/mtd3-wifi.bin; ls -l /var/tmp\r\n"
+echo C2; cat /dev/mtdblock1 > /var/tmp/mtd1-bootloader.bin; cat /dev/mtdbloc
+k2 > /var/tmp/mtd2-tag.bin; cat /dev/mtdblock3 > /var/tmp/mtd3-wifi.bin; ls -l /
+var/tmp
+C2
+drwxr-xr-x    2 Z500_w9b root           120 Jan  1  1970 linux-igd
+-rw-r--r--    1 Z500_w9b root       1048576 Oct 13 04:02 mtd1-bootloader.bin
+-rw-r--r--    1 Z500_w9b root       1048576 Oct 13 04:02 mtd2-tag.bin
+-rw-r--r--    1 Z500_w9b root       1048576 Oct 13 04:02 mtd3-wifi.bin
+drwxr-x---    2 Z500_w9b root            40 Jan  1  1970 ppp
+/ # 
+=== [send @70000ms] "echo C3; for f in /var/tmp/mtd*.bin; do echo \"UP $(basename $f)\"; curl -f -sS -T \"$f\" \"http://192.168.5.5:8001/$(basename $f)\"; echo rc=$?; done\r\n"
+echo C3; for f in /var/tmp/mtd*.bin; do echo "UP $(basename $f)"; curl -f -s
+S -T "$f" "http://192.168.5.5:8001/$(basename $f)"; echo rc=$?; done
+C3
+UP mtd1-bootloader.bin
+ok
+rc=0
+UP mtd2-tag.bin
+ok
+rc=0
+UP mtd3-wifi.bin
+ok
+rc=0
+/ # 
+=== [send @120000ms] "echo C4; rm -f /var/tmp/mtd*.bin; cat /dev/mtdblock4 > /var/tmp/mtd4-usercfg.bin; cat /dev/mtdblock5 > /var/tmp/mtd5-defcfg.bin; curl -f -sS -T /var/tmp/mtd4-usercfg.bin http://192.168.5.5:8001/mtd4-usercfg.bin; echo rc4=$?; curl -f -sS -T /var/tmp/mtd5-defcfg.bin http://192.168.5.5:8001/mtd5-defcfg.bin; echo rc5=$?\r\n"
+echo C4; rm -f /var/tmp/mtd*.bin; cat /dev/mtdblock4 > /var/tmp/mtd4-usercfg
+.bin; cat /dev/mtdblock5 > /var/tmp/mtd5-defcfg.bin; curl -f -sS -T /var/tmp/mtd
+4-usercfg.bin http://192.168.5.5:8001/mtd4-usercfg.bin; echo rc4=$?; curl -f -sS
+ -T /var/tmp/mtd5-defcfg.bin http://192.168.5.5:8001/mtd5-defcfg.bin; echo rc5=$
+?
+C4
+ok
+rc4=0
+ok
+rc5=0
+/ # 
+=== [send @180000ms] "echo C5; rm -f /var/tmp/mtd*.bin; cat /dev/mtdblock6 > /var/tmp/kernel1.bin; ls -l /var/tmp/kernel1.bin; curl -f -sS -T /var/tmp/kernel1.bin http://192.168.5.5:8001/kernel1.bin; echo rck=$?\r\n"
+echo C5; rm -f /var/tmp/mtd*.bin; cat /dev/mtdblock6 > /var/tmp/kernel1.bin;
+ ls -l /var/tmp/kernel1.bin; curl -f -sS -T /var/tmp/kernel1.bin http://192.168.
+5.5:8001/kernel1.bin; echo rck=$?
+C5
+-rw-r--r--    1 Z500_w9b root       3407872 Oct 13 04:04 /var/tmp/kernel1.bin
+ok
+rck=0
+/ # 
+=== [send @240000ms] "echo C6; rm -f /var/tmp/kernel1.bin; ls -l /var/tmp; df -k /var\r\n"
+echo C6; rm -f /var/tmp/kernel1.bin; ls -l /var/tmp; df -k /var
+C6
+-rw-r--r--    1 Z500_w9b root             4 Oct 13 04:04 fm_mgr_curl
+drwxr-xr-x    2 Z500_w9b root           120 Jan  1  1970 linux-igd
+drwxr-x---    2 Z500_w9b root            40 Jan  1  1970 ppp
+-r-xr-xr-x    1 Z500_w9b root             0 Oct 13 04:04 special_resolv.conf
+Filesystem           1024-blocks    Used Available Use% Mounted on
+tmpfs                       40960           72        40888   0% /var 
+/ # 
+=== [send @260000ms] "echo C7; dmesg\r\n"
+echo C7; dmesg
+C7
+/bin/sh: dmesg: not found
+/ # 
+=== [send @340000ms] "echo C8; cat /proc/zte/ledkey_m/led; echo ---; cat /proc/zte/ledkey_m/key; echo ---; cat /proc/zte/verinfo/versionstates; echo ---; cat /proc/zte/bbx/BootRecord; echo ---; exit\r\n"
+echo C8; cat /proc/zte/ledkey_m/led; echo ---; cat /proc/zte/ledkey_m/key; e
+cho ---; cat /proc/zte/verinfo/versionstates; echo ---; cat /proc/zte/bbx/BootRe
+cord; echo ---; exit
+C8
+                LedModules
+LedId   CurrentOnOff    Count   CurrentMode     TimeOn  Timeoff
+gpio    hal_led_init    hal_led_on      hal_led_off     init_action
+============================================================
+0x32    0       0       0       0       0
+8       0xc0426878      0xc04268ac      0xc04268b4      25344
+============================================================
+0x64    0       0       0       0       0
+40      0xc0426878      0xc04268ac      0xc04268b4      33024
+============================================================
+0x128   1       0       1       0       0
+60      0xc0426878      0xc04268ac      0xc04268b4      33024
+============================================================
+---
+                LedModules
+KeyId   keystate        doubleclick     keyofftime      keyontime
+gpio    hal_key_init    hal_keyoff
+============================================================
+0x2     1       0       0       0
+18      0xc0426888      0xc0426898
+============================================================
+0x1     1       0       0       0
+20      0xc0426888      0xc0426898
+============================================================
+---
+=========================Version Information=========================
+curverBootStartPhyAddr: 0x00700000
+currentverphyaddr: 0x00700000
+curverheaderaddr: 0x01c60000
+curverSerialNumber: 0x00000010
+IsCurrentVersion: 0x00000001
+curverIsBad: 0x00000000
+curverheader_lowstart: 0x00700000
+curverheader_lowendstart: 0x02300000
+curverheader_highstart: 0x02300000
+curverheader_highendStart: 0x03f00000
+curversignsize: 0x00000000
+curFirmwareForm: 0x00000001
+curFirmwareType: 0x00000000
+curUpgradeKey1: 0x00001351
+curUpgradeKey2: 0x00005211
+backverphyaddr: 0x02300000
+backverheaderaddr: 0x03860000
+backverSerialNumber: 0x00000010
+IsCurrentVersion: 0x00000000
+backverIsBad: 0x00000000
+maxversionum: 0x00000010
+=====================================================================
+---
+Mode:2(1:power down 2:reset)
+---
+
+### CLOSED

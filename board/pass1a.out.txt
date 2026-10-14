@@ -1,0 +1,28 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @500ms] "\r\n"
+
+Password: 
+=== [send @2000ms] "root\r\n"
+
+User name or Password is incorrect
+
+Login: 
+=== [send @3500ms] "<redacted:vendor telnet password>\r\n"
+<redacted:vendor telnet password>
+Password: 
+=== [send @6000ms] "\r\n"
+
+User name or Password is incorrect
+
+Login: 
+=== [send @8000ms] "id\r\n"
+id
+Password: 
+=== [send @9500ms] "echo MARKER_OK\r\n"
+
+User name or Password is incorrect
+Login fail,exceed 3 times! wait 60 seconds!
+
+### CLOSED

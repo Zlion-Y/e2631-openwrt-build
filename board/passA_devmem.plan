@@ -1,0 +1,9 @@
+1000|root
+3000|<redacted:vendor telnet password>
+7000|
+9000|echo B1_DEVMEM; devmem2 0x9a101014 word
+12000|echo B2_PROC; ls /proc/
+16000|echo B3_ZTE; ls -R /proc/zte/ 2>/dev/null
+20000|echo B4_SWNET; cat /sys/class/net/sw/peed 2>/dev/null; ls /sys/class/net/pon/ /sys/class/net/idm0/ 2>/dev/null | head -30
+25000|echo B5_DONE
+27000|exit

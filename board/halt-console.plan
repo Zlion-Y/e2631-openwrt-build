@@ -1,0 +1,16 @@
+22000|uci set wireless.radio0.disabled=1; uci set wireless.radio1.disabled=1; uci set wireless.default_radio0.disabled=1; uci set wireless.default_radio1.disabled=1; uci commit wireless; sync; echo RADIOS-OFF
+27500|uci set wireless.radio0.disabled=1; uci set wireless.radio1.disabled=1; uci set wireless.default_radio0.disabled=1; uci set wireless.default_radio1.disabled=1; uci commit wireless; sync; echo RADIOS-OFF
+33000|uci set wireless.radio0.disabled=1; uci set wireless.radio1.disabled=1; uci set wireless.default_radio0.disabled=1; uci set wireless.default_radio1.disabled=1; uci commit wireless; sync; echo RADIOS-OFF
+38500|uci set wireless.radio0.disabled=1; uci set wireless.radio1.disabled=1; uci set wireless.default_radio0.disabled=1; uci set wireless.default_radio1.disabled=1; uci commit wireless; sync; echo RADIOS-OFF
+44000|echo STILL-ALIVE-$(cut -d" " -f1 /proc/uptime); iw dev | head -4; grep mt7915e /proc/interrupts
+49500|uci set wireless.radio0.disabled=1; uci set wireless.radio1.disabled=1; uci commit wireless; sync; echo RADIOS-OFF
+55000|echo STILL-ALIVE-$(cut -d" " -f1 /proc/uptime); iw dev | head -4; grep mt7915e /proc/interrupts
+60500|uci set wireless.radio0.disabled=1; uci set wireless.radio1.disabled=1; uci commit wireless; sync; echo RADIOS-OFF
+66000|echo STILL-ALIVE-$(cut -d" " -f1 /proc/uptime); dmesg | tail -6
+71500|uci set wireless.radio0.disabled=1; uci commit wireless; sync; echo RADIOS-OFF
+77000|echo STILL-ALIVE-$(cut -d" " -f1 /proc/uptime); dmesg | tail -8
+82500|echo IRQ-AND-COUNTERS; grep mt7915e /proc/interrupts; cat /sys/kernel/debug/ieee80211/phy0/mt76/sys_recovery 2>/dev/null | head -3
+88000|echo UPTIME-NOW-$(cut -d" " -f1 /proc/uptime)
+93500|echo STILL-HERE
+99000|echo STILL-HERE
+104500|echo STILL-HERE

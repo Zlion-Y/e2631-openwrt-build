@@ -1,0 +1,10 @@
+1000|root
+3000|<redacted:vendor telnet password>
+7000|
+9000|echo A1_MDIOLIST; ls /sys/bus/mdio_bus/devices/
+12000|echo A2_MDIOCLASS; ls /sys/class/mdio_bus/
+15000|echo A3_PHYDEV; ls -l /sys/class/net/*/phydev 2>/dev/null
+18000|echo A4_CARRIER; for n in /sys/class/net/*; do echo "$n state=$(cat $n/operstate 2>/dev/null) carrier=$(cat $n/carrier 2>/dev/null)"; done
+26000|echo A5_BRIDGE; brctl show
+29000|echo A6_DONE
+31000|exit

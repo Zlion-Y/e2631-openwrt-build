@@ -1,0 +1,24 @@
+1500|root
+4500|<redacted:vendor telnet password>
+8000|ls /sys/kernel/debug/regmap/
+11000|find / -name "*9128S*" > /var/tmp/ko_path.txt 2>/dev/null; cat /var/tmp/ko_path.txt
+18000|ls /sys/kernel/debug/regmap/94000000.topcrm/ 2>/dev/null
+21000|cat /sys/kernel/debug/regmap/94000000.topcrm/registers > /var/tmp/topcrm.txt; wc -c /var/tmp/topcrm.txt
+25000|cat /sys/kernel/debug/regmap/94100000.crm2/registers > /var/tmp/crm2.txt 2>/dev/null; wc -c /var/tmp/crm2.txt
+28000|ls /sys/devices/platform/soc/soc:pcie@10000000/
+31000|cat /sys/devices/platform/soc/soc:pcie@10000000/resource > /var/tmp/pcie0_res.txt; wc -c /var/tmp/pcie0_res.txt
+35000|hexdump -C /sys/bus/pci/devices/0000:00:00.0/config > /var/tmp/ep0_cfg.txt 2>/dev/null; busybox hexdump -C /sys/bus/pci/devices/0000:00:00.0/config > /var/tmp/ep0_cfg.txt; wc -c /var/tmp/ep0_cfg.txt
+40000|busybox hexdump -C /sys/bus/pci/devices/0000:01:00.0/config > /var/tmp/ep1_cfg.txt; wc -c /var/tmp/ep1_cfg.txt
+43000|zcat /proc/config.gz > /var/tmp/vconfig.txt; grep -iE "PCIE|PHY" /var/tmp/vconfig.txt > /var/tmp/vpcie.txt; wc -l /var/tmp/vpcie.txt
+47000|cat /var/tmp/ko_path.txt
+49000|for f in $(cat /var/tmp/ko_path.txt); do cp -f $f /var/tmp/ 2>/dev/null; done; ls -l /var/tmp/ | grep -i 9128
+53000|curl -f -sS -T /var/tmp/topcrm.txt http://192.168.5.5:8001/vendor-regmap-topcrm.txt; echo rc=$?
+57000|curl -f -sS -T /var/tmp/crm2.txt http://192.168.5.5:8001/vendor-regmap-crm2.txt; echo rc=$?
+61000|curl -f -sS -T /var/tmp/pcie0_res.txt http://192.168.5.5:8001/vendor-pcie0-resource.txt; echo rc=$?
+65000|curl -f -sS -T /var/tmp/ep0_cfg.txt http://192.168.5.5:8001/vendor-ep0-config.txt; echo rc=$?
+69000|curl -f -sS -T /var/tmp/ep1_cfg.txt http://192.168.5.5:8001/vendor-ep1-config.txt; echo rc=$?
+73000|curl -f -sS -T /var/tmp/vpcie.txt http://192.168.5.5:8001/vendor-config-pcie.txt; echo rc=$?
+77000|ls /var/tmp/ | grep -i 9128
+80000|curl -f -sS -T /var/tmp/plat_zxylzb_9128S.ko http://192.168.5.5:8001/plat_zxylzb_9128S.ko; echo rc=$?
+84000|echo ZDONE
+86000|exit

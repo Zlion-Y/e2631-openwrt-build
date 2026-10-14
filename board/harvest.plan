@@ -1,0 +1,14 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo H1; rm -f /var/tmp/fw.bin; df -k /var; sha256sum /dev/null && echo HAVE_SHA
+30000|echo H2; dd if=/dev/mtdblock0 bs=131072 skip=56 count=224 of=/var/tmp/slotA.bin 2>&1; ls -l /var/tmp/slotA.bin
+120000|echo H3; sha256sum /var/tmp/slotA.bin
+140000|echo H4; curl -f -sS -T /var/tmp/slotA.bin http://192.168.5.5:8001/slotA.bin; echo rc=$?
+200000|echo H5; rm -f /var/tmp/slotA.bin; df -k /var; for i in 1 2 3 4 5 6 7 8; do echo "mtd$i size=$(cat /sys/class/mtd/mtd$i/size 2>/dev/null) name=$(cat /sys/class/mtd/mtd$i/name 2>/dev/null)"; done
+230000|echo H6; dd if=/dev/mtdblock1 bs=131072 count=8 of=/var/tmp/mtd1-bootloader.bin 2>&1; dd if=/dev/mtdblock2 bs=131072 count=8 of=/var/tmp/mtd2-tag.bin 2>&1; dd if=/dev/mtdblock3 bs=131072 count=8 of=/var/tmp/mtd3-wifi.bin 2>&1; dd if=/dev/mtdblock4 bs=131072 count=16 of=/var/tmp/mtd4-usercfg.bin 2>&1; dd if=/dev/mtdblock5 bs=131072 count=16 of=/var/tmp/mtd5-defcfg.bin 2>&1; ls -l /var/tmp/*.bin
+300000|echo H7; for f in /var/tmp/mtd*.bin; do echo "UP $f"; curl -f -sS -T "$f" "http://192.168.5.5:8001/$(basename $f)"; echo rc=$?; done; sha256sum /var/tmp/mtd*.bin; rm -f /var/tmp/mtd*.bin
+380000|echo H8; for p in /proc/capability/* /proc/zte/ledkey_m/* /proc/zte/bbx/* /proc/zte/verinfo/*; do echo "===== $p"; cat $p; done
+520000|echo H9; dmesg
+600000|echo H10; ls /sys/firmware/; cat /proc/cmdline; exit
+630000|exit

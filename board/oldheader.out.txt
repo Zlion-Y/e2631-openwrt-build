@@ -1,0 +1,45 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo H1; busybox hexdump -v -e '16/1 \"%02x\"' -s 0x3300000 -n 512 /dev/mtdblock0; echo\r\n"
+echo H1; busybox hexdump -v -e '16/1 "%02x"' -s 0x3300000 -n 512 /dev/mtdblo
+ck0; echo
+H1
+ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+/ # 
+=== [send @25000ms] "echo H2; busybox hexdump -v -e '16/1 \"%02x\" \"\\n\"' -s 0x3300000 -n 64 /dev/mtdblock0; echo H3; busybox hexdump -v -e '16/1 \"%02x\" \"\\n\"' -s 0x3860000 -n 64 /dev/mtdblock0; echo H4; busybox hexdump -v -e '16/1 \"%02x\" \"\\n\"' -s 0x3400000 -n 32 /dev/mtdblock0\r\n"
+echo H2; busybox hexdump -v -e '16/1 "%02x" "\n"' -s 0x3300000 -n 64 /dev/mt
+dblock0; echo H3; busybox hexdump -v -e '16/1 "%02x" "\n"' -s 0x3860000 -n 64 /d
+ev/mtdblock0; echo H4; busybox hexdump -v -e '16/1 "%02x" "\n"' -s 0x3400000 -n 
+32 /dev/mtdblock0
+H2
+ffffffffffffffffffffffffffffffff
+ffffffffffffffffffffffffffffffff
+ffffffffffffffffffffffffffffffff
+ffffffffffffffffffffffffffffffff
+H3
+ffffffffffffffffffffffffffffffff
+ffffffffffffffffffffffffffffffff
+ffffffffffffffffffffffffffffffff
+ffffffffffffffffffffffffffffffff
+H4
+ffffffffffffffffffffffffffffffff
+ffffffffffffffffffffffffffffffff
+/ # 
+=== [send @40000ms] "exit\r\n"
+exit
+
+### CLOSED

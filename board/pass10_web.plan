@@ -1,0 +1,9 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo D1; ls /
+16000|echo D2; ls /www /rom /usr/lib 2>&1
+22000|echo D3; grep -E ":0050 |:1F95 |:1F96 " /proc/net/tcp /proc/net/tcp6 2>&1
+30000|echo D4; find / -maxdepth 3 -name "*.lua" 2>/dev/null
+55000|echo D5; grep -rl VersionUpload /www /usr /lib /etc /rom 2>&1
+85000|echo D6; grep -rl firmware_upgrade /www /usr /lib /etc /rom 2>&1

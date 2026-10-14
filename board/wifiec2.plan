@@ -1,0 +1,19 @@
+1500|root
+4500|<redacted:vendor telnet password>
+8000|id
+9000|uname -a
+10500|ls /sys/bus/pci/devices/
+11500|ls /sys/bus/pci/drivers/
+13000|for d in /sys/bus/pci/devices/*; do echo $d $(cat $d/vendor):$(cat $d/device) class=$(cat $d/class) irq=$(cat $d/irq); done
+16000|dmesg | grep -i pcie
+18000|dmesg | grep -iE "phy|perst|reset|link" | head -20
+21000|ls /sys/class/net/
+22000|cat /sys/class/net/wlan0/operstate /sys/class/net/wlan0/address
+23500|cat /proc/modules | cut -d" " -f1 | tr "\n" " "
+26000|cat /proc/capability/portinfo
+27500|ls /wlan
+28500|cat /proc/mtd
+30500|cat /sys/kernel/debug/gpio 2>/dev/null | head -25
+33500|grep -i pcie /proc/interrupts
+35000|echo ZDONE
+36500|exit

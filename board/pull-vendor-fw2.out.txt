@@ -1,0 +1,53 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1500ms] "root\r\n"
+root
+Password: 
+=== [send @4500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @8000ms] "echo Z1; cd /etc/wireless/mt7916\r\n"
+echo Z1; cd /etc/wireless/mt7916
+Z1
+/etc/wireless/mt7916 # 
+=== [send @12000ms] "echo Z2; for f in l1profile.dat.dbdc mt7916.dbdc.b0.dat mt7916.dbdc.b1.dat; do /kmodule/bin/curl -sS -m 60 -T $f http://192.168.5.17:8000/put/$f; echo \" $f rc=$?\"; done\r\n"
+echo Z2; for f in l1profile.dat.dbdc mt7916.dbdc.b0.dat m
+t7916.dbdc.b1.dat; do /kmodule/bin/curl -sS -m 60 -T $f http://192.168.5.17:8000
+/put/$f; echo " $f rc=$?"; done
+Z2
+ok 560
+ l1profile.dat.dbdc rc=0
+ok 7297
+ mt7916.dbdc.b0.dat rc=0
+ok 7382
+ mt7916.dbdc.b1.dat rc=0
+/etc/wireless/mt7916 # 
+=== [send @26000ms] "echo Z3; /kmodule/bin/curl -sS -m 180 -T 7916_WACPU_RAM_CODE_release.bin http://192.168.5.17:8000/put/7916_WACPU_RAM_CODE_release.bin; echo \"wa rc=$?\"\r\n"
+echo Z3; /kmodule/bin/curl -sS -m 180 -T 7916_WACPU_RAM_C
+ODE_release.bin http://192.168.5.17:8000/put/7916_WACPU_RAM_CODE_release.bin; ec
+ho "wa rc=$?"
+Z3
+ok 458112
+wa rc=0
+/etc/wireless/mt7916 # 
+=== [send @50000ms] "echo Z4; /kmodule/bin/curl -sS -m 300 -T WIFI_RAM_CODE_MT7916.bin http://192.168.5.17:8000/put/WIFI_RAM_CODE_MT7916.bin; echo \"wm rc=$?\"\r\n"
+echo Z4; /kmodule/bin/curl -sS -m 300 -T WIFI_RAM_CODE_MT
+7916.bin http://192.168.5.17:8000/put/WIFI_RAM_CODE_MT7916.bin; echo "wm rc=$?"
+Z4
+ok 1759340
+wm rc=0
+/etc/wireless/mt7916 # 
+=== [send @100000ms] "echo Z5; md5sum *.bin; exit\r\n"
+echo Z5; md5sum *.bin; exit
+Z5
+967fa140cea53cc6d420d3c790e0b757  7916_WACPU_RAM_CODE_release.bin
+632aa59809c99d4f52721f23c93d7f8d  MT7916_EEPROM.bin
+9a3fb936a95eacbe860375c3b02aad1b  WIFI_RAM_CODE_MT7916.bin
+ae74c1430ee511b2033035accd49512a  mt7916_patch_e1_hdr.bin
+
+### CLOSED

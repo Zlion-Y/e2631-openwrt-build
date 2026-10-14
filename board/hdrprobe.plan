@@ -1,0 +1,10 @@
+1500|root
+4500|<redacted:vendor telnet password>
+7000|busybox hexdump -C -s 0x1c60000 -n 512 /dev/mtd0 | busybox sed -n "1p;31,33p"
+11000|busybox hexdump -C -s 0x3700000 -n 512 /dev/mtd0 | busybox sed -n "1p;31,33p"
+15000|busybox hexdump -C -s 0x3860000 -n 512 /dev/mtd0 | busybox sed -n "1p;31,33p"
+19000|busybox hexdump -C -s 0x3700000 -n 64 /dev/mtd0
+23000|busybox hexdump -C -s 0x3860000 -n 64 /dev/mtd0
+27000|/var/tmp/fw info
+31000|echo ZDONE
+33000|exit

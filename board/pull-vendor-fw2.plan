@@ -1,0 +1,7 @@
+1500|root
+4500|<redacted:vendor telnet password>
+8000|echo Z1; cd /etc/wireless/mt7916
+12000|echo Z2; for f in l1profile.dat.dbdc mt7916.dbdc.b0.dat mt7916.dbdc.b1.dat; do /kmodule/bin/curl -sS -m 60 -T $f http://192.168.5.17:8000/put/$f; echo " $f rc=$?"; done
+26000|echo Z3; /kmodule/bin/curl -sS -m 180 -T 7916_WACPU_RAM_CODE_release.bin http://192.168.5.17:8000/put/7916_WACPU_RAM_CODE_release.bin; echo "wa rc=$?"
+50000|echo Z4; /kmodule/bin/curl -sS -m 300 -T WIFI_RAM_CODE_MT7916.bin http://192.168.5.17:8000/put/WIFI_RAM_CODE_MT7916.bin; echo "wm rc=$?"
+100000|echo Z5; md5sum *.bin; exit

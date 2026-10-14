@@ -1,0 +1,119 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @7000ms] "\r\n"
+
+/ # 
+=== [send @9000ms] "echo B1_DEVMEM; devmem2 0x9a101014 word\r\n"
+echo B1_DEVMEM; devmem2 0x9a101014 word
+B1_DEVMEM
+Memory mapped at address 0xb6f9c000.
+Value at address 0x9A101014 (0xb6f9c014): 0x195A
+/ # 
+=== [send @12000ms] "echo B2_PROC; ls /proc/\r\n"
+echo B2_PROC; ls /proc/
+B2_PROC
+1              176            494            consoles       mounts
+10             18             5              cpu            mtd
+1086           183            509            cpuinfo        net
+1093           2              511            cpuusage       pagetypeinfo
+1094           230            513            crypto         partitions
+1095           231            515            device-tree    self
+1096           283            517            devices        serial
+1097           3              520            diskstats      slabinfo
+1098           4              522            driver         softirqs
+11             429            524            execdomains    stat
+1142           459            526            fb             sys
+1250           470            565            filesystems    sysrq-trigger
+1251           474            593            fs             sysvipc
+1252           475            595            idm            tcphy
+1253           476            596            idm_fdb        tempsensor
+1254           477            597            interrupts     thread-self
+1255           479            598            iomem          timer_list
+1256           480            6              ioports        tm
+1257           481            7              irq            tty
+1285           482            8              kallsyms       uptime
+13             483            9              kmsg           version
+14             484            990            kpagecount     vmallocinfo
+15             485            991            kpageflags     vmstat
+1545           486            992            laninfo        watchdog
+1547           487            993            loadavg        wlan_cfg
+16             488            buddyinfo      locks          zoneinfo
+170            489            bus            log            zte
+171            490            capability     meminfo
+173            491            cmdline        misc
+174            493            config.gz      modules
+/ # 
+=== [send @16000ms] "echo B3_ZTE; ls -R /proc/zte/ 2>/dev/null\r\n"
+echo B3_ZTE; ls -R /proc/zte/ 2>/dev/null
+B3_ZTE
+/proc/zte/:
+bbx       ledkey_m  sys       verinfo
+
+/proc/zte/bbx:
+BootRecord        backup            regLastPrintItem
+addr              record
+
+/proc/zte/ledkey_m:
+errcount  key       led       ledhook
+
+/proc/zte/sys:
+ffe  qos
+
+/proc/zte/sys/ffe:
+cmd        ipv4_mc    ipv4_udp   ipv6_tcp   npu
+ffeinfo    ipv4_raw   ipv6_mc    ipv6_udp   scripts
+hash       ipv4_tcp   ipv6_raw   learnlist  sharedata
+
+/proc/zte/sys/ffe/hash:
+ipv4_mc_hash   ipv4_tcp_hash  ipv6_mc_hash   ipv6_tcp_hash
+ipv4_raw_hash  ipv4_udp_hash  ipv6_raw_hash  ipv6_udp_hash
+
+/proc/zte/sys/ffe/npu:
+ipv4_mc_npu   ipv4_tcp_npu  ipv6_mc_npu   ipv6_tcp_npu  npu_cap
+ipv4_raw_npu  ipv4_udp_npu  ipv6_raw_npu  ipv6_udp_npu  npufilter
+
+/proc/zte/sys/ffe/scripts:
+acc_thresh        ipv4_raw          ipv6_udp          npuretry
+del               ipv4_tcp          layer_enable      pps
+ffe               ipv4_udp          mcastdebug        rps_cpu_map
+flowcnt           ipv6_mc           no_delete         rps_tx_queue_max
+icmp_acc          ipv6_raw          npu               show
+ipv4_mc           ipv6_tcp          npudd             timer
+
+/proc/zte/sys/ffe/sharedata:
+ffe_cmd   ffe_path
+
+/proc/zte/sys/qos:
+qos
+
+/proc/zte/verinfo:
+bootVersion         hardVersion         softReversion       versionstates
+cspversion          loadtype            softVersion
+cspversionheader    otherbootVersion    verdate
+fwdescription       othersoftVersion    versionopenorclose
+/ # 
+=== [send @20000ms] "echo B4_SWNET; cat /sys/class/net/sw/peed 2>/dev/null; ls /sys/class/net/pon/ /sys/class/net/idm0/ 2>/dev/null | head -30\r\n"
+echo B4_SWNET; cat /sys/class/net/sw/peed 2>/dev/null; ls /sys/class/net/pon
+/ /sys/class/net/idm0/ 2>/dev/null | head -30
+B4_SWNET
+/bin/sh: head: not found
+/ # 
+=== [send @25000ms] "echo B5_DONE\r\n"
+echo B5_DONE
+B5_DONE
+/ # 
+=== [send @27000ms] "exit\r\n"
+exit
+
+### CLOSED

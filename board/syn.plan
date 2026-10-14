@@ -1,0 +1,16 @@
+3000|root
+9000|<redacted:vendor telnet password>
+13000|id
+16000|cat /proc/mtd
+20000|echo BEGIN_SYN
+22000|syn_version
+40000|ping -c 1 -w 2 192.168.5.5
+70000|ping -c 1 -w 2 192.168.5.5
+100000|ping -c 1 -w 2 192.168.5.5
+130000|ping -c 1 -w 2 192.168.5.5
+160000|ping -c 1 -w 2 192.168.5.5
+190000|ping -c 1 -w 2 192.168.5.5
+215000|echo SYN_MAYBE_DONE
+220000|cat /proc/mtd
+226000|echo ZDONE
+230000|exit

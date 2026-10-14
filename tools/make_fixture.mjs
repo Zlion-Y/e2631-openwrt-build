@@ -3,7 +3,7 @@
 // "e2631-fwslot check" is the first thing that runs on the device before it
 // writes flash, so its parser has to be exercised somewhere.
 //
-//   node tools/make_fixture.mjs [dir]
+//   node build/tools/make_fixture.mjs [dir]
 //     -> <dir>/fixture.bin        accepted by the packer and by e2631-fwslot check
 //     -> <dir>/fixture-broken.bin one byte changed in the kernel extent
 //

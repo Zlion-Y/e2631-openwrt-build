@@ -1,0 +1,12 @@
+1000|root
+3000|<redacted:vendor telnet password>
+7000|
+9000|echo C1_TCPHY; cat /proc/tcphy
+13000|echo C2_LANINFO; cat /proc/laninfo
+17000|echo C3_LED; cat /proc/zte/ledkey_m/led
+20000|echo C4_KEY; cat /proc/zte/ledkey_m/key
+23000|echo C5_LEDHOOK; cat /proc/zte/ledkey_m/ledhook
+26000|echo C6_BOOTREC; cat /proc/zte/bbx/BootRecord; echo "--record--"; cat /proc/zte/bbx/record; echo "--addr--"; cat /proc/zte/bbx/addr
+31000|echo C7_CAP; for f in /proc/capability/*; do echo "==$f"; cat $f; done
+36000|echo C8_DONE
+38000|exit

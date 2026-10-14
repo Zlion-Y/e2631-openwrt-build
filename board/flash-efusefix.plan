@@ -1,0 +1,20 @@
+1500|root
+4500|<redacted:vendor telnet password>
+7000|echo F-LOGIN; cd /var/tmp; pwd; df -k /var | busybox sed -n 1,3p
+10000|echo F-DL; /bin/curl -f -sS -m 300 -o fw.bin http://192.168.5.17:8000/e2631-openwrt-efusefix.bin; ls -l fw.bin
+24000|echo F-SHA; md5sum fw.bin; wc -c fw.bin
+32000|echo F-HEAD; busybox hexdump -v -e '1/1 "%02x"' -n 32 fw.bin; echo
+40000|echo F-GATE; sz=$(wc -c < fw.bin 2>/dev/null); echo "size=$sz want=20972052"; if [ "$sz" = 20972052 ]; then (fw_flashing -f /var/tmp/fw.bin > /var/tmp/ff.log 2>&1; echo FF-DONE >> /var/tmp/ff.log) & else echo REFUSE-BAD-SIZE > /var/tmp/ff.log; fi
+48000|echo P1; busybox grep -c FF-DONE /var/tmp/ff.log
+56000|echo P2; busybox grep -c FF-DONE /var/tmp/ff.log
+64000|echo P3; busybox grep -c FF-DONE /var/tmp/ff.log
+72000|echo P4; busybox grep -c FF-DONE /var/tmp/ff.log
+80000|echo P5; busybox grep -c FF-DONE /var/tmp/ff.log
+88000|echo P6; busybox grep -c FF-DONE /var/tmp/ff.log
+96000|echo P7; busybox grep -c FF-DONE /var/tmp/ff.log
+104000|echo P8; busybox grep -c FF-DONE /var/tmp/ff.log
+112000|echo P9; busybox grep -c FF-DONE /var/tmp/ff.log
+120000|echo F-LOG; cat /var/tmp/ff.log
+130000|echo F-LOG2; busybox tail -20 /var/tmp/ff.log 2>/dev/null; busybox grep -c success /var/tmp/ff.log
+140000|echo F-REBOOT; reboot
+150000|exit

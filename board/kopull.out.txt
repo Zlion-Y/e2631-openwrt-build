@@ -1,0 +1,58 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1500ms] "root\r\n"
+root
+Password: 
+=== [send @4500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @8000ms] "ls -l /kmodule/\r\n"
+ls -l /kmodule/
+drwxr-xr-x    2 Z500_w9b root          1595 Sep 25  2025 bin
+-rw-r--r--    1 Z500_w9b root         13180 Sep 25  2025 bspdriver.ko
+drwxr-xr-x    3 Z500_w9b root            28 Sep 25  2025 home
+-rw-r--r--    1 Z500_w9b root         49220 Sep 25  2025 idmfdb.ko
+drwxr-xr-x    4 Z500_w9b root          2461 Sep 25  2025 lib
+-rw-r--r--    1 Z500_w9b root          5112 Sep 25  2025 patch.ko
+-rw-r--r--    1 Z500_w9b root        149296 Sep 25  2025 plat-zxylzb_9128S.ko
+-rw-r--r--    1 Z500_w9b root         32084 Sep 25  2025 shellproc.ko
+-rw-r--r--    1 Z500_w9b root        223320 Sep 25  2025 switch.ko
+-rw-r--r--    1 Z500_w9b root       1268988 Sep 25  2025 tm.ko
+drwxr-xr-x    4 Z500_w9b root            38 Sep 25  2025 usr
+-rw-r--r--    1 Z500_w9b root         63748 Sep 25  2025 wlan_debug_module.ko
+-rw-r--r--    1 Z500_w9b root        984380 Sep 25  2025 xdpi.ko
+-rw-r--r--    1 Z500_w9b root          4872 Sep 25  2025 zx_ponreg.ko
+/ # 
+=== [send @11000ms] "cp -f /kmodule/plat-zxylzb_9128S.ko /var/tmp/; ls -l /var/tmp/plat-zxylzb_9128S.ko\r\n"
+cp -f /kmodule/plat-zxylzb_9128S.ko /var/tmp/; ls -l /var/tmp/plat-zxylzb_91
+28S.ko
+-rw-r--r--    1 Z500_w9b root        149296 Oct 13 14:32 /var/tmp/plat-zxylzb_9128S.ko
+/ # 
+=== [send @15000ms] "curl -f -sS -T /var/tmp/plat-zxylzb_9128S.ko http://192.168.5.5:8001/plat-zxylzb_9128S.ko; echo rc_ko=$?\r\n"
+curl -f -sS -T /var/tmp/plat-zxylzb_9128S.ko http://192.168.5.5:8001/plat-zx
+ylzb_9128S.ko; echo rc_ko=$?
+ok
+rc_ko=0
+/ # 
+=== [send @20000ms] "curl -f -sS -T /var/tmp/vconfig.txt http://192.168.5.5:8001/vendor-config-full.txt; echo rc_cfg=$?\r\n"
+curl -f -sS -T /var/tmp/vconfig.txt http://192.168.5.5:8001/vendor-config-fu
+ll.txt; echo rc_cfg=$?
+ok
+rc_cfg=0
+/ # 
+=== [send @24000ms] "ls /kmodule/ | tr \"\\n\" \" \"\r\n"
+ls /kmodule/ | tr "\n" " "
+bin bspdriver.ko home idmfdb.ko lib patch.ko plat-zxylzb_9128S.ko shellproc.ko switch.ko tm.ko usr wlan_debug_module.ko xdpi.ko zx_ponreg.ko / # 
+=== [send @27000ms] "echo ZDONE\r\n"
+echo ZDONE
+ZDONE
+/ # 
+=== [send @29000ms] "exit\r\n"
+exit
+
+### CLOSED

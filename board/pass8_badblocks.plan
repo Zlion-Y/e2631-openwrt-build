@@ -1,0 +1,11 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo B1; ls /sys/class/mtd/mtd0/
+16000|echo B2; cat /sys/class/mtd/mtd0/bad_blocks 2>&1
+20000|echo B3; cat /proc/mtd
+30000|echo B4; dmesg 2>&1 | grep -i -E "bad|bbt|HYF|spinand|spif" | head -40
+45000|echo B5; busybox hexdump -C -s 0x3300000 -n 64 /dev/mtdblock0
+50000|echo B6; busybox hexdump -C -s 0x2300000 -n 48 /dev/mtdblock0
+55000|echo B7; cat /proc/zte/verinfo/versionstates 2>&1 | head -30
+70000|echo B8; cat /proc/cmdline

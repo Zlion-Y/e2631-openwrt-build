@@ -3,8 +3,8 @@
 # ash chokes on CRLF ("syntax error: unexpected ")" ..."), and we deliver these
 # with `cat >`, which preserves whatever the workspace file contains.
 set -u
-cd /mnt/d/AI/Qoder/E2631-OpenWRT || exit 1
-FILES="device/mpscfg.sh device/hb.sh out/assoc-trial.sh"
+cd /mnt/d/AI/Qoder/E2631-OpenWRT/build || exit 1
+FILES="board/mpscfg.sh board/hb.sh ../out/assoc-trial.sh"
 rc=0
 for f in $FILES; do
 	[ -f "$f" ] || { echo "MISSING $f"; rc=1; continue; }

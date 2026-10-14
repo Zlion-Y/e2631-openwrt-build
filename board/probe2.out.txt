@@ -1,0 +1,6 @@
+[connected 192.168.5.3:23]
+E2631
+> root
+Login: ro> <redacted:vendor telnet password>
+> 
+> echo MARKER_$((1+1))

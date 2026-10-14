@@ -1,0 +1,8 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo J1; ls /kmodule
+18000|echo J2; ls /kmodule/bin /kmodule/www /kmodule/lib 2>&1
+26000|echo J3; (grep -rl VersionUpload /kmodule > /tmp/vu.txt 2>/dev/null; grep -rl supgrade /kmodule > /tmp/sp.txt 2>/dev/null; grep -rl firmware_upgrade /kmodule > /tmp/fu.txt 2>/dev/null; echo done > /tmp/grepdone.txt) &
+70000|echo J4; cat /tmp/grepdone.txt /tmp/vu.txt /tmp/sp.txt /tmp/fu.txt 2>&1
+78000|echo J5; ls -l /kmodule/bin 2>&1

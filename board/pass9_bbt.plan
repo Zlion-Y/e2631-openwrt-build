@@ -1,0 +1,10 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo C1; cat /sys/class/mtd/mtd0/bbt_blocks /sys/class/mtd/mtd0/bad_blocks
+16000|echo C2; for f in /sys/class/mtd/mtd*/bbt_blocks; do echo $f; cat $f; done
+26000|echo C3; for f in /sys/class/mtd/mtd*/bad_blocks; do echo $f; cat $f; done
+36000|echo C4; dmesg 2>&1 | grep -i -E "bad block|bbt|brow|scan"
+50000|echo C5; cat /proc/zte/verinfo/versionstates
+62000|echo C6; busybox hexdump -C -s 0x3300000 -n 16 /dev/mtdblock0; busybox hexdump -C -s 0x3860000 -n 64 /dev/mtdblock0
+70000|echo C7; cat /proc/uptime; cat /proc/zte/verinfo/softVersion

@@ -1,0 +1,18 @@
+14400|
+14800|uci set wireless.radio0.disabled=1; uci set wireless.radio1.disabled=1; uci set wireless.default_radio0.disabled=1; uci set wireless.default_radio1.disabled=1; uci commit wireless; echo ALL-RADIOS-OFF-1
+15600|rmmod mt7915e; echo 1 > /sys/bus/pci/devices/0001:01:00.0/remove; echo HIF-OUT-1
+16600|echo 0 > /sys/bus/pci/drivers_autoprobe; modprobe mt7915e; echo 1 > /sys/bus/pci/drivers_autoprobe; echo 0000:01:00.0 > /sys/bus/pci/drivers/mt7915e/bind; ls /sys/class/ieee80211/
+18000|uci set wireless.radio0.disabled=1; uci set wireless.radio1.disabled=1; uci commit wireless; echo ALL-RADIOS-OFF-2
+18600|rmmod mt7915e 2>&1; echo 1 > /sys/bus/pci/devices/0001:01:00.0/remove 2>&1; echo HIF-OUT-2
+19600|echo 0 > /sys/bus/pci/drivers_autoprobe; modprobe mt7915e; echo 1 > /sys/bus/pci/drivers_autoprobe; echo 0000:01:00.0 > /sys/bus/pci/drivers/mt7915e/bind; ls /sys/class/ieee80211/; grep mt7915e /proc/interrupts
+21500|uci set wireless.radio1.disabled=0; uci set wireless.radio1.channel=44; uci set wireless.radio1.htmode=HE80; uci set wireless.default_radio1.disabled=0; uci set wireless.default_radio1.ssid=E2631-5G-only; uci set wireless.default_radio1.encryption=psk2; uci set wireless.default_radio1.key=TestPass123; uci commit wireless; wifi; echo 5G-ONLY-UP
+26000|echo S1-$(cut -d" " -f1 /proc/uptime); iw dev; grep mt7915e /proc/interrupts
+32000|echo S2-$(cut -d" " -f1 /proc/uptime); iw dev; grep mt7915e /proc/interrupts
+38000|echo S3-$(cut -d" " -f1 /proc/uptime); iw dev; dmesg | tail -4
+44000|echo S4-$(cut -d" " -f1 /proc/uptime); iw dev; dmesg | tail -4
+50000|echo S5-$(cut -d" " -f1 /proc/uptime); iw dev; cat /proc/loadavg
+56000|echo S6-$(cut -d" " -f1 /proc/uptime); iw dev; logread | grep -i hostapd | tail -6
+62000|echo S7-ALIVE; iw dev
+68000|echo S8-ALIVE; iw dev
+73000|uci set wireless.radio1.disabled=1; uci set wireless.default_radio1.disabled=1; uci commit wireless; sync; wifi; echo LEFT-SAFE
+80000|echo FINAL-$(cut -d" " -f1 /proc/uptime); iw dev

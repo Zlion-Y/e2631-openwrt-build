@@ -1,0 +1,261 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo J1; ls /kmodule\r\n"
+echo J1; ls /kmodule
+J1
+bin                   patch.ko              usr
+bspdriver.ko          plat-zxylzb_9128S.ko  wlan_debug_module.ko
+home                  shellproc.ko          xdpi.ko
+idmfdb.ko             switch.ko             zx_ponreg.ko
+lib                   tm.ko
+/ # 
+=== [send @18000ms] "echo J2; ls /kmodule/bin /kmodule/www /kmodule/lib 2>&1\r\n"
+echo J2; ls /kmodule/bin /kmodule/www /kmodule/lib 2>&1
+J2
+ls: /kmodule/www: No such file or directory
+/kmodule/bin:
+ash                    idm_service            rm
+axel                   inadyn                 rmdir
+boot_flashing          ip                     rpcAgent
+brconfig               ip6tables              rpm
+brctl                  iptables               sbusd
+busybox                kill                   sbusd-adaptor
+cat                    laninfo                sed
+chmod                  ledkey_ctl             sendcmd
+chown                  ledkeytest             set_process_threshold
+cmd                    ln                     setmac
+cp                     log_upload             sh
+cpeserver              logcat                 sleep
+cpio                   logctrl                stun
+cspd                   login                  switchtst
+curl                   ls                     syn_version
+date                   lzop                   sync
+devmem2                memtest                sysdiagd
+df                     mirror                 tar
+diagnose               mkdir                  tc
+dnsapi                 mknod                  telnetd
+dnsdomainname          mount                  test_slibc
+dnsmasq                mqtt                   touch
+dnspods                msntp                  traceroute1
+ebtables               multiapd               udpechos
+echo                   multicast_test         umount
+egrep                  mv                     uname
+fgrep                  nice                   upgradetest
+fpga                   owdplugind             upnpd
+ftest                  owjdxbplugind          uuplugind
+fw_flashing            pc                     wantest
+getopt                 phddns                 wgets
+grep                   phtest                 wificali
+gunzip                 ping                   wlandiagcli
+gzip                   ping6                  wput
+hostname               pppd                   wput_ftp
+htpdate                ps                     zcat
+httpd                  pwd                    znslookup
+
+/kmodule/lib:
+domain_policy.so                   libm-0.9.33.2.so
+ld-uClibc-0.9.33.2.so              libm.so.0
+ld-uClibc.so.0                     libmbedcrypto.so
+libatomic.a                        libmbedcrypto.so.16
+libatomic.la                       libmbedtls.so
+libatomic.so                       libmbedtls.so.21
+libatomic.so.1                     libmbedx509.so
+libatomic.so.1.1.0                 libmbedx509.so.7
+libbbx.so                          libmqtt.so
+libc.so.0                          libmtduserapi.so
+libcapability.so                   libmultiapcfapi.so
+libcfapi.so                        libmultiapcmapi.so
+libcjson.so                        libneon.so
+libcmapi.so                        libnsl-0.9.33.2.so
+libcmexpat.so                      libnsl.so.0
+libcoap-3-mbedtls.so               liboss.so
+libcoap-3-mbedtls.so.3             liboss_pub.so
+libcoap-3-mbedtls.so.3.0.0         libplugin.so
+libcoap-3.so                       libpthread-0.9.33.2.so
+libcoap.so                         libpthread.so.0
+libcommfun.so                      libresolv-0.9.33.2.so
+libcrypt-0.9.33.2.so               libresolv.so.0
+libcrypt.so.0                      librt-0.9.33.2.so
+libcrypto.so                       librt.so.0
+libcrypto.so.1.0.0                 libsbus.so
+libcrypto.so.1.1                   libsbus_adaptor.so
+libcsputil.so                      libsha256.so
+libctype.so                        libssl.so
+libcurl-3.1.0.so                   libssl.so.1.0.0
+libcurl.so                         libssl.so.1.1
+libcurl.so.4                       libstdc++.so
+libcurl.so.4.5.0                   libstdc++.so.6
+libdb.so                           libstdc++.so.6.0.20
+libdevselfcheck.so                 libtagparam.so
+libdl-0.9.33.2.so                  libtencentcloud-sdk-cpp-core.so
+libdl.so.0                         libtencentcloud-sdk-cpp-dnspod.so
+libenv.so                          libuClibc-0.9.33.2.so
+libevent.so                        libunl.so
+libevent_openssl.so                libupgrade_service.so
+libgcc_s.so                        libusermdio.so
+libgcc_s.so.1                      libutil-0.9.33.2.so
+libhardcode.so                     libutil.so.0
+libidm.so                          libutils.so
+libidmapi.so                       libwebsocket.so
+libieee1905cfapi.so                libz.so
+libieee1905cmapi.so                libz.so.1
+libiprt2.so                        libz.so.1.2.8
+libiw.so.29                        libzlink_access.so
+libjansson.so                      libzlog.so
+libjsonrpc.so                      libzte_slibc.so
+libjsonunify.so                    libzutils.so
+libkv.so                           modules
+libledkey.so                       mqtt
+liblog.so                          passpppoe.so
+liblog_service.so                  rp-pppoe.so
+liblua.so
+/ # 
+=== [send @26000ms] "echo J3; (grep -rl VersionUpload /kmodule > /tmp/vu.txt 2>/dev/null; grep -rl supgrade /kmodule > /tmp/sp.txt 2>/dev/null; grep -rl firmware_upgrade /kmodule > /tmp/fu.txt 2>/dev/null; echo done > /tmp/grepdone.txt) &\r\n"
+echo J3; (grep -rl VersionUpload /kmodule > /tmp/vu.txt 2>/dev/null; grep -r
+l supgrade /kmodule > /tmp/sp.txt 2>/dev/null; grep -rl firmware_upgrade /kmodul
+e > /tmp/fu.txt 2>/dev/null; echo done > /tmp/grepdone.txt) &
+J3
+/ # 
+=== [send @70000ms] "echo J4; cat /tmp/grepdone.txt /tmp/vu.txt /tmp/sp.txt /tmp/fu.txt 2>&1\r\n"
+echo J4; cat /tmp/grepdone.txt /tmp/vu.txt /tmp/sp.txt /tmp/fu.txt 2>&1
+J4
+cat: can't open '/tmp/grepdone.txt': No such file or directory
+/kmodule/bin/httpd
+/kmodule/home/httpd/webmodules/modules/do_firmware_upgrade.lua
+/kmodule/home/httpd/webmodules/modules/hidden_upgrade_firmware_js.lp
+/kmodule/home/httpd/webmodules/modules/hidden_upgrade_firmware_t.lp
+cat: can't open '/tmp/fu.txt': No such file or directory
+/ # 
+=== [send @78000ms] "echo J5; ls -l /kmodule/bin 2>&1\r\n"
+echo J5; ls -l /kmodule/bin 2>&1
+J5
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 ash -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root         53988 Sep 25  2025 axel
+-rwxr-xr-x    1 Z500_w9b root         12030 Sep 25  2025 boot_flashing
+-rwxr-xr-x    1 Z500_w9b root          8430 Sep 25  2025 brconfig
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 brctl -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root        398568 Sep 25  2025 busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 cat -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 chmod -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 chown -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root         76418 Sep 25  2025 cmd
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 cp -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root         99693 Sep 25  2025 cpeserver
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 cpio -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root       2843118 Sep 25  2025 cspd
+-rwxr-xr-x    1 Z500_w9b root        190558 Sep 25  2025 curl
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 date -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root          6719 Sep 25  2025 devmem2
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 df -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root         45686 Sep 25  2025 diagnose
+-rwxr-xr-x    1 Z500_w9b root          8351 Sep 25  2025 dnsapi
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 dnsdomainname -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root         85959 Sep 25  2025 dnsmasq
+-rwxr-xr-x    1 Z500_w9b root         59125 Sep 25  2025 dnspods
+-rwxr-xr-x    1 Z500_w9b root         79634 Sep 25  2025 ebtables
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 echo -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 egrep -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 fgrep -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root          5975 Sep 25  2025 fpga
+-rwxr-xr-x    1 Z500_w9b root         12727 Sep 25  2025 ftest
+-rwxr-xr-x    1 Z500_w9b root         62734 Sep 25  2025 fw_flashing
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 getopt -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 grep -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 gunzip -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 gzip -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 hostname -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root         22476 Sep 25  2025 htpdate
+-rwxr-xr-x    1 Z500_w9b root        425638 Sep 25  2025 httpd
+-rwxr-xr-x    1 Z500_w9b root         46570 Sep 25  2025 idm_service
+-rwxr-xr-x    1 Z500_w9b root         88781 Sep 25  2025 inadyn
+-rwxr-xr-x    1 Z500_w9b root        174664 Sep 25  2025 ip
+-rwxr-xr-x    1 Z500_w9b root        158778 Sep 25  2025 ip6tables
+-rwxr-xr-x    1 Z500_w9b root        164623 Sep 25  2025 iptables
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 kill -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root        110106 Sep 25  2025 laninfo
+-rwxr-xr-x    1 Z500_w9b root          7527 Sep 25  2025 ledkey_ctl
+-rwxr-xr-x    1 Z500_w9b root          8939 Sep 25  2025 ledkeytest
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 ln -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root         16407 Sep 25  2025 log_upload
+-rwxr-xr-x    1 Z500_w9b root         58288 Sep 25  2025 logcat
+-rwxr-xr-x    1 Z500_w9b root         45924 Sep 25  2025 logctrl
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 login -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 ls -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 lzop -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root         40355 Sep 25  2025 memtest
+-rwxr-xr-x    1 Z500_w9b root          6289 Sep 25  2025 mirror
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 mkdir -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 mknod -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 mount -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root        495313 Sep 25  2025 mqtt
+-rwxr-xr-x    1 Z500_w9b root         22076 Sep 25  2025 msntp
+-rwxr-xr-x    1 Z500_w9b root        910941 Sep 25  2025 multiapd
+-rwxr-xr-x    1 Z500_w9b root         21198 Sep 25  2025 multicast_test
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 mv -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 nice -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root         17704 Sep 25  2025 owdplugind
+-rwxr-xr-x    1 Z500_w9b root         21685 Sep 25  2025 owjdxbplugind
+-rwxr-xr-x    1 Z500_w9b root         50297 Sep 25  2025 pc
+-rwxr-xr-x    1 Z500_w9b root         40762 Sep 25  2025 phddns
+-rwxr-xr-x    1 Z500_w9b root          8002 Sep 25  2025 phtest
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 ping -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 ping6 -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root        140895 Sep 25  2025 pppd
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 ps -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 pwd -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 rm -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 rmdir -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root         14190 Sep 25  2025 rpcAgent
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 rpm -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root        126336 Sep 25  2025 sbusd
+-rwxr-xr-x    1 Z500_w9b root         30300 Sep 25  2025 sbusd-adaptor
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 sed -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root         14949 Sep 25  2025 sendcmd
+-rwxr-xr-x    1 Z500_w9b root          6095 Sep 25  2025 set_process_threshold
+-rwxr-xr-x    1 Z500_w9b root          8137 Sep 25  2025 setmac
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 sh -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 sleep -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root         17292 Sep 25  2025 stun
+-rwxr-xr-x    1 Z500_w9b root         62179 Sep 25  2025 switchtst
+-rwxr-xr-x    1 Z500_w9b root         15744 Sep 25  2025 syn_version
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 sync -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root         36506 Sep 25  2025 sysdiagd
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 tar -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root        102688 Sep 25  2025 tc
+-rwxr-xr-x    1 Z500_w9b root         61491 Sep 25  2025 telnetd
+-rwxr-xr-x    1 Z500_w9b root         14907 Sep 25  2025 test_slibc
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 touch -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root         41358 Sep 25  2025 traceroute1
+-rwxr-xr-x    1 Z500_w9b root         21646 Sep 25  2025 udpechos
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 umount -> /bin/busybox
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 uname -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root          7662 Sep 25  2025 upgradetest
+-rwxr-xr-x    1 Z500_w9b root        341233 Sep 25  2025 upnpd
+-rwxr-xr-x    1 Z500_w9b root         21598 Sep 25  2025 uuplugind
+-rwxr-xr-x    1 Z500_w9b root         30191 Sep 25  2025 wantest
+-rwxr-xr-x    1 Z500_w9b root        340228 Sep 25  2025 wgets
+-rwxr-xr-x    1 Z500_w9b root         11048 Sep 25  2025 wificali
+-rwxr-xr-x    1 Z500_w9b root         33937 Sep 25  2025 wlandiagcli
+-rwxr-xr-x    1 Z500_w9b root         11609 Sep 25  2025 wput
+-rwxr-xr-x    1 Z500_w9b root         15708 Sep 25  2025 wput_ftp
+lrwxrwxrwx    1 Z500_w9b root            12 Sep 25  2025 zcat -> /bin/busybox
+-rwxr-xr-x    1 Z500_w9b root          5556 Sep 25  2025 znslookup
+/ # 
+=== [send @79500ms] "exit\r\n"
+exit
+
+### CLOSED

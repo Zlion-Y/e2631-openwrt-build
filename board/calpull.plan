@@ -1,0 +1,9 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo W1; ls -l /wlan/; mount | grep -i -E "wlan|wifi"
+40000|echo W2; for f in /wlan/*; do echo "F $f $(ls -l $f)"; done
+70000|echo W3; cat /wlan/caldata > /var/tmp/caldata.bin; ls -l /var/tmp/caldata.bin; busybox hexdump -v -n 16 -e '16/1 "%02x"' /var/tmp/caldata.bin; echo
+110000|echo W4; curl -f -sS -T /var/tmp/caldata.bin http://192.168.5.5:8001/caldata.bin; echo rc=$?
+150000|echo W5; busybox hexdump -v -n 16 -e '16/1 "%02x"' /wlan/caldata; echo; df -k /var; rm -f /var/tmp/caldata.bin; exit
+180000|exit

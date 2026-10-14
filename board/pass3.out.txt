@@ -1,0 +1,154 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @2500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @5000ms] "\r\n"
+
+/ # 
+=== [send @7000ms] "echo W1_HDR_SLOTA; busybox hexdump -C -s 0x1c60000 -n 512 /dev/mtdblock0\r\n"
+echo W1_HDR_SLOTA; busybox hexdump -C -s 0x1c60000 -n 512 /dev/mtdblock0
+W1_HDR_SLOTA
+01c60000  00 00 00 00 00 00 00 00  51 13 00 00 11 52 00 00  |........Q....R..|
+01c60010  56 31 2e 30 2e 30 2e 37  42 35 2e 38 30 30 30 00  |V1.0.0.7B5.8000.|
+01c60020  00 00 00 00 00 00 00 00  00 00 00 00 01 00 00 00  |................|
+01c60030  00 00 56 01 cc fd 33 00  34 02 00 00 46 c2 f7 9e  |..V...3.4...F...|
+01c60040  00 00 22 01 14 02 34 00  e2 5e f8 3d 00 00 70 00  |.."...4..^.=..p.|
+01c60050  00 00 c0 01 00 00 00 00  00 00 00 01 00 00 30 02  |..............0.|
+01c60060  00 00 c0 01 00 00 00 00  00 00 00 01 5a 58 48 4e  |............ZXHN|
+01c60070  20 45 32 36 33 31 20 56  31 2e 30 2e 30 00 00 00  | E2631 V1.0.0...|
+01c60080  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+01c60090  00 00 00 00 00 00 00 00  00 00 00 00 01 00 00 00  |................|
+01c600a0  01 00 00 00 db df 61 6e  32 30 32 35 30 39 32 35  |......an20250925|
+01c600b0  32 32 31 31 32 34 00 00  00 00 00 00 ff ff ff ff  |221124..........|
+01c600c0  ff ff ff ff 00 00 00 08  00 00 01 00 00 00 00 00  |................|
+01c600d0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+01c600f0  00 00 00 00 33 33 33 33  66 66 66 66 99 99 99 99  |....3333ffff....|
+01c60100  cc cc cc cc 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+01c60110  56 31 2e 30 2e 30 00 00  00 00 00 00 00 00 00 00  |V1.0.0..........|
+01c60120  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+01c60190  00 ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  |................|
+01c601a0  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  |................|
+01c601b0  ff ff ff ff ff ff 07 00  00 00 00 00 00 00 ff ff  |................|
+01c601c0  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  |................|
+01c601d0  ff ff ff ff ff ff ff ff  ff ff ff ff 00 00 00 00  |................|
+01c601e0  00 00 70 00 00 00 30 02  00 00 30 02 00 00 f0 03  |..p...0...0.....|
+01c601f0  00 00 70 00 10 00 00 00  01 00 00 00 30 e5 fc 1b  |..p.........0...|
+01c60200
+/ # 
+=== [send @12000ms] "echo W2_HDR_SLOTB; busybox hexdump -C -s 0x3ca0000 -n 512 /dev/mtdblock0\r\n"
+echo W2_HDR_SLOTB; busybox hexdump -C -s 0x3ca0000 -n 512 /dev/mtdblock0
+W2_HDR_SLOTB
+03ca0000  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  |................|
+*
+03ca0200
+/ # 
+=== [send @17000ms] "echo W3_BINLIST; ls /bin\r\n"
+echo W3_BINLIST; ls /bin
+W3_BINLIST
+ash                    idm_service            rm
+axel                   inadyn                 rmdir
+boot_flashing          ip                     rpcAgent
+brconfig               ip6tables              rpm
+brctl                  iptables               sbusd
+busybox                kill                   sbusd-adaptor
+cat                    laninfo                sed
+chmod                  ledkey_ctl             sendcmd
+chown                  ledkeytest             set_process_threshold
+cmd                    ln                     setmac
+cp                     log_upload             sh
+cpeserver              logcat                 sleep
+cpio                   logctrl                stun
+cspd                   login                  switchtst
+curl                   ls                     syn_version
+date                   lzop                   sync
+devmem2                memtest                sysdiagd
+df                     mirror                 tar
+diagnose               mkdir                  tc
+dnsapi                 mknod                  telnetd
+dnsdomainname          mount                  test_slibc
+dnsmasq                mqtt                   touch
+dnspods                msntp                  traceroute1
+ebtables               multiapd               udpechos
+echo                   multicast_test         umount
+egrep                  mv                     uname
+fgrep                  nice                   upgradetest
+fpga                   owdplugind             upnpd
+ftest                  owjdxbplugind          uuplugind
+fw_flashing            pc                     wantest
+getopt                 phddns                 wgets
+grep                   phtest                 wificali
+gunzip                 ping                   wlandiagcli
+gzip                   ping6                  wput
+hostname               pppd                   wput_ftp
+htpdate                ps                     zcat
+httpd                  pwd                    znslookup
+/ # 
+=== [send @21000ms] "echo W4_SBIN; ls /sbin\r\n"
+echo W4_SBIN; ls /sbin
+W4_SBIN
+ated        ifconfig    iwlist      lsmod       reboot
+ated_cli    init        iwpriv      mkdosfs     rmmod
+fdisk       initwifi    iwprivget   mkfs.vfat   route
+getty       insmod      kv          pivot_root  swapoff
+halt        iwconfig    kvctrl      poweroff    swapon
+/ # 
+=== [send @25000ms] "echo W5_UBIN; ls /usr/bin\r\n"
+echo W5_UBIN; ls /usr/bin
+W5_UBIN
+awk         cut         hexdump     md5sum      timeout     unzip
+basename    diagput     id          passwd      top         wc
+bunzip2     expr        killall     pgrep       tr          wget
+bzcat       fdformat    killall5    readlink    traceroute  which
+bzip2       find        lzcat       rpm2cpio    unlzma      xargs
+chrt        free        lzma        setsid      unlzop      xz
+cmp         fuser       lzopcat     tftp        unxz        xzcat
+/ # 
+=== [send @29000ms] "echo W6_USRabin2; ls /usr/sbin\r\n"
+echo W6_USRabin2; ls /usr/sbin
+W6_USRabin2
+chroot
+/ # 
+=== [send @33000ms] "echo W7_MOUNTS; cat /proc/mounts\r\n"
+echo W7_MOUNTS; cat /proc/mounts
+W7_MOUNTS
+/dev/root / jffs2 ro,relatime 0 0
+/dev/loop0 /kmodule squashfs ro,relatime 0 0
+proc /proc proc rw,relatime 0 0
+tmpfs /var tmpfs rw,relatime,size=40960k 0 0
+tmpfs /tmp tmpfs rw,relatime,size=20480k 0 0
+tmpfs /tracelog tmpfs rw,relatime,size=2048k 0 0
+tmpfs /DPITMP tmpfs rw,relatime,size=61440k 0 0
+tmpfs /uadd tmpfs rw,relatime,size=1024k 0 0
+tmpfs /owjdxbplugin/tmp tmpfs rw,relatime,size=3072k 0 0
+sysfs /sys sysfs rw,relatime 0 0
+debugfs /sys/kernel/debug debugfs rw,relatime 0 0
+tmpfs /mnt tmpfs rw,relatime,size=16k 0 0
+/dev/mtdblock3 /wlan jffs2 rw,relatime 0 0
+/dev/mtdblock4 /usercfg jffs2 rw,relatime 0 0
+/dev/mtdblock5 /defcfg jffs2 rw,relatime 0 0
+/dev/mtdblock9 /UUPlugin jffs2 rw,relatime 0 0
+/dev/mtdblock10 /owdptsplugin/bin jffs2 rw,relatime 0 0
+tmpfs /owdptsplugin/tmp tmpfs rw,relatime,size=2048k 0 0
+/dev/mtdblock11 /status jffs2 rw,relatime 0 0
+/dev/mtdblock12 /DPIPlugin jffs2 rw,relatime 0 0
+/dev/mtdblock13 /UnifiedStorage jffs2 rw,relatime 0 0
+/dev/mtdblock14 /owjdxbplugin/bin jffs2 rw,relatime 0 0
+/ # 
+=== [send @37000ms] "echo W8_DMESG; busybox dmesg | busybox grep -m 70 -i -E \"mtd|nand|spifc|partit|bad|erase|slot|crypto|aes|decrypt|fdt|dtb\"\r\n"
+echo W8_DMESG; busybox dmesg | busybox grep -m 70 -i -E "mtd|nand|spifc|part
+it|bad|erase|slot|crypto|aes|decrypt|fdt|dtb"
+W8_DMESG
+dmesg: applet not found
+/ # 
+### TIMEOUT

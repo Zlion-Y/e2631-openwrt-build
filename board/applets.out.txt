@@ -1,0 +1,59 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo A1; for a in dd sha256sum md5sum hexdump od head tail wc gzip tar base64 cat sync stat; do printf \"%s=\" $a; busybox $a --help >/dev/null 2>&1 && echo ok || echo missing; done\r\n"
+echo A1; for a in dd sha256sum md5sum hexdump od head tail wc gzip tar base6
+4 cat sync stat; do printf "%s=" $a; busybox $a --help >/dev/null 2>&1 && echo o
+k || echo missing; done
+A1
+dd=missing
+sha256sum=missing
+md5sum=missing
+hexdump=missing
+od=missing
+head=missing
+tail=missing
+wc=missing
+gzip=missing
+tar=missing
+base64=missing
+cat=missing
+sync=missing
+stat=missing
+/ # 
+=== [send @45000ms] "echo A2; busybox dd if=/dev/mtdblock0 bs=131072 skip=408 count=1 of=/var/tmp/t.bin 2>&1; ls -l /var/tmp/t.bin; busybox sha256sum /var/tmp/t.bin 2>&1\r\n"
+echo A2; busybox dd if=/dev/mtdblock0 bs=131072 skip=408 count=1 of=/var/tmp
+/t.bin 2>&1; ls -l /var/tmp/t.bin; busybox sha256sum /var/tmp/t.bin 2>&1
+A2
+dd: applet not found
+ls: /var/tmp/t.bin: No such file or directory
+sha256sum: applet not found
+/ # 
+=== [send @80000ms] "echo A3; curl -f -sS -T /var/tmp/t.bin http://192.168.5.5:8001/probe-block408.bin; echo rc=$?\r\n"
+echo A3; curl -f -sS -T /var/tmp/t.bin http://192.168.5.5:8001/probe-block40
+8.bin; echo rc=$?
+A3
+curl: Can't open '/var/tmp/t.bin'!
+curl: try 'curl --help' or 'curl --manual' for more information
+rc=26
+/ # 
+=== [send @110000ms] "echo A4; busybox hexdump -v -e '16/1 \"%02x\"' -s 0x3300000 -n 64 /dev/mtdblock0; echo; rm -f /var/tmp/t.bin; exit\r\n"
+echo A4; busybox hexdump -v -e '16/1 "%02x"' -s 0x3300000 -n 64 /dev/mtdbloc
+k0; echo; rm -f /var/tmp/t.bin; exit
+A4
+0000000000000000511300001152000056312e302e302e3842382e38303030000000000000000000000000000100000000000001f8bd3400340200008e095513
+
+### CLOSED

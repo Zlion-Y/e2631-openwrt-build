@@ -1,0 +1,64 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo D1; ls /\r\n"
+echo D1; ls /
+D1
+DPIPlugin       dev             linuxrc         sbin            usercfg
+DPITMP          etc             mnt             status          userconfig
+UUPlugin        home            owdptsplugin    sys             usr
+UnifiedStorage  kmodule         owjdxbplugin    tmp             var
+bin             kmoduletmp      proc            tracelog        wlan
+defcfg          lib             root            uadd
+/ # 
+=== [send @16000ms] "echo D2; ls /www /rom /usr/lib 2>&1\r\n"
+echo D2; ls /www /rom /usr/lib 2>&1
+D2
+ls: /www: No such file or directory
+ls: /rom: No such file or directory
+ls: /usr/lib: No such file or directory
+/ # 
+=== [send @22000ms] "echo D3; grep -E \":0050 |:1F95 |:1F96 \" /proc/net/tcp /proc/net/tcp6 2>&1\r\n"
+echo D3; grep -E ":0050 |:1F95 |:1F96 " /proc/net/tcp /proc/net/tcp6 2>&1
+D3
+/proc/net/tcp:   1: 00000000:0050 00000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 3125 1 c7200b40 100 0 0 10 0 1250 httpd                   
+/proc/net/tcp:   2: 00000000:1F95 00000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 3134 1 c7201680 100 0 0 10 0 1250 httpd                   
+/proc/net/tcp:   3: 00000000:1F96 00000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 3136 1 c7201c20 100 0 0 10 0 1250 httpd                   
+/proc/net/tcp6:   0: 00000000000000000000000000000000:0050 00000000000000000000000000000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 3130 1 c5728620 100 0 0 10 0 1250 httpd
+/proc/net/tcp6:   1: 00000000000000000000000000000000:1F95 00000000000000000000000000000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 3137 1 c5729260 100 0 0 10 0 1250 httpd
+/proc/net/tcp6:   2: 00000000000000000000000000000000:1F96 00000000000000000000000000000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 3139 1 c5729880 100 0 0 10 0 1250 httpd
+/ # 
+=== [send @30000ms] "echo D4; find / -maxdepth 3 -name \"*.lua\" 2>/dev/null\r\n"
+echo D4; find / -maxdepth 3 -name "*.lua" 2>/dev/null
+D4
+/ # 
+=== [send @55000ms] "echo D5; grep -rl VersionUpload /www /usr /lib /etc /rom 2>&1\r\n"
+echo D5; grep -rl VersionUpload /www /usr /lib /etc /rom 2>&1
+D5
+grep: /www: No such file or directory
+grep: /rom: No such file or directory
+/ # 
+=== [send @85000ms] "echo D6; grep -rl firmware_upgrade /www /usr /lib /etc /rom 2>&1\r\n"
+echo D6; grep -rl firmware_upgrade /www /usr /lib /etc /rom 2>&1
+D6
+grep: /www: No such file or directory
+
+=== [send @86500ms] "exit\r\n"
+exit
+grep: /rom: No such file or directory
+/ # exit
+
+### CLOSED

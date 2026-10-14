@@ -1,0 +1,79 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @7000ms] "\r\n"
+
+/ # 
+=== [send @9000ms] "echo A1_MDIOLIST; ls /sys/bus/mdio_bus/devices/\r\n"
+echo A1_MDIOLIST; ls /sys/bus/mdio_bus/devices/
+A1_MDIOLIST
+/ # 
+=== [send @12000ms] "echo A2_MDIOCLASS; ls /sys/class/mdio_bus/\r\n"
+echo A2_MDIOCLASS; ls /sys/class/mdio_bus/
+A2_MDIOCLASS
+/ # 
+=== [send @15000ms] "echo A3_PHYDEV; ls -l /sys/class/net/*/phydev 2>/dev/null\r\n"
+echo A3_PHYDEV; ls -l /sys/class/net/*/phydev 2>/dev/null
+A3_PHYDEV
+/ # 
+=== [send @18000ms] "echo A4_CARRIER; for n in /sys/class/net/*; do echo \"$n state=$(cat $n/operstate 2>/dev/null) carrier=$(cat $n/carrier 2>/dev/null)\"; done\r\n"
+echo A4_CARRIER; for n in /sys/class/net/*; do echo "$n state=$(cat $n/opers
+tate 2>/dev/null) carrier=$(cat $n/carrier 2>/dev/null)"; done
+A4_CARRIER
+/sys/class/net/apcli0 state=down carrier=
+/sys/class/net/apcli5g0 state=down carrier=
+/sys/class/net/br0 state=up carrier=1
+/sys/class/net/eth0 state=up carrier=1
+/sys/class/net/eth1 state=down carrier=0
+/sys/class/net/eth2 state=up carrier=1
+/sys/class/net/eth3 state=down carrier=0
+/sys/class/net/idm0 state=unknown carrier=1
+/sys/class/net/idm1 state=unknown carrier=1
+/sys/class/net/ifb0 state=down carrier=
+/sys/class/net/ifb1 state=down carrier=
+/sys/class/net/ip6tnl0 state=down carrier=
+/sys/class/net/lo state=unknown carrier=1
+/sys/class/net/nbif0 state=unknown carrier=1
+/sys/class/net/pon state=unknown carrier=1
+/sys/class/net/sit0 state=down carrier=
+/sys/class/net/sw state=unknown carrier=1
+/sys/class/net/wlan0 state=unknown carrier=1
+/sys/class/net/wlan1 state=down carrier=
+/sys/class/net/wlan2 state=down carrier=
+/sys/class/net/wlan3 state=unknown carrier=1
+/sys/class/net/wlan5g0 state=unknown carrier=1
+/sys/class/net/wlan5g1 state=down carrier=
+/sys/class/net/wlan5g2 state=down carrier=
+/sys/class/net/wlan5g3 state=unknown carrier=1
+/ # 
+=== [send @26000ms] "echo A5_BRIDGE; brctl show\r\n"
+echo A5_BRIDGE; brctl show
+A5_BRIDGE
+bridge name     bridge id               STP enabled     interfaces
+br0             8000.f8731ad3efa8       no              eth1
+                                                        eth2
+                                                        eth3
+                                                        nbif0
+                                                        wlan0
+                                                        wlan5g0
+                                                        wlan3
+                                                        wlan5g3
+/ # 
+=== [send @29000ms] "echo A6_DONE\r\n"
+echo A6_DONE
+A6_DONE
+/ # 
+=== [send @31000ms] "exit\r\n"
+exit
+
+### CLOSED

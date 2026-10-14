@@ -1,0 +1,55 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo S1; rm -f /var/tmp/e2631-fwslot /var/tmp/fw.bin /var/tmp/flash.log; df -k /var /tmp; mount | grep -E " /var| /tmp"; which setsid nohup curl; cat /proc/mtd; ls -l /dev/mtd* 2>/dev/null
+18000|echo S2; curl -f --connect-timeout 5 --max-time 240 -o /var/tmp/e2631-fwslot http://192.168.5.5:8001/e2631-fwslot; echo rc=$?; chmod +x /var/tmp/e2631-fwslot; ls -l /var/tmp/e2631-fwslot
+24000|:
+30000|echo S3; curl -f --connect-timeout 5 --max-time 240 -o /var/tmp/fw.bin http://192.168.5.5:8001/fw.bin; echo rc=$?; ls -l /var/tmp/fw.bin
+36000|:
+46000|echo S4; /var/tmp/e2631-fwslot info
+48000|:
+58000|echo S5; /var/tmp/e2631-fwslot check /var/tmp/fw.bin
+60000|:
+72000|echo S6; rm -f /var/tmp/flash.log; (setsid /var/tmp/e2631-fwslot flash /var/tmp/fw.bin  > /var/tmp/flash.log 2>&1 &); echo started
+72000|:
+84000|echo S6.0; cat /var/tmp/flash.log
+84000|:
+96000|echo S6.1; cat /var/tmp/flash.log
+96000|:
+108000|echo S6.2; cat /var/tmp/flash.log
+108000|:
+120000|echo S6.3; cat /var/tmp/flash.log
+120000|:
+132000|echo S6.4; cat /var/tmp/flash.log
+132000|:
+144000|echo S6.5; cat /var/tmp/flash.log
+144000|:
+156000|echo S6.6; cat /var/tmp/flash.log
+156000|:
+168000|echo S6.7; cat /var/tmp/flash.log
+168000|:
+180000|echo S6.8; cat /var/tmp/flash.log
+180000|:
+192000|echo S6.9; cat /var/tmp/flash.log
+192000|:
+204000|echo S6.10; cat /var/tmp/flash.log
+204000|:
+216000|echo S6.11; cat /var/tmp/flash.log
+216000|:
+228000|echo S6.12; cat /var/tmp/flash.log
+228000|:
+240000|echo S6.13; cat /var/tmp/flash.log
+240000|:
+252000|echo S6.14; cat /var/tmp/flash.log
+252000|:
+264000|echo S6.15; cat /var/tmp/flash.log
+264000|:
+276000|echo S6.16; cat /var/tmp/flash.log
+276000|:
+288000|echo S6.17; cat /var/tmp/flash.log
+288000|:
+300000|echo S6.18; cat /var/tmp/flash.log
+300000|:
+312000|echo S6.19; cat /var/tmp/flash.log
+312000|:
+324000|echo S6.20; cat /var/tmp/flash.log

@@ -1,0 +1,24 @@
+1500|root
+4500|<redacted:vendor telnet password>
+7000|echo T-LOGIN; cd /var/tmp; pwd; df -k /var | busybox sed -n 1,3p
+10000|echo T-DL; /bin/curl -f -sS -m 240 -o fw.bin http://192.168.5.5:8000/e2631-openwrt-s30.bin; ls -l fw.bin
+20000|echo T-SIZE; wc -c fw.bin
+26000|echo T-SHA; ls -l fw.bin
+32000|echo T-FREE; df -k /var | busybox sed -n 1,3p
+38000|echo T-START; (fw_flashing -f /var/tmp/fw.bin > /var/tmp/ff.log 2>&1; echo FF-DONE >> /var/tmp/ff.log) &
+45000|echo P1; wc -c /var/tmp/ff.log; busybox grep -c FF-DONE /var/tmp/ff.log
+52000|echo P2; wc -c /var/tmp/ff.log; busybox grep -c FF-DONE /var/tmp/ff.log
+59000|echo P3; busybox grep -c FF-DONE /var/tmp/ff.log
+66000|echo P4; busybox grep -c FF-DONE /var/tmp/ff.log
+73000|echo P5; busybox grep -c FF-DONE /var/tmp/ff.log
+80000|echo P6; busybox grep -c FF-DONE /var/tmp/ff.log
+87000|echo P7; busybox grep -c FF-DONE /var/tmp/ff.log
+94000|echo P8; busybox grep -c FF-DONE /var/tmp/ff.log
+101000|echo P9; busybox grep -c FF-DONE /var/tmp/ff.log
+108000|echo P10; cat /var/tmp/ff.log
+116000|echo P11; cat /var/tmp/ff.log
+124000|echo P12; cat /var/tmp/ff.log
+132000|echo P13; cat /var/tmp/ff.log
+140000|echo P14; cat /var/tmp/ff.log
+148000|echo P15; cat /var/tmp/ff.log
+156000|echo T-EXIT; exit

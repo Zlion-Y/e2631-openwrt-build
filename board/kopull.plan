@@ -1,0 +1,9 @@
+1500|root
+4500|<redacted:vendor telnet password>
+8000|ls -l /kmodule/
+11000|cp -f /kmodule/plat-zxylzb_9128S.ko /var/tmp/; ls -l /var/tmp/plat-zxylzb_9128S.ko
+15000|curl -f -sS -T /var/tmp/plat-zxylzb_9128S.ko http://192.168.5.5:8001/plat-zxylzb_9128S.ko; echo rc_ko=$?
+20000|curl -f -sS -T /var/tmp/vconfig.txt http://192.168.5.5:8001/vendor-config-full.txt; echo rc_cfg=$?
+24000|ls /kmodule/ | tr "\n" " "
+27000|echo ZDONE
+29000|exit

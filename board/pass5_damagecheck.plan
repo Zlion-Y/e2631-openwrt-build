@@ -1,0 +1,7 @@
+1000|root
+2500|<redacted:vendor telnet password>
+5000|
+8000|echo U1_SLOTB_NEWHEAD; busybox hexdump -C -s 0x3860000 -n 512 /dev/mtdblock0
+15000|echo U2_OLDHEADPOS; busybox hexdump -C -s 0x3ca0000 -n 64 /dev/mtdblock0
+19000|echo U3_SLOTB_KERNEL; busybox hexdump -C -s 0x2300000 -n 64 /dev/mtdblock0
+23000|echo U4_SLOTA_KERNEL; busybox hexdump -C -s 0x700000 -n 64 /dev/mtdblock0

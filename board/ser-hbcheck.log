@@ -1,0 +1,437 @@
+[  104.104266] procd: - shutdown -
+[  104.280440] mt7915e 0000:01:00.0 phy0-ap0: left allmulticast mode
+[  104.280497] mt7915e 0000:01:00.0 phy0-ap0: left promiscuous mode
+[  104.280622] br-lan: port 4(phy0-ap0) entered disabled state
+[  104.803011] br-lan: port 1(lan1) entered disabled state
+[  104.804875] zx279128s-eth 92000000.ethernet lan1: left allmulticast mode
+[  104.804896] zx279128s-eth 92000000.ethernet lan1: left promiscuous mode
+[  104.804989] br-lan: port 1(lan1) entered disabled state
+[  104.805905] zx279128s-eth 92000000.ethernet lan1: Link is Down
+[  104.807233] zx279128s-eth 92000000.ethernet lan2: left allmulticast mode
+[  104.807258] zx279128s-eth 92000000.ethernet lan2: left promiscuous mode
+[  104.807356] br-lan: port 2(lan2) entered disabled state
+[  104.821523] zx279128s-eth 92000000.ethernet lan3: left allmulticast mode
+[  104.821542] zx279128s-eth 92000000.ethernet lan3: left promiscuous mode
+[  104.821615] br-lan: port 3(lan3) entered disabled state
+[  106.259089] procd: /etc/rc.d/K90umount: umount: tmpfs busy - remounted read-only
+[  106.260695] mtdblock: MTD device 'rootfs_data' is NAND, please consider using UBI block devices instead.
+[  106.261250] procd: /etc/rc.d/K90umount: umount: can't remount tmpfs read-only
+[  106.290190] procd: - SIGTERM processes -
+[  107.290793] procd: - SIGKILL processes -
+[  108.291266] procd: - reboot -
+[  109.292746] reboot: Restarting system
+
+Boot SPI NAND
+start read bootheader
+start read secondboot
+non secure boot 
+Jump
+
+enter bootloader...
+crpm init enter
+crpm init done
+ddr init enter, rate is 1333 Mbps
+5ddr init done 
+serial init start 
+serial init done 
+SPI NAND
+non secure uboot 
+backup header!!
+Jump
+
+
+U-Boot 2013.04 (Aug 28 2023 - 18:40:22)
+
+CPU  : ZX279128S@A9,1000MHZ
+Board: ZTE zx279128sevb
+I2C:   ready
+5DRAM:  256 MiB
+5,10000000,50000000
+product_vid = 63
+vid=63-E1630
+input gpio:5
+input gpio:15
+input gpio:62
+input gpio:61
+input gpio:43
+input gpio:47
+input gpio:46
+input gpio:45
+output gpio:8,value:1
+output gpio:40,value:1
+output gpio:60,value:0
+input gpio:18
+input gpio:20
+output gpio:55,value:0
+output gpio:52,value:0
+output gpio:54,value:0
+output gpio:51,value:0
+output gpio:2,value:0
+bootsel=3
+NAND:  manuid=1,15
+
+Manu ID: 0x01, Chip ID: 0x15 (AMD SPI NAND HYF1GQ4UTACAE 128MiB 3,3V)
+128 MiB
+<nand_read_skip_bad_,411>!mtdpart=0x1,offset=0x0,mtdpartoffset=0xc0000,mtdPartsize=0x40000,length=0x20000
+In:    serial
+Out:   serial
+Err:   serial
+clk_pll env is not setted, core clk won't change
+Net:   enter ref_clk_set.. mode = 0 .
+enter pll_cfg_fractional
+ref_clk_set success!
+gpon serdes init 
+rxpll_ready
+addr 0x9400004c before value is 38000
+addr 0x9400004c after value is 381ff
+eth0
+pdt_cspboot_init:883 Start to initialize cspboot...
+zteboot_info_default_init:1246 zboot info inited
+pdt_cspboot_info_init:862 memtop:42000000 entry:40008000
+pdt_cspboot_init:917 Cspboot initialization is done.
+*** Press 1 means entering boot mode***
+ 0 
+cspboot:1475 Booting image ...... 
+zteboot_search_firmware:51 searching the whole image...
+zteboot_verify_header:337 found version
+csp_crc:103  >>csp_crc,  data addr:42000000, crc_len:0xa4
+crc=0x919e2024, 0x6e61dfdb
+
+zteboot_search_firmware:88 correct header has been found @1c60000
+zteboot_update_bootpara:670 search the real offset of kernel.....
+zteboot_update_bootpara:673 FwClass:0x0, ofs:0x1c60000
+zteboot_update_bootpara:674 VersionLowStartAddr:0x700000, VersionHighStartAddr:0x2300000
+zteboot_update_bootpara:675 JffsOffset:0x340214,JffsSize:0x1220000
+zteboot_update_bootpara:692 update bootpara first firmware
+zteboot_update_bootpara:704 search the real offset of kernel.....
+zteboot_update_bootpara:707 test kernel block @[ 700000 ].....
+zteboot_update_bootpara:742 the kernel header is found FlashKernelOff=0x700000
+zteboot_update_bootpara:761 Skip Kernel: fs start:a40000 skip:0
+zteboot_update_bootpara:768 Skip bad: fs start:a40000 skip:0
+zteboot_update_bootpara:778 HeaderOffset=0x1c60000,VmlinuzOffset=700000,FsOffset=a40000 
+zteboot_update_bootpara:819 ------------------Print Image BootPara[0]---------------------
+zteboot_update_bootpara:820 BP Magic Num:cccccccc 55555555 aaaaaaaa 11111111
+zteboot_update_bootpara:822 totalImgNum=1 validImgNum=1 bootWhichImg=0 runmode=3
+zteboot_update_bootpara:823 BP->imagetype=0
+zteboot_update_bootpara:824 BP->flags=a3
+zteboot_update_bootpara:829 dwVersionStartPhyAddr=0x700000 dwHeadRealPhyAddr=0x1c60000 dwKernelStartPhyAddr=0x700000 dwFsStartPhyAddr=0xa40000
+zteboot_update_bootpara:831 dwVersionLowStartAddr:0x700000 dwVersionHighStartAddr:0x2300000
+zteboot_update_bootpara:832 ---------------------------------------------------------
+
+zteboot_update_bootpara:819 ------------------Print Image BootPara[1]---------------------
+zteboot_update_bootpara:820 BP Magic Num:cccccccc 55555555 aaaaaaaa 11111111
+zteboot_update_bootpara:822 totalImgNum=1 validImgNum=1 bootWhichImg=0 runmode=3
+zteboot_update_bootpara:823 BP->imagetype=0
+zteboot_update_bootpara:824 BP->flags=0
+zteboot_update_bootpara:829 dwVersionStartPhyAddr=0x0 dwHeadRealPhyAddr=0x0 dwKernelStartPhyAddr=0x0 dwFsStartPhyAddr=0x0
+zteboot_update_bootpara:831 dwVersionLowStartAddr:0x0 dwVersionHighStartAddr:0x0
+zteboot_update_bootpara:832 ---------------------------------------------------------
+
+zteboot_verify_header:337 found version
+csp_crc:103  >>csp_crc,  data addr:42000000, crc_len:0xa4
+crc=0x823d012e, 0x7dc2fed1
+
+zteboot_search_firmware:88 correct header has been found @3700000
+zteboot_update_bootpara:670 search the real offset of kernel.....
+zteboot_update_bootpara:673 FwClass:0x0, ofs:0x3700000
+zteboot_update_bootpara:674 VersionLowStartAddr:0x700000, VersionHighStartAddr:0x2300000
+zteboot_update_bootpara:675 JffsOffset:0x400214,JffsSize:0x7a0000
+zteboot_update_bootpara:699 update bootpara second firmware
+zteboot_update_bootpara:704 search the real offset of kernel.....
+zteboot_update_bootpara:707 test kernel block @[ 2300000 ].....
+zteboot_update_bootpara:742 the kernel header is found FlashKernelOff=0x2300000
+zteboot_update_bootpara:761 Skip Kernel: fs start:2700000 skip:0
+zteboot_update_bootpara:768 Skip bad: fs start:2700000 skip:0
+zteboot_update_bootpara:778 HeaderOffset=0x3700000,VmlinuzOffset=2300000,FsOffset=2700000 
+zteboot_update_bootpara:819 ------------------Print Image BootPara[0]---------------------
+zteboot_update_bootpara:820 BP Magic Num:cccccccc 55555555 aaaaaaaa 11111111
+zteboot_update_bootpara:822 totalImgNum=2 validImgNum=2 bootWhichImg=0 runmode=3
+zteboot_update_bootpara:823 BP->imagetype=0
+zteboot_update_bootpara:824 BP->flags=a3
+zteboot_update_bootpara:829 dwVersionStartPhyAddr=0x700000 dwHeadRealPhyAddr=0x1c60000 dwKernelStartPhyAddr=0x700000 dwFsStartPhyAddr=0xa40000
+zteboot_update_bootpara:831 dwVersionLowStartAddr:0x700000 dwVersionHighStartAddr:0x2300000
+zteboot_update_bootpara:832 ---------------------------------------------------------
+
+zteboot_update_bootpara:819 ------------------Print Image BootPara[1]---------------------
+zteboot_update_bootpara:820 BP Magic Num:cccccccc 55555555 aaaaaaaa 11111111
+zteboot_update_bootpara:822 totalImgNum=2 validImgNum=2 bootWhichImg=0 runmode=3
+zteboot_update_bootpara:823 BP->imagetype=0
+zteboot_update_bootpara:824 BP->flags=a3
+zteboot_update_bootpara:829 dwVersionStartPhyAddr=0x2300000 dwHeadRealPhyAddr=0x3700000 dwKernelStartPhyAddr=0x2300000 dwFsStartPhyAddr=0x2700000
+zteboot_update_bootpara:831 dwVersionLowStartAddr:0x700000 dwVersionHighStartAddr:0x2300000
+zteboot_update_bootpara:832 ---------------------------------------------------------
+
+zteboot_search_firmware:94 now we have found two headers. so  stop searching! ofs=0x3700000
+zteboot_save_bootpara:850 ##save bootpara @0x40007000 size=0x554 sum=0x0000ec9e
+zteboot_select_pdtver:253 Select firmware
+csp_crc:103  >>csp_crc,  data addr:4f531ee8, crc_len:0xa4
+crc=0x919e2024, 0x6e61dfdb
+
+csp_crc:103  >>csp_crc,  data addr:4f531ee8, crc_len:0xa4
+crc=0x823d012e, 0x7dc2fed1
+
+pdt_getimgindex:230 pdt_getimg select = 1, serial0=0x19, serial1=0x1a,
+zteboot_select_pdtver:325 pdt_getimg select = 1, serial0=0x19, serial1=0x1a,
+zteboot_save_bootpara:850 ##save bootpara @0x40007000 size=0x554 sum=0x0000ec9f
+pdt_getreal_kernelfs:461 pdt_start_kernel [1]firmware kernle@2300000[ 3fffe0 ] fs@ 2700000[ 7a0000 ] header:3700000
+pdt_getreal_kernelfs:478 search the real offset of kernel.....
+pdt_getreal_kernelfs:482 test kernel block @[ 2300000 ].....
+pdt_getreal_kernelfs:534 verify_kernel readflash @0x2300000 size:0x400000 at ram:0x42020020
+csp_crc:103  >>csp_crc,  data addr:42020020, crc_len:0x3fffe0
+crc=0x3ed3f1cf, 0xc12c0e30
+
+zteboot_verify_kernel:178 verify kernel success!!
+pdt_getreal_kernelfs:570 check fs: start:2700000 skip:0
+pdt_getreal_kernelfs:574 found fs: flashstart:2700000 rsize:7a0000
+csp_crc:103  >>csp_crc,  data addr:42440000, crc_len:0x7a0000
+crc=0x75cf7bb, 0xf8a30844
+
+zteboot_verify_fs:208 zteboot_verify_fs romfs = 0x42440000,len = 0x7a0000
+zteboot_verify_fs:245 verify fs success!!
+zteboot_save_bootpara:850 ##save bootpara @0x40007000 size=0x554 sum=0x0000eccd
+pdt_start_kernel:747 
+ Total found 2 firmwares(valid:2), start from ver 1 :
+pdt_start_kernel:749 
++-----+------------+------------+------------+
+pdt_start_kernel:751 
+| Seq |   Kernel   |    Romfs   |   Header   |
+pdt_start_kernel:754 
++-----+------------+------------+------------+
+pdt_start_kernel:760 
+|  0  | 0x00700000 | 0x00a40000 | 0x01c60000 | 
+pdt_start_kernel:754 
++-----+------------+------------+------------+
+pdt_start_kernel:760 
+|  1  | 0x02300000 | 0x02700000 | 0x03700000 | 
+pdt_start_kernel:763 
++-----+------------+------------+------------+
+
+zteboot_do_settings:467 >>zteboot_do_settings
+zteboot_do_settings:490 >>s=256M init=/bin/sh -c "exec /bin/sh", select=1
+zteboot_do_settings:567 >>s=setenv bootargs console=$(console) root=/dev/mtdblock8 ro rootfstype=squashfs  mem=$(memsize) ;, select=1
+setting versioninfo...
+(CONFIG_SYS_LOAD_ADDR  + SZ_16M) =0x43000000
+<nand_read_skip_bad_,411>!mtdpart=0x0,offset=0x0,mtdpartoffset=0x0,mtdPartsize=0xc0000,length=0xa0000
+lseek=0x4308c800
+cmdline=U-Boot V1.0.0 20250325110003 
+arg=bootm 0x42020020;
+cmd=setenv bootargs console=$(console) root=/dev/mtdblock8 ro rootfstype=squashfs  mem=$(memsize) ;
+## Booting kernel from Legacy Image at 42020020 ...
+   Image Name:   ARM OpenWrt Linux-6.18.55
+   Image Type:   ARM Linux Kernel Image (uncompressed)
+   Data Size:    3466750 Bytes = 3.3 MiB
+   Load Address: 40008000
+   Entry Point:  40008000
+   Verifying Checksum ... OK
+   Loading Kernel Image ... OK
+OK
+----------------------
+|-->setup versioninfo tag...
+
+Starting kernel ...
+
+[    0.148681] printk: console [ttyAMA0] enabled
+[    0.153168] printk: legacy bootconsole [pl11] disabled
+[    0.159657] 94405000.serial: ttyAMA1 at MMIO 0x94405000 (irq = 27, base_baud = 0) is a PL011 rev1
+[    0.167014] zx279128s-pcie f000000.pcie: host bridge /soc/pcie@f000000 ranges:
+[    0.167060] zx279128s-pcie f000000.pcie:      MEM 0x0010000000..0x0017ffffff -> 0x0010000000
+[    0.167086] zx279128s-pcie f000000.pcie:   IB MEM 0x0040000000..0x005fffffff -> 0x0040000000
+[    0.479304] zx279128s-pcie f000000.pcie: iATU: unroll F, 5 ob, 5 ib, align 64K, limit 4G
+[    0.578914] zx279128s-pcie f000000.pcie: PCIe Gen.1 x1 link up
+[    0.579156] zx279128s-pcie f000000.pcie: PCI host bridge to bus 0000:00
+[    0.579173] pci_bus 0000:00: root bus resource [bus 00-ff]
+[    0.579184] pci_bus 0000:00: root bus resource [mem 0x10000000-0x17ffffff]
+[    0.579219] pci 0000:00:00.0: [1cf2:6830] type 01 class 0x060400 PCIe Root Port
+[    0.579244] pci 0000:00:00.0: BAR 0 [mem 0x00000000-0x000fffff]
+[    0.579254] pci 0000:00:00.0: BAR 1 [mem 0x00000000-0x000fffff]
+[    0.579263] pci 0000:00:00.0: PCI bridge to [bus 01-ff]
+[    0.579274] pci 0000:00:00.0:   bridge window [io  0x0000-0x0fff]
+[    0.579282] pci 0000:00:00.0:   bridge window [mem 0x00000000-0x000fffff]
+[    0.579292] pci 0000:00:00.0:   bridge window [mem 0x00000000-0x000fffff pref]
+[    0.579313] pci 0000:00:00.0: removing 2.5GT/s downstream link speed restriction
+[    0.598965] pci 0000:00:00.0: supports D1
+[    0.598977] pci 0000:00:00.0: PME# supported from D0 D1 D3hot
+[    0.600066] PCI: bus0: Fast back to back transfers disabled
+[    0.600294] pci 0000:01:00.0: [14c3:7906] type 00 class 0x028000 PCIe Endpoint
+[    0.600588] pci 0000:01:00.0: BAR 0 [mem 0x00000000-0x000fffff 64bit pref]
+[    0.600615] pci 0000:01:00.0: BAR 2 [mem 0x00000000-0x00007fff 64bit]
+[    0.600639] pci 0000:01:00.0: BAR 4 [mem 0x00000000-0x00000fff 64bit pref]
+[    0.601108] pci 0000:01:00.0: PME# supported from D0 D3hot D3cold
+[    0.601375] pci 0000:01:00.0: 4.000 Gb/s available PCIe bandwidth, limited by 5.0 GT/s PCIe x1 link at 0000:00:00.0 (capable of 8.000 Gb/s with 5.0 GT/s PCIe x2 link)
+[    0.601671] PCI: bus1: Fast back to back transfers disabled
+[    0.601703] pci 0000:00:00.0: BAR 0 [mem 0x10000000-0x100fffff]: assigned
+[    0.601718] pci 0000:00:00.0: BAR 1 [mem 0x10100000-0x101fffff]: assigned
+[    0.601728] pci 0000:00:00.0: bridge window [mem 0x10200000-0x102fffff]: assigned
+[    0.601737] pci 0000:00:00.0: bridge window [mem 0x10300000-0x104fffff pref]: assigned
+[    0.601750] pci 0000:01:00.0: BAR 0 [mem 0x10300000-0x103fffff 64bit pref]: assigned
+[    0.601812] pci 0000:01:00.0: BAR 2 [mem 0x10200000-0x10207fff 64bit]: assigned
+[    0.601872] pci 0000:01:00.0: BAR 4 [mem 0x10400000-0x10400fff 64bit pref]: assigned
+[    0.601934] pci 0000:00:00.0: PCI bridge to [bus 01-ff]
+[    0.601943] pci 0000:00:00.0:   bridge window [mem 0x10200000-0x102fffff]
+[    0.601952] pci 0000:00:00.0:   bridge window [mem 0x10300000-0x104fffff pref]
+[    0.601964] pci_bus 0000:00: resource 4 [mem 0x10000000-0x17ffffff]
+[    0.601973] pci_bus 0000:01: resource 1 [mem 0x10200000-0x102fffff]
+[    0.601980] pci_bus 0000:01: resource 2 [mem 0x10300000-0x104fffff pref]
+[    0.602368] pcieport 0000:00:00.0: PME: Signaling with IRQ 28
+[    0.603223] pcieport 0000:00:00.0: AER: enabled with IRQ 28
+[    0.605595] zx279128s-pcie f100000.pcie: host bridge /soc/pcie@f100000 ranges:
+[    0.605639] zx279128s-pcie f100000.pcie:      MEM 0x0020000000..0x0027ffffff -> 0x0020000000
+[    0.605665] zx279128s-pcie f100000.pcie:   IB MEM 0x0040000000..0x005fffffff -> 0x0040000000
+[    0.606531] zx279128s-pcie f100000.pcie: iATU: unroll F, 5 ob, 5 ib, align 64K, limit 4G
+[    0.698918] zx279128s-pcie f100000.pcie: PCIe Gen.1 x1 link up
+[    0.699104] zx279128s-pcie f100000.pcie: PCI host bridge to bus 0001:00
+[    0.699119] pci_bus 0001:00: root bus resource [bus 00-ff]
+[    0.699165] pci_bus 0001:00: root bus resource [mem 0x20000000-0x27ffffff]
+[    0.699203] pci 0001:00:00.0: [1cf2:6830] type 01 class 0x060400 PCIe Root Port
+[    0.699230] pci 0001:00:00.0: BAR 0 [mem 0x00000000-0x000fffff]
+[    0.699240] pci 0001:00:00.0: BAR 1 [mem 0x00000000-0x000fffff]
+[    0.699248] pci 0001:00:00.0: PCI bridge to [bus 01-ff]
+[    0.699259] pci 0001:00:00.0:   bridge window [io  0x0000-0x0fff]
+[    0.699268] pci 0001:00:00.0:   bridge window [mem 0x00000000-0x000fffff]
+[    0.699278] pci 0001:00:00.0:   bridge window [mem 0x00000000-0x000fffff pref]
+[    0.699300] pci 0001:00:00.0: removing 2.5GT/s downstream link speed restriction
+[    0.718958] pci 0001:00:00.0: supports D1
+[    0.718968] pci 0001:00:00.0: PME# supported from D0 D1 D3hot
+[    0.720057] PCI: bus0: Fast back to back transfers disabled
+[    0.720286] pci 0001:01:00.0: [14c3:790a] type 00 class 0x028000 PCIe Endpoint
+[    0.720578] pci 0001:01:00.0: BAR 0 [mem 0x00000000-0x000fffff 64bit pref]
+[    0.720605] pci 0001:01:00.0: BAR 2 [mem 0x00000000-0x00007fff 64bit]
+[    0.720628] pci 0001:01:00.0: BAR 4 [mem 0x00000000-0x00000fff 64bit pref]
+[    0.721095] pci 0001:01:00.0: PME# supported from D0 D3hot D3cold
+[    0.721638] PCI: bus1: Fast back to back transfers disabled
+[    0.721671] pci 0001:00:00.0: BAR 0 [mem 0x20000000-0x200fffff]: assigned
+[    0.721684] pci 0001:00:00.0: BAR 1 [mem 0x20100000-0x201fffff]: assigned
+[    0.721695] pci 0001:00:00.0: bridge window [mem 0x20200000-0x202fffff]: assigned
+[    0.721703] pci 0001:00:00.0: bridge window [mem 0x20300000-0x204fffff pref]: assigned
+[    0.721717] pci 0001:01:00.0: BAR 0 [mem 0x20300000-0x203fffff 64bit pref]: assigned
+[    0.721779] pci 0001:01:00.0: BAR 2 [mem 0x20200000-0x20207fff 64bit]: assigned
+[    0.721839] pci 0001:01:00.0: BAR 4 [mem 0x20400000-0x20400fff 64bit pref]: assigned
+[    0.721901] pci 0001:00:00.0: PCI bridge to [bus 01-ff]
+[    0.721911] pci 0001:00:00.0:   bridge window [mem 0x20200000-0x202fffff]
+[    0.721920] pci 0001:00:00.0:   bridge window [mem 0x20300000-0x204fffff pref]
+[    0.721932] pci_bus 0001:00: resource 4 [mem 0x20000000-0x27ffffff]
+[    0.721941] pci_bus 0001:01: resource 1 [mem 0x20200000-0x202fffff]
+[    0.721948] pci_bus 0001:01: resource 2 [mem 0x20300000-0x204fffff pref]
+[    0.722306] pcieport 0001:00:00.0: PME: Signaling with IRQ 29
+[    0.723205] pcieport 0001:00:00.0: AER: enabled with IRQ 29
+[    0.864562] zx279128s-eth 92000000.ethernet lan3 (uninitialized): PHY [9a101000.mdio:0a] driver [Generic PHY] (irq=POLL)
+[    0.865546] zx279128s-eth 92000000.ethernet lan2 (uninitialized): PHY [9a101000.mdio:0b] driver [Generic PHY] (irq=POLL)
+[    0.866546] zx279128s-eth 92000000.ethernet lan1 (uninitialized): PHY [9a101000.mdio:0c] driver [Generic PHY] (irq=POLL)
+[    0.867554] zx279128s-eth 92000000.ethernet wan (uninitialized): PHY [9a101000.mdio:0d] driver [Generic PHY] (irq=POLL)
+[    0.881626] clk: Disabling unused clocks
+[    0.881841] check access for rdinit=/init failed: -2, ignoring
+[    0.882031] mtdblock: MTD device 'rootfs' is NAND, please consider using UBI block devices instead.
+[    0.895090] VFS: Mounted root (squashfs filesystem) readonly on device 31:7.
+[    0.902818] Freeing unused kernel image (initmem) memory: 1024K
+[    0.908105] Run /sbin/init as init process
+[    1.405650] init: Console is alive
+[    2.167445] kmodloader: loading kernel modules from /etc/modules-boot.d/*
+[    2.210804] gpio_button_hotplug: loading out-of-tree module taints kernel.
+[    2.215334] kmodloader: done loading kernel modules from /etc/modules-boot.d/*
+[    2.216342] init: - preinit -
+[    5.548922] random: crng init done
+[    5.666166] zx279128s-eth 92000000.ethernet lan1: configuring for phy/internal link mode
+Press the [f] key and hit [enter] to enter failsafe mode
+Press the [1], [2], [3] or [4] key and hit [enter] to select the debug level
+[    9.839218] zx279128s-eth 92000000.ethernet lan1: Link is Up - 1Gbps/Full - flow control off
+[    9.970388] jffs2: NAND pages can be programmed once: clean markers are in the data, 2048 bytes
+[   10.034107] jffs2: notice: (554) jffs2_build_xattr_subsystem: complete building xattr subsystem, 17 of xdatum (0 unchecked, 5 orphan) and 20 of xref (5 dead, 0 orphan) found.
+[   10.042491] mount_root: switching to jffs2 overlay
+[   10.050512] overlayfs: upper fs does not support tmpfile.
+[   10.065396] urandom-seed: Seeding with /etc/urandom.seed
+[   10.244325] zx279128s-eth 92000000.ethernet lan1: Link is Down
+[   10.250416] procd: - early -
+[   10.844104] procd: - ubus -
+[   10.954393] procd: - init -
+Please press Enter to activate this console.
+[   11.980396] kmodloader: loading kernel modules from /etc/modules.d/*
+[   12.059287] urngd: v1.0.2 started.
+[   12.314873] i2c_dev: i2c /dev entries driver
+[   12.366968] PPP generic driver version 2.4.2
+[   12.368460] NET: Registered PF_PPPOX protocol family
+[   12.386036] kmodloader: done loading kernel modules from /etc/modules.d/*
+[   16.351842] HB up=16.02 irq= sta=0 aer=0 ld=0.38
+[   18.250246] zx279128s-eth 92000000.ethernet lan1: configuring for phy/internal link mode
+[   18.251469] br-lan: port 1(lan1) entered blocking state
+[   18.251493] br-lan: port 1(lan1) entered disabled state
+[   18.251536] zx279128s-eth 92000000.ethernet lan1: entered allmulticast mode
+[   18.251762] zx279128s-eth 92000000.ethernet lan1: entered promiscuous mode
+[   18.280836] zx279128s-eth 92000000.ethernet lan2: configuring for phy/internal link mode
+[   18.282083] br-lan: port 2(lan2) entered blocking state
+[   18.282102] br-lan: port 2(lan2) entered disabled state
+[   18.282144] zx279128s-eth 92000000.ethernet lan2: entered allmulticast mode
+[   18.282369] zx279128s-eth 92000000.ethernet lan2: entered promiscuous mode
+[   18.291564] zx279128s-eth 92000000.ethernet lan3: configuring for phy/internal link mode
+[   18.292818] br-lan: port 3(lan3) entered blocking state
+[   18.292835] br-lan: port 3(lan3) entered disabled state
+[   18.292881] zx279128s-eth 92000000.ethernet lan3: entered allmulticast mode
+[   18.293110] zx279128s-eth 92000000.ethernet lan3: entered promiscuous mode
+[   18.323701] zx279128s-eth 92000000.ethernet wan: configuring for phy/internal link mode
+[   19.668638] HB up=19.35 irq= sta=0 aer=0 ld=0.38
+[   22.399419] zx279128s-eth 92000000.ethernet lan1: Link is Up - 1Gbps/Full - flow control off
+[   22.399474] br-lan: port 1(lan1) entered blocking state
+[   22.399488] br-lan: port 1(lan1) entered forwarding state
+[   22.771089] HB up=22.66 irq= sta=0 aer=0 ld=0.83
+[   25.874253] HB up=25.76 irq= sta=0 aer=0 ld=0.77
+[   28.977322] HB up=28.87 irq= sta=0 aer=0 ld=0.77
+[   32.084237] HB up=31.97 irq= sta=0 aer=0 ld=0.70
+[   35.187172] HB up=35.08 irq= sta=0 aer=0 ld=0.65
+[   38.294320] HB up=38.18 irq= sta=0 aer=0 ld=0.65
+[   41.396801] HB up=41.29 irq= sta=0 aer=0 ld=0.59
+[   44.500230] HB up=44.39 irq= sta=0 aer=0 ld=0.59
+[   47.602280] HB up=47.49 irq= sta=0 aer=0 ld=0.55
+[   50.704016] HB up=50.59 irq= sta=0 aer=0 ld=0.50
+[   53.806754] HB up=53.70 irq= sta=0 aer=0 ld=0.50
+[   56.909420] HB up=56.80 irq= sta=0 aer=0 ld=0.46
+[   60.013444] HB up=59.90 irq= sta=0 aer=0 ld=0.46
+[   63.115750] HB up=63.00 irq= sta=0 aer=0 ld=0.43
+[   66.218842] HB up=66.11 irq= sta=0 aer=0 ld=0.39
+[   69.322673] HB up=69.21 irq= sta=0 aer=0 ld=0.39
+[   72.424880] HB up=72.31 irq= sta=0 aer=0 ld=0.36
+[   75.527547] HB up=75.42 irq= sta=0 aer=0 ld=0.33
+[   78.634336] HB up=78.52 irq= sta=0 aer=0 ld=0.33
+[   81.737398] HB up=81.63 irq= sta=0 aer=0 ld=0.30
+[   84.845578] HB up=84.73 irq= sta=0 aer=0 ld=0.30
+[   87.947992] HB up=87.84 irq= sta=0 aer=0 ld=0.28
+[   91.055590] HB up=90.94 irq= sta=0 aer=0 ld=0.26
+[   94.158268] HB up=94.05 irq= sta=0 aer=0 ld=0.26
+[   97.265117] HB up=97.15 irq= sta=0 aer=0 ld=0.24
+[  100.367712] HB up=100.26 irq= sta=0 aer=0 ld=0.22
+[  103.476016] HB up=103.36 irq= sta=0 aer=0 ld=0.22
+[  106.578132] HB up=106.47 irq= sta=0 aer=0 ld=0.20
+[  109.685051] HB up=109.57 irq= sta=0 aer=0 ld=0.20
+[  112.787589] HB up=112.68 irq= sta=0 aer=0 ld=0.18
+[  115.895140] HB up=115.78 irq= sta=0 aer=0 ld=0.17
+[  118.997769] HB up=118.89 irq= sta=0 aer=0 ld=0.17
+[  122.104741] HB up=121.99 irq= sta=0 aer=0 ld=0.15
+[  125.207278] HB up=125.10 irq= sta=0 aer=0 ld=0.15
+[  128.314115] HB up=128.20 irq= sta=0 aer=0 ld=0.14
+[  131.448440] HB up=131.31 irq= sta=0 aer=0 ld=0.13
+[  134.551628] HB up=134.44 irq= sta=0 aer=0 ld=0.13
+[  137.654236] HB up=137.54 irq= sta=0 aer=0 ld=0.12
+[  140.756998] HB up=140.65 irq= sta=0 aer=0 ld=0.11
+[  143.863753] HB up=143.75 irq= sta=0 aer=0 ld=0.11
+[  146.966033] HB up=146.86 irq= sta=0 aer=0 ld=0.10
+[  150.069017] HB up=149.96 irq= sta=0 aer=0 ld=0.10
+[  153.172176] HB up=153.06 irq= sta=0 aer=0 ld=0.09
+[  156.274728] HB up=156.16 irq= sta=0 aer=0 ld=0.08
+[  159.376826] HB up=159.27 irq= sta=0 aer=0 ld=0.08
+[  162.479660] HB up=162.37 irq= sta=0 aer=0 ld=0.08
+[  165.582716] HB up=165.47 irq= sta=0 aer=0 ld=0.07
+[  168.685497] HB up=168.57 irq= sta=0 aer=0 ld=0.07
+[  171.787865] HB up=171.68 irq= sta=0 aer=0 ld=0.07
+[  174.890028] HB up=174.78 irq= sta=0 aer=0 ld=0.07
+[  177.992753] HB up=177.88 irq= sta=0 aer=0 ld=0.06
+[  181.094524] HB up=180.98 irq= sta=0 aer=0 ld=0.06
+[  184.197610] HB up=184.09 irq= sta=0 aer=0 ld=0.06
+[  187.299965] HB up=187.19 irq= sta=0 aer=0 ld=0.05
+[  190.402550] HB up=190.29 irq= sta=0 aer=0 ld=0.05
+[  193.504320] HB up=193.39 irq= sta=0 aer=0 ld=0.13
+[  196.607376] HB up=196.50 irq= sta=0 aer=0 ld=0.12
+[  199.710276] HB up=199.60 irq= sta=0 aer=0 ld=0.12
+[  202.812680] HB up=202.70 irq= sta=0 aer=0 ld=0.11
+[  205.915314] HB up=205.80 irq= sta=0 aer=0 ld=0.10
+[  209.017631] HB up=208.91 irq= sta=0 aer=0 ld=0.10
+[  212.120293] HB up=212.01 irq= sta=0 aer=0 ld=0.09
+[  215.223035] HB up=215.11 irq= sta=0 aer=0 ld=0.09
+[  218.325188] HB up=218.21 irq= sta=0 aer=0 ld=0.08

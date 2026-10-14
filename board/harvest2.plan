@@ -1,0 +1,12 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo C1; rm -f /var/tmp/*; df -k /var
+25000|echo C2; cat /dev/mtdblock1 > /var/tmp/mtd1-bootloader.bin; cat /dev/mtdblock2 > /var/tmp/mtd2-tag.bin; cat /dev/mtdblock3 > /var/tmp/mtd3-wifi.bin; ls -l /var/tmp
+70000|echo C3; for f in /var/tmp/mtd*.bin; do echo "UP $(basename $f)"; curl -f -sS -T "$f" "http://192.168.5.5:8001/$(basename $f)"; echo rc=$?; done
+120000|echo C4; rm -f /var/tmp/mtd*.bin; cat /dev/mtdblock4 > /var/tmp/mtd4-usercfg.bin; cat /dev/mtdblock5 > /var/tmp/mtd5-defcfg.bin; curl -f -sS -T /var/tmp/mtd4-usercfg.bin http://192.168.5.5:8001/mtd4-usercfg.bin; echo rc4=$?; curl -f -sS -T /var/tmp/mtd5-defcfg.bin http://192.168.5.5:8001/mtd5-defcfg.bin; echo rc5=$?
+180000|echo C5; rm -f /var/tmp/mtd*.bin; cat /dev/mtdblock6 > /var/tmp/kernel1.bin; ls -l /var/tmp/kernel1.bin; curl -f -sS -T /var/tmp/kernel1.bin http://192.168.5.5:8001/kernel1.bin; echo rck=$?
+240000|echo C6; rm -f /var/tmp/kernel1.bin; ls -l /var/tmp; df -k /var
+260000|echo C7; dmesg
+340000|echo C8; cat /proc/zte/ledkey_m/led; echo ---; cat /proc/zte/ledkey_m/key; echo ---; cat /proc/zte/verinfo/versionstates; echo ---; cat /proc/zte/bbx/BootRecord; echo ---; exit
+390000|exit

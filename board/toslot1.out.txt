@@ -1,0 +1,50 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1500ms] "root\r\n"
+root
+Password: 
+=== [send @4500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @7000ms] "curl -f -o /var/tmp/fw http://192.168.5.5:8000/e2631-fwslot; chmod +x /var/tmp/fw; ls -l /var/tmp/fw\r\n"
+curl -f -o /var/tmp/fw http://192.168.5.5:8000/e2631-fwslot; chmod +x /var/t
+mp/fw; ls -l /var/tmp/fw
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100 69943  100 69943    0     0  1951k      0 --:--:-- --:--:-- --:--:-- 2069k
+-rwxr-xr-x    1 Z500_w9b root         69943 Oct 13 14:49 /var/tmp/fw
+/ # 
+=== [send @13000ms] "/var/tmp/fw info\r\n"
+/var/tmp/fw info
+
+=== [send @16000ms] "/var/tmp/fw boot 1\r\n"
+/var/tmp/fw boot 1
+running slot: 0
+slot 0: base 0x700000 span 0x1c00000 mtd0 (viewed through the whole-flash mtd) header@0x1560000 serial=18 version="V1.0.0.7B5.8000" [running] [next boot]
+slot 1: base 0x2300000 span 0x1c00000 mtd0 (viewed through the whole-flash mtd) header@0x1560000 serial=18 version="V1.0.0.7B5.8000"
+/ # /var/tmp/fw boot 1
+  slot 1 reached through mtd0 (whole flash, from 0x2300000)
+
+=== [send @20000ms] "/var/tmp/fw info\r\n"
+/var/tmp/fw info
+ok: slot 1 header at 0x1560000 now serial 19
+/ # /var/tmp/fw info
+
+=== [send @24000ms] "reboot\r\n"
+reboot
+
+=== [send @28000ms] "exit\r\n"
+exit
+running slot: 0
+slot 0: base 0x700000 span 0x1c00000 mtd0 (viewed through the whole-flash mtd) header@0x1560000 serial=18 version="V1.0.0.7B5.8000" [running]
+slot 1: base 0x2300000 span 0x1c00000 mtd0 (viewed through the whole-flash mtd) header@0x1560000 serial=19 version="V1.0.0.7B5.8000" [next boot]
+/ # reboot
+
+=== [send @29500ms] "exit\r\n"
+
+### ERROR ECONNRESET

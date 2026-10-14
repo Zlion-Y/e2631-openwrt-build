@@ -1,0 +1,64 @@
+1000|root
+3000|<redacted:vendor telnet password>
+7000|
+9000|cat > /tmp/m.sh <<'EOS'
+9500|#!/bin/sh
+9600|# ZX279128S MDIO read-only scan. Register map from drivers/net/mdio/mdio-zx279128s.c:
+9700|#   +0x04 DATA_WR  +0x08 DATA_RD  +0x0c CFG  +0x10 STATUS(bit0=DONE)  +0x14 CMD
+9800|#   CMD: reg[4:0]  addr[9:5]  WR=bit10  RD=bit11  CLK_DIV=bit12  START=bit14
+9900|# Only RD transactions are issued and every bit outside 10:0 is preserved, so
+10000|# the vendor driver's clock divider setting stays exactly as it found it.
+10100|B=0x9a101000
+10200|CMD=$(printf '0x%x' $((B + 0x14)))
+10300|STS=$(printf '0x%x' $((B + 0x10)))
+10400|DAT=$(printf '0x%x' $((B + 0x08)))
+10500|GET() { devmem2 "$1" word 2>/dev/null | sed -n 's/.*): //p'; }
+10600|SET() { devmem2 "$1" word "$2" >/dev/null 2>&1; }
+10700|# $1 = phy address, $2 = MII register
+10800|rd() {
+10900|  c=$(GET $CMD)
+11000|  [ -n "$c" ] || { echo ERR; return 1; }
+11100|  c=$(printf '0x%x' $((c & 0xfffff800)))
+11200|  SET $CMD $c
+11300|  SET $STS 0
+11400|  v=$(printf '0x%x' $((c | 0x800 | ($1 << 5) | $2)))
+11500|  SET $CMD $v
+11600|  SET $CMD $(printf '0x%x' $((v | 0x4000)))
+11700|  i=0; s=0
+11800|  while [ $i -lt 20 ]; do
+11900|    s=$(GET $STS)
+12000|    [ $((s & 1)) -eq 1 ] && break
+12100|    i=$((i + 1))
+12200|  done
+12300|  if [ $((s & 1)) -ne 1 ]; then SET $CMD $c; echo TIMEOUT; return 1; fi
+12400|  d=$(GET $DAT)
+12500|  SET $CMD $c
+12600|  SET $STS 0
+12700|  printf '%s' "$(printf '0x%04x' $((d & 0xffff)))"
+12800|}
+12900|echo "=== CMD now: $(GET $CMD)   STATUS: $(GET $STS)   CFG: $(GET $(printf '0x%x' $((B + 0x0c))))) ==="
+13000|echo "-- phase 1: PHY ID1 (reg 2) on every address 0..31 --"
+13100|a=0
+13200|LIVE=""
+13300|while [ $a -lt 32 ]; do
+13400|  v=$(rd $a 2)
+13500|  case "$v" in
+13600|    0x0000|0xffff|TIMEOUT|ERR) ;;
+13700|    *) LIVE="$LIVE $a"; echo "  addr $a ID1=$v  <== responds" ;;
+13800|  esac
+13900|  a=$((a + 1))
+14000|done
+14100|echo "-- responding addresses:$LIVE --"
+14200|echo "-- phase 2: full register set for responders --"
+14300|for a in $LIVE; do
+14400|  echo "  addr $a: ID1=$(rd $a 2) ID2=$(rd $a 3) BMSR=$(rd $a 0) BMSR_status=$(rd $a 1)"
+14500|done
+14600|echo MDIOSCAN_DONE
+14700|EOS
+15900|wc -l < /tmp/m.sh; echo UPLOADED
+18400|( sh /tmp/m.sh > /tmp/m.out 2>&1 ) &
+21400|echo STARTED; wc -l < /tmp/m.out
+51400|echo TICK1; wc -l < /tmp/m.out
+96400|echo TICK2; wc -l < /tmp/m.out
+156400|echo =====RESULT=====; cat /tmp/m.out
+162400|echo SWEEP_END

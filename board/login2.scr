@@ -1,0 +1,15 @@
+# Retry the vendor telnet login expect-style. The password contains "#", so no
+# step may expect on a bare "#"; expect the two prompts by their own words.
+EXPECT Login:
+SENDLN root
+WAIT 1200
+EXPECT Password:
+SENDLN <redacted:vendor telnet password>
+WAIT 4000
+SENDLN id
+WAIT 2000
+SENDLN /var/tmp/fw info
+WAIT 3000
+SENDLN echo ZDONE
+WAIT 1000
+SENDLN exit

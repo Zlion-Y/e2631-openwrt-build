@@ -1,5 +1,5 @@
 #!/bin/bash
-# Offline self-test for device/mpscfg.sh: run the same ash logic against the
+# Offline self-test for board/mpscfg.sh: run the same ash logic against the
 # vendor's captured config space, whose expected decode we know by hand:
 #   DevCap=0x10008fe1 (256 B max) DevCtl=0x2910 (MPS 128, MRRS 512, RO/ExtTag/SERR)
 #   DevSta=0x0000 LnkSta=0x1011 (Gen1 x1)
@@ -10,7 +10,7 @@ rm -rf "$T"; mkdir -p "$T/0000:01:00.0" "$T/0001:01:00.0"
 cp "$W/out/vendor-ep0-config.bin" "$T/0000:01:00.0/config"
 cp "$W/out/vendor-ep1-config.bin" "$T/0001:01:00.0/config"
 chmod u+w "$T"/*/config
-cp "$W/device/mpscfg.sh" "$T/mpscfg.sh"
+cp "$W/build/board/mpscfg.sh" "$T/mpscfg.sh"
 sed -i 's/\r$//' "$T/mpscfg.sh"
 
 if command -v ash >/dev/null 2>&1; then SB="ash"

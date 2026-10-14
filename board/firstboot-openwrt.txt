@@ -1,0 +1,274 @@
+@@@ boot
+300.01 566.12
+Linux OpenWrt 6.18.55 #0 SMP Mon Oct 12 17:14:44 2026 armv7l GNU/Linux
+DISTRIB_ID='OpenWrt'
+DISTRIB_RELEASE='SNAPSHOT'
+DISTRIB_REVISION='r0-db8b8d4'
+DISTRIB_TARGET='sanechips/generic'
+@@@ mem
+MemTotal:         248332 kB
+MemFree:          178156 kB
+MemAvailable:     161832 kB
+@@@ ps
+  PID USER       VSZ STAT COMMAND
+    1 root      1432 S    /sbin/procd
+    2 root         0 SW   [kthreadd]
+    3 root         0 SW   [pool_workqueue_]
+    4 root         0 IW<  [kworker/R-rcu_g]
+    5 root         0 IW<  [kworker/R-sync_]
+    6 root         0 IW<  [kworker/R-kvfre]
+    7 root         0 IW<  [kworker/R-slub_]
+    8 root         0 IW<  [kworker/R-netns]
+    9 root         0 IW   [kworker/0:0-eve]
+   10 root         0 IW<  [kworker/0:0H-ev]
+   11 root         0 IW   [kworker/0:1-rcu]
+   12 root         0 IW   [kworker/u8:0-ip]
+   13 root         0 IW<  [kworker/R-mm_pe]
+   14 root         0 SW   [ksoftirqd/0]
+   15 root         0 IW   [rcu_sched]
+   16 root         0 SW   [rcu_exp_par_gp_]
+   17 root         0 SW   [rcu_exp_gp_kthr]
+   18 root         0 SW   [migration/0]
+   19 root         0 SW   [cpuhp/0]
+   20 root         0 SW   [cpuhp/1]
+   21 root         0 SW   [migration/1]
+   22 root         0 SW   [ksoftirqd/1]
+   23 root         0 IW   [kworker/1:0-dev]
+   24 root         0 IW<  [kworker/1:0H-kb]
+@@@ dmesg
+[    0.000000] Booting Linux on physical CPU 0x0
+[    0.000000] Linux version 6.18.55 (runner@runnervmmprz5) (arm-openwrt-linux-muslgnueabi-gcc (OpenWrt GCC 14.4.0 r0-db8b8d4) 14.4.0, GNU ld (GNU Binutils) 2.46.1) #0 SMP Mon Oct 12 17:14:44 2026
+[    0.000000] CPU: ARMv7 Processor [414fc091] revision 1 (ARMv7), cr=18c5387d
+[    0.000000] CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
+[    0.000000] OF: fdt: Machine model: ZTE ZXHN E2631
+[    0.000000] Memory policy: Data cache writealloc
+[    0.000000] cma: Reserved 32 MiB at 0x4e000000
+[    0.000000] Zone ranges:
+[    0.000000]   Normal   [mem 0x0000000040000000-0x000000004fffffff]
+[    0.000000]   HighMem  empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000040000000-0x000000004fffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000040000000-0x000000004fffffff]
+[    0.000000] OF: reserved mem: Reserved memory: No reserved-memory node in the DT
+[    0.000000] percpu: Embedded 12 pages/cpu s20428 r8192 d20532 u49152
+[    0.000000] pcpu-alloc: s20428 r8192 d20532 u49152 alloc=12*4096
+[    0.000000] pcpu-alloc: [0] 0 [0] 1 
+[    0.000000] Kernel command line: console=ttyAMA0,115200n8 root=/dev/mtdblock7 rootfstype=squashfs ro rootwait
+[    0.000000] printk: log buffer data + meta data: 131072 + 409600 = 540672 bytes
+[    0.000000] Dentry cache hash table entries: 32768 (order: 5, 131072 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 16384 (order: 4, 65536 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 65536
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] SLUB: HWalign=32, Order=0-3, MinObjects=0, CPUs=2, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 10 jiffies.
+[    0.000000] RCU Tasks Trace: Setting shift to 1 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=2.
+[    0.000000] NR_IRQS: 16, nr_irqs: 16, preallocated irqs: 16
+[    0.000000] L2C: DT/platform modifies aux control register: 0x02030000 -> 0x32430000
+[    0.000000] L2C-310 enabling early BRESP for Cortex-A9
+[    0.000000] L2C-310 full line of zeros enabled for Cortex-A9
+[    0.000000] L2C-310 ID prefetch enabled, offset 1 lines
+[    0.000000] L2C-310 dynamic clock gating enabled, standby mode enabled
+[    0.000000] L2C-310 cache controller enabled, 16 ways, 256 kB
+[    0.000000] L2C-310: CACHE_ID 0x410000c9, AUX_CTRL 0x76430001
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+[    0.000002] sched_clock: 64 bits at 500MHz, resolution 2ns, wraps every 4398046511103ns
+[    0.000019] clocksource: arm_global_timer: mask: 0xffffffffffffffff max_cycles: 0xe6a171a037, max_idle_ns: 881590485102 ns
+[    0.000041] Switching to timer-based delay loop, resolution 2ns
+[    0.000327] Calibrating delay loop (skipped), value calculated using timer frequency.. 1000.00 BogoMIPS (lpj=5000000)
+[    0.000340] CPU: Testing write buffer coherency: ok
+[    0.000369] CPU0: Spectre v2: using BPIALL workaround
+[    0.000375] pid_max: default: 32768 minimum: 301
+[    0.005929] Mount-cache hash table entries: 1024 (order: 0, 4096 bytes, linear)
+[    0.005944] Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes, linear)
+[    0.015860] CPU0: thread -1, cpu 0, socket 0, mpidr 80000000
+[    0.017250] Setting up static identity map for 0x40100000 - 0x40100060
+[    0.017477] rcu: Hierarchical SRCU implementation.
+[    0.017485] rcu: 	Max phase no-delay instances is 1000.
+[    0.018095] smp: Bringing up secondary CPUs ...
+[    0.018890] CPU1: thread -1, cpu 1, socket 0, mpidr 80000001
+[    0.018993] CPU1: Spectre v2: using BPIALL workaround
+[    0.019128] smp: Brought up 1 node, 2 CPUs
+[    0.019140] SMP: Total of 2 processors activated (2000.00 BogoMIPS).
+[    0.019148] CPU: All CPU(s) started in SVC mode.
+[    0.019671] Memory: 213456K/262144K available (7547K kernel code, 593K rwdata, 1928K rodata, 1024K init, 232K bss, 14836K reserved, 32768K cma-reserved, 0K highmem)
+[    0.023411] posixtimers hash table entries: 1024 (order: 1, 8192 bytes, linear)
+[    0.023468] futex hash table entries: 512 (32768 bytes on 1 NUMA nodes, total 32 KiB, linear).
+[    0.027665] pinctrl core: initialized pinctrl subsystem
+[    0.029362] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.031581] DMA: preallocated 256 KiB pool for atomic coherent allocations
+[    0.032549] thermal_sys: Registered thermal governor 'step_wise'
+[    0.032642] No ATAGs?
+[    0.032745] Serial: AMBA PL011 UART driver
+[    0.046231] clocksource: Switched to clocksource arm_global_timer
+[    0.052271] NET: Registered PF_INET protocol family
+[    0.052472] IP idents hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.053128] tcp_listen_portaddr_hash hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.053156] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.053171] TCP established hash table entries: 2048 (order: 1, 8192 bytes, linear)
+[    0.053193] TCP bind hash table entries: 2048 (order: 3, 32768 bytes, linear)
+[    0.053246] TCP: Hash tables configured (established 2048 bind 2048)
+[    0.053545] MPTCP token hash table entries: 256 (order: 0, 4096 bytes, linear)
+[    0.053765] UDP hash table entries: 256 (order: 2, 14336 bytes, linear)
+[    0.053804] UDP-Lite hash table entries: 256 (order: 2, 14336 bytes, linear)
+[    0.054276] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    0.054317] PCI: CLS 0 bytes, default 64
+[    0.056259] workingset: timestamp_bits=14 max_order=16 bucket_order=2
+[    0.057915] squashfs: version 4.0 (2009/01/31) Phillip Lougher
+[    0.057924] jffs2: version 2.2 (NAND) (SUMMARY) (ZLIB) (LZMA) (RTIME) (CMODE_PRIORITY) (c) 2001-2006 Red Hat, Inc.
+[    0.061382] pinctrl-single 94200000.pinctrl: 128 pins, size 16
+[    0.063709] Serial: 8250/16550 driver, 2 ports, IRQ sharing disabled
+[    0.068595] zx-qspi 94406000.spi: ZX QSPI Controller driver initializing
+[    0.069232] zx-qspi 94406000.spi: Cannot get RX DMA, using PIO
+[    0.069245] zx-qspi 94406000.spi: Cannot get TX DMA, using PIO
+[    0.069768] spi-nand spi0.0: SkyHigh SPI NAND was found.
+[    0.069779] spi-nand spi0.0: 128 MiB, block size: 128 KiB, page size: 2048, OOB size: 64
+[    0.070326] 10 fixed-partitions partitions found on MTD device spi0.0
+[    0.070347] Creating 10 MTD partitions on "spi0.0":
+[    0.070378] 0x000000000000-0x000000100000 : "bootloader"
+[    0.071764] 0x000000100000-0x000000200000 : "tag"
+[    0.073688] 0x000000200000-0x000000300000 : "wifi"
+[    0.075128] 0x000000300000-0x000000500000 : "usercfg"
+[    0.076826] 0x000000500000-0x000000700000 : "defcfg"
+[    0.079090] 0x000000700000-0x000002300000 : "slot0"
+[    0.094798] 0x000002300000-0x000003f00000 : "slot1"
+[    0.111016] 0x000002700000-0x000002f00000 : "rootfs"
+[    0.111545] mtd: setting mtd7 (rootfs) as root device
+[    0.112047] 1 squashfs-split partitions found on MTD device rootfs
+[    0.112066] 0x000002b40000-0x000002f00000 : "rootfs_data"
+[    0.112902] 0x000002f00000-0x000002f20000 : "slot1-header"
+[    0.113726] 0x000002f20000-0x000003f00000 : "rootfs_data"
+[    0.181521] zx279128s-eth 92000000.ethernet lan3 (uninitialized): PHY [9a101000.mdio:0a] driver [Generic PHY] (irq=POLL)
+[    0.182417] zx279128s-eth 92000000.ethernet lan2 (uninitialized): PHY [9a101000.mdio:0b] driver [Generic PHY] (irq=POLL)
+[    0.183444] zx279128s-eth 92000000.ethernet lan1 (uninitialized): PHY [9a101000.mdio:0c] driver [Generic PHY] (irq=POLL)
+[    0.184315] zx279128s-eth 92000000.ethernet wan (uninitialized): PHY [9a101000.mdio:0d] driver [Generic PHY] (irq=POLL)
+[    0.188141] NET: Registered PF_INET6 protocol family
+[    0.190448] Segment Routing with IPv6
+[    0.190502] In-situ OAM (IOAM) with IPv6
+[    0.190586] NET: Registered PF_PACKET protocol family
+[    0.190946] 8021q: 802.1Q VLAN Support v1.8
+[    0.191050] Registering SWP/SWPB emulation handler
+[    0.214385] clk: Disabling unused clocks
+[    0.214472] Warning: unable to open an initial console.
+[    0.215203] check access for rdinit=/init failed: -2, ignoring
+[    0.215418] mtdblock: MTD device 'rootfs' is NAND, please consider using UBI block devices instead.
+[    0.222223] VFS: Mounted root (squashfs filesystem) readonly on device 31:7.
+[    0.223205] Freeing unused kernel image (initmem) memory: 1024K
+[    0.223468] Run /sbin/init as init process
+[    0.223473]   with arguments:
+[    0.223476]     /sbin/init
+[    0.223479]   with environment:
+[    0.223481]     HOME=/
+[    0.223484]     TERM=linux
+[    0.762465] init: Console is alive
+[    1.524482] kmodloader: loading kernel modules from /etc/modules-boot.d/*
+[    1.563880] gpio_button_hotplug: loading out-of-tree module taints kernel.
+[    1.568672] kmodloader: done loading kernel modules from /etc/modules-boot.d/*
+[    1.569424] init: - preinit -
+[    4.866231] random: crng init done
+[    4.979808] zx279128s-eth 92000000.ethernet lan1: configuring for phy/internal link mode
+[    9.116750] zx279128s-eth 92000000.ethernet lan1: Link is Up - 1Gbps/Full - flow control off
+[    9.281692] mount_root: no usable overlay filesystem found, using tmpfs overlay
+[    9.284218] urandom-seed: Seed file not found (/etc/urandom.seed)
+[    9.639371] zx279128s-eth 92000000.ethernet lan1: Link is Down
+[    9.645221] procd: - early -
+[   10.231506] procd: - ubus -
+[   10.306785] procd: - init -
+[   11.237914] kmodloader: loading kernel modules from /etc/modules.d/*
+[   11.275671] urngd: v1.0.2 started.
+[   11.554019] i2c_dev: i2c /dev entries driver
+[   11.561169] Loading modules backported from Linux version v7.2-0-g8d3ae59288f1
+[   11.561179] Backport generated by backports.git v5.15.58-1-198-g2580fa90cb79
+[   11.811338] PPP generic driver version 2.4.2
+[   11.812667] NET: Registered PF_PPPOX protocol family
+[   11.821140] kmodloader: done loading kernel modules from /etc/modules.d/*
+[   20.274604] jffs2: NAND pages can be programmed once: clean markers are in the data, 2048 bytes
+[   20.306037] jffs2: notice: (2746) jffs2_build_xattr_subsystem: complete building xattr subsystem, 0 of xdatum (0 unchecked, 0 orphan) and 0 of xref (0 dead, 0 orphan) found.
+[   20.392382] overlayfs: upper fs does not support tmpfile.
+[   20.545441] zx279128s-eth 92000000.ethernet lan1: configuring for phy/internal link mode
+[   20.547547] br-lan: port 1(lan1) entered blocking state
+[   20.547567] br-lan: port 1(lan1) entered disabled state
+[   20.547610] zx279128s-eth 92000000.ethernet lan1: entered allmulticast mode
+[   20.547833] zx279128s-eth 92000000.ethernet lan1: entered promiscuous mode
+[   20.571094] zx279128s-eth 92000000.ethernet lan2: configuring for phy/internal link mode
+[   20.574500] br-lan: port 2(lan2) entered blocking state
+[   20.574520] br-lan: port 2(lan2) entered disabled state
+[   20.574567] zx279128s-eth 92000000.ethernet lan2: entered allmulticast mode
+[   20.574817] zx279128s-eth 92000000.ethernet lan2: entered promiscuous mode
+[   20.589356] zx279128s-eth 92000000.ethernet lan3: configuring for phy/internal link mode
+[   20.596530] br-lan: port 3(lan3) entered blocking state
+[   20.596565] br-lan: port 3(lan3) entered disabled state
+[   20.596618] zx279128s-eth 92000000.ethernet lan3: entered allmulticast mode
+[   20.596883] zx279128s-eth 92000000.ethernet lan3: entered promiscuous mode
+[   20.611355] zx279128s-eth 92000000.ethernet wan: configuring for phy/internal link mode
+[   22.236986] platform f000000.pcie: deferred probe pending: zx279128s-pcie: failed to get pcie phy
+[   22.237001] platform f100000.pcie: deferred probe pending: zx279128s-pcie: failed to get pcie phy
+[   24.716992] zx279128s-eth 92000000.ethernet lan1: Link is Up - 1Gbps/Full - flow control off
+[   24.717067] br-lan: port 1(lan1) entered blocking state
+[   24.717079] br-lan: port 1(lan1) entered forwarding state
+[  280.886105] mtdblock: MTD device 'rootfs_data' is NAND, please consider using UBI block devices instead.
+@@@ mdio
+9a101000.mdio:0a
+9a101000.mdio:0b
+9a101000.mdio:0c
+9a101000.mdio:0d
+/sys/bus/mdio_bus/devices/9a101000.mdio:0a driver=Generic
+/sys/bus/mdio_bus/devices/9a101000.mdio:0b driver=Generic
+/sys/bus/mdio_bus/devices/9a101000.mdio:0c driver=Generic
+/sys/bus/mdio_bus/devices/9a101000.mdio:0d driver=Generic
+@@@ net
+lrwxrwxrwx    1 root     root             0 Oct 12 17:14 br-lan -> ../../devices/virtual/net/br-lan
+lrwxrwxrwx    1 root     root             0 Jan  1  1970 lan1 -> ../../devices/platform/soc/92000000.ethernet/net/lan1
+lrwxrwxrwx    1 root     root             0 Jan  1  1970 lan2 -> ../../devices/platform/soc/92000000.ethernet/net/lan2
+lrwxrwxrwx    1 root     root             0 Jan  1  1970 lan3 -> ../../devices/platform/soc/92000000.ethernet/net/lan3
+lrwxrwxrwx    1 root     root             0 Jan  1  1970 lo -> ../../devices/virtual/net/lo
+lrwxrwxrwx    1 root     root             0 Jan  1  1970 wan -> ../../devices/platform/soc/92000000.ethernet/net/wan
+1: lo    inet 127.0.0.1/8 scope host lo\       valid_lft forever preferred_lft forever
+1: lo    inet6 ::1/128 scope host \       valid_lft forever preferred_lft forever
+6: br-lan    inet 192.168.1.1/24 brd 192.168.1.255 scope global br-lan\       valid_lft forever preferred_lft forever
+6: br-lan    inet6 fd2a:2f18:b9ea::1/60 scope global noprefixroute \       valid_lft forever preferred_lft forever
+6: br-lan    inet6 fe80::a048:a7ff:fed1:d547/64 scope link \       valid_lft forever preferred_lft forever
+@@@ pci
+@@@ wifi
+mt7915_rom_patch.bin
+mt7915_wa.bin
+mt7915_wm.bin
+{
+	
+}
+@@@ leds
+lrwxrwxrwx    1 root     root             0 Jan  1  1970 green:power -> ../../devices/platform/leds/leds/green:power
+lrwxrwxrwx    1 root     root             0 Jan  1  1970 green:wan -> ../../devices/platform/leds/leds/green:wan
+lrwxrwxrwx    1 root     root             0 Jan  1  1970 green:wlan -> ../../devices/platform/leds/leds/green:wlan
+/sys/class/leds/green:power brightness=1 trigger=[none] timer heartbeat default-on netdev
+/sys/class/leds/green:wan brightness=0 trigger=[none] timer heartbeat default-on netdev
+/sys/class/leds/green:wlan brightness=0 trigger=[none] timer heartbeat default-on netdev
+@@@ gpio
+chip0
+chip1
+chip2
+chip3
+chip4
+chip5
+export
+gpiochip512
+gpiochip528
+gpiochip544
+gpiochip560
+gpiochip576
+gpiochip592
+unexport
+@@@ fwslot
+running slot: 1
+slot 0: base 0x700000 span 0x1c00000 mtd5 header@0x1560000 serial=16 version="V1.0.0.7B5.8000" [next boot]
+slot 1: base 0x2300000 span 0x1c00000 mtd6 header@0xc00000 serial=17 version="V1.0.0.8B8.8000" [running]
+       damaged: root filesystem CRC mismatch (cspboot will not be pointed here)
+usage: e2631-fwslot check <package.bin>  verify a package without writing
+       e2631-fwslot flash <package.bin>  write package to the inactive slot
+       e2631-fwslot switch              verify the other slot and make it the next boot
+       e2631-fwslot boot <0|1>          same, naming the slot explicitly
+       e2631-fwslot info [-j]           show both slots, -j as JSON
+@@@ done

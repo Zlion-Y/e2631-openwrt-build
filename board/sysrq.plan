@@ -1,0 +1,15 @@
+17000|BREAK:w
+19000|BREAK:l
+22000|BREAK:w
+25000|BREAK:l
+28000|BREAK:m
+31000|uci set wireless.radio0.disabled=1; uci set wireless.radio1.disabled=1; uci set wireless.default_radio0.disabled=1; uci set wireless.default_radio1.disabled=1; uci commit wireless; sync; echo RADIOS-OFF
+38000|BREAK:w
+42000|BREAK:l
+46000|echo STILL-ALIVE-$(cut -d" " -f1 /proc/uptime); iw dev | head -4; grep mt7915e /proc/interrupts
+52000|uci set wireless.radio0.disabled=1; uci commit wireless; sync; echo RADIOS-OFF-2
+58000|BREAK:w
+64000|echo STILL-ALIVE-$(cut -d" " -f1 /proc/uptime); dmesg | tail -8
+70000|BREAK:l
+76000|echo STILL-ALIVE-$(cut -d" " -f1 /proc/uptime); dmesg | tail -10
+85000|echo LAST-LOOK; grep mt7915e /proc/interrupts; dmesg | tail -12

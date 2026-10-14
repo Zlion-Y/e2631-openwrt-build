@@ -1,0 +1,105 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1500ms] "root\r\n"
+root
+Password: 
+=== [send @4500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @8000ms] "echo W1; ls -l /lib/firmware 2>&1\r\n"
+echo W1; ls -l /lib/firmware 2>&1
+W1
+ls: /lib/firmware: No such file or directory
+/ # 
+=== [send @12000ms] "echo W2; ls -l /lib/firmware/mediatek 2>&1\r\n"
+echo W2; ls -l /lib/firmware/mediatek 2>&1
+W2
+ls: /lib/firmware/mediatek: No such file or directory
+/ # 
+=== [send @16000ms] "echo W3; ls -d /wlan /etc/wlan /misc /lib/firmware/* 2>&1\r\n"
+echo W3; ls -d /wlan /etc/wlan /misc /lib/firmware/* 2>&1
+W3
+ls: /etc/wlan: No such file or directory
+ls: /misc: No such file or directory
+ls: /lib/firmware/*: No such file or directory
+/wlan
+/ # 
+=== [send @22000ms] "echo W4; find / -maxdepth 6 -name '*.bin' -size +50k 2>/dev/null\r\n"
+echo W4; find / -maxdepth 6 -name '*.bin' -size +50k 2>/dev/null
+W4
+/ # 
+=== [send @40000ms] "echo W5; find / -maxdepth 6 -iname 'mt7*' 2>/dev/null\r\n"
+echo W5; find / -maxdepth 6 -iname 'mt7*' 2>/dev/null
+W5
+/etc/wireless/mt7916
+/etc/wireless/mt7916/mt7916_Debug.sh
+/etc/wireless/mt7916/mt7916_patch_e1_hdr.bin
+/etc/wireless/mt7916/MT7916_EEPROM.bin
+/etc/wireless/mt7916/mt7916.dbdc.b0.dat
+/etc/wireless/mt7916/mt7916.dbdc.b1.dat
+/var/tmp/mt7916.dbdc.b1.dat
+/var/tmp/mt7916.dbdc.b0.dat
+/sys/module/tm/holders/mt7916
+/sys/module/plat_zxylzb_9128S/holders/mt7916
+/sys/module/mt7916
+/kmodule/lib/modules/mt7916.ko
+/ # 
+=== [send @52000ms] "echo W6; find / -maxdepth 6 -iname '*rebb*' -o -maxdepth 6 -iname 'WAN_*' 2>/dev/null\r\n"
+echo W6; find / -maxdepth 6 -iname '*rebb*' -o -maxdepth 6 -iname 'WAN_*' 2>
+/dev/null
+W6
+/kmodule/home/httpd/webmodules/modules/wan_comm_lua.lua
+/kmodule/home/httpd/webmodules/modules/wan_common_func.lua
+/kmodule/home/httpd/webmodules/modules/wan_convert_table.lua
+/kmodule/home/httpd/webmodules/modules/wan_internet_lua.lua
+/kmodule/home/httpd/webmodules/modules/wan_wancbridge_lua.lua
+/kmodule/home/httpd/webmodules/modules/wan_wancip_lua.lua
+/kmodule/home/httpd/webmodules/modules/wan_wancppp_lua.lua
+/ # 
+=== [send @62000ms] "echo W7; ls -l /lib/modules 2>&1; ls /lib/modules/*/ 2>&1 | sed -n 1,12p\r\n"
+echo W7; ls -l /lib/modules 2>&1; ls /lib/modules/*/ 2>&1 | sed -n 1,12p
+W7
+drwxr-xr-x    3 Z500_w9b root           311 Sep 25  2025 4.1.25
+-rw-r--r--    1 Z500_w9b root         15232 Sep 25  2025 lan_test.ko
+-rwxr-xr-x    1 Z500_w9b root       5586568 Sep 25  2025 mt7916.ko
+-rwxr-xr-x    1 Z500_w9b root         64010 Sep 25  2025 wlan_debug_module.ko
+build
+kernel
+modules.alias
+modules.alias.bin
+modules.builtin
+modules.builtin.bin
+modules.dep
+modules.dep.bin
+modules.devname
+modules.order
+modules.softdep
+modules.symbols
+/ # 
+=== [send @75000ms] "echo W8; for f in $(find / -maxdepth 6 -name '*.bin' -size +100k 2>/dev/null); do md5sum $f; done\r\n"
+echo W8; for f in $(find / -maxdepth 6 -name '*.bin' -size +100k 2>/dev/null
+); do md5sum $f; done
+W8
+/ # 
+=== [send @110000ms] "echo W9; cat /proc/modules | sed -n 1,12p\r\n"
+echo W9; cat /proc/modules | sed -n 1,12p
+W9
+xdpi 882299 0 - Live 0xbf6d8000 (O)
+mt7916 4506386 5 - Live 0xbf1f9000 (O)
+idmfdb 64461 0 - Live 0xbf1e4000 (O)
+switch 172680 1 idmfdb, Live 0xbf1ab000 (O)
+tm 1179936 2 mt7916,switch, Live 0xbf04d000 (O)
+plat_zxylzb_9128S 167427 4 mt7916,idmfdb,switch,tm, Live 0xbf018000 (O)
+zx_ponreg 2256 2 switch,tm, Live 0xbf014000 (O)
+patch 2057 0 - Live 0xbf010000 (O)
+shellproc 47932 1 patch,[permanent], Live 0xbf000000 (O)
+/ # 
+=== [send @120000ms] "exit\r\n"
+exit
+
+### CLOSED

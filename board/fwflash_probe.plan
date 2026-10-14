@@ -1,0 +1,9 @@
+1500|root
+4500|<redacted:vendor telnet password>
+7000|which fw_flashing; which boot_flashing; which upgradetest
+9000|busybox grep -rl fw_flashing /www /usr/lib/lua /etc /bin /usr/bin 2>/dev/null
+13000|F=$(which fw_flashing); echo "$F"; busybox strings "$F" 2>/dev/null | busybox grep -iE "usage|slot|version|tmp|bin$|\\.%s|flash" | head -30
+20000|busybox strings /bin/fw_flashing 2>/dev/null | head -40
+26000|ls -l /tmp/*.bin /tmp/upgrade* /var/upgrade* 2>/dev/null
+29000|echo ZDONE
+31000|exit

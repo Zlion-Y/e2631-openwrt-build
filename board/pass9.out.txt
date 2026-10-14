@@ -1,0 +1,143 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1000ms] "root\r\n"
+root
+Password: 
+=== [send @3000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @9000ms] "\r\n"
+
+/ # 
+=== [send @12000ms] "echo C1; cat /sys/class/mtd/mtd0/bbt_blocks /sys/class/mtd/mtd0/bad_blocks\r\n"
+echo C1; cat /sys/class/mtd/mtd0/bbt_blocks /sys/class/mtd/mtd0/bad_blocks
+C1
+0
+0
+/ # 
+=== [send @16000ms] "echo C2; for f in /sys/class/mtd/mtd*/bbt_blocks; do echo $f; cat $f; done\r\n"
+echo C2; for f in /sys/class/mtd/mtd*/bbt_blocks; do echo $f; cat $f; done
+C2
+/sys/class/mtd/mtd0/bbt_blocks
+0
+/sys/class/mtd/mtd1/bbt_blocks
+0
+/sys/class/mtd/mtd10/bbt_blocks
+0
+/sys/class/mtd/mtd11/bbt_blocks
+0
+/sys/class/mtd/mtd12/bbt_blocks
+0
+/sys/class/mtd/mtd13/bbt_blocks
+0
+/sys/class/mtd/mtd14/bbt_blocks
+0
+/sys/class/mtd/mtd2/bbt_blocks
+0
+/sys/class/mtd/mtd3/bbt_blocks
+0
+/sys/class/mtd/mtd4/bbt_blocks
+0
+/sys/class/mtd/mtd5/bbt_blocks
+0
+/sys/class/mtd/mtd6/bbt_blocks
+0
+/sys/class/mtd/mtd7/bbt_blocks
+0
+/sys/class/mtd/mtd8/bbt_blocks
+0
+/sys/class/mtd/mtd9/bbt_blocks
+0
+/ # 
+=== [send @26000ms] "echo C3; for f in /sys/class/mtd/mtd*/bad_blocks; do echo $f; cat $f; done\r\n"
+echo C3; for f in /sys/class/mtd/mtd*/bad_blocks; do echo $f; cat $f; done
+C3
+/sys/class/mtd/mtd0/bad_blocks
+0
+/sys/class/mtd/mtd1/bad_blocks
+0
+/sys/class/mtd/mtd10/bad_blocks
+0
+/sys/class/mtd/mtd11/bad_blocks
+0
+/sys/class/mtd/mtd12/bad_blocks
+0
+/sys/class/mtd/mtd13/bad_blocks
+0
+/sys/class/mtd/mtd14/bad_blocks
+0
+/sys/class/mtd/mtd2/bad_blocks
+0
+/sys/class/mtd/mtd3/bad_blocks
+0
+/sys/class/mtd/mtd4/bad_blocks
+0
+/sys/class/mtd/mtd5/bad_blocks
+0
+/sys/class/mtd/mtd6/bad_blocks
+0
+/sys/class/mtd/mtd7/bad_blocks
+0
+/sys/class/mtd/mtd8/bad_blocks
+0
+/sys/class/mtd/mtd9/bad_blocks
+0
+/ # 
+=== [send @36000ms] "echo C4; dmesg 2>&1 | grep -i -E \"bad block|bbt|brow|scan\"\r\n"
+echo C4; dmesg 2>&1 | grep -i -E "bad block|bbt|brow|scan"
+C4
+/ # 
+=== [send @50000ms] "echo C5; cat /proc/zte/verinfo/versionstates\r\n"
+echo C5; cat /proc/zte/verinfo/versionstates
+C5
+=========================Version Information=========================
+curverBootStartPhyAddr: 0x00700000
+currentverphyaddr: 0x00700000
+curverheaderaddr: 0x01c60000
+curverSerialNumber: 0x00000010
+IsCurrentVersion: 0x00000001
+curverIsBad: 0x00000000
+curverheader_lowstart: 0x00700000
+curverheader_lowendstart: 0x02300000
+curverheader_highstart: 0x02300000
+curverheader_highendStart: 0x03f00000
+curversignsize: 0x00000000
+curFirmwareForm: 0x00000001
+curFirmwareType: 0x00000000
+curUpgradeKey1: 0x00001351
+curUpgradeKey2: 0x00005211
+backverphyaddr: 0x02300000
+backverheaderaddr: 0x03860000
+backverSerialNumber: 0x00000010
+IsCurrentVersion: 0x00000000
+backverIsBad: 0x00000000
+maxversionum: 0x00000010
+=====================================================================
+/ # 
+=== [send @62000ms] "echo C6; busybox hexdump -C -s 0x3300000 -n 16 /dev/mtdblock0; busybox hexdump -C -s 0x3860000 -n 64 /dev/mtdblock0\r\n"
+echo C6; busybox hexdump -C -s 0x3300000 -n 16 /dev/mtdblock0; busybox hexdu
+mp -C -s 0x3860000 -n 64 /dev/mtdblock0
+C6
+03300000  e3 68 17 e0 59 8f f0 e5  ef 91 75 cc 37 31 ad 33  |.h..Y.....u.71.3|
+03300010
+03860000  00 00 00 00 00 00 00 00  51 13 00 00 11 52 00 00  |........Q....R..|
+03860010  56 31 2e 30 2e 30 2e 37  42 35 2e 38 30 30 30 00  |V1.0.0.7B5.8000.|
+03860020  00 00 00 00 00 00 00 00  00 00 00 00 01 00 00 00  |................|
+03860030  00 00 56 01 cc fd 33 00  34 02 00 00 46 c2 f7 9e  |..V...3.4...F...|
+03860040
+/ # 
+=== [send @70000ms] "echo C7; cat /proc/uptime; cat /proc/zte/verinfo/softVersion\r\n"
+echo C7; cat /proc/uptime; cat /proc/zte/verinfo/softVersion
+C7
+3894.56 7716.54
+V1.0.0.7B5.8000
+/ # 
+=== [send @71500ms] "exit\r\n"
+exit
+
+### CLOSED

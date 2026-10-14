@@ -1,0 +1,59 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1500ms] "root\r\n"
+root
+Password: 
+=== [send @4500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @7000ms] "busybox hexdump -C -s 0x1c60000 -n 512 /dev/mtd0 | busybox sed -n \"1p;31,33p\"\r\n"
+busybox hexdump -C -s 0x1c60000 -n 512 /dev/mtd0 | busybox sed -n "1p;31,33p
+"
+01c60000  00 00 00 00 00 00 00 00  51 13 00 00 11 52 00 00  |........Q....R..|
+/ # 
+=== [send @11000ms] "busybox hexdump -C -s 0x3700000 -n 512 /dev/mtd0 | busybox sed -n \"1p;31,33p\"\r\n"
+busybox hexdump -C -s 0x3700000 -n 512 /dev/mtd0 | busybox sed -n "1p;31,33p
+"
+03700000  bf cf 01 04 67 84 fb 3a  e7 cc e3 10 e8 f8 83 be  |....g..:........|
+037001e0  c0 65 55 8d 55 4d b4 08  66 d0 14 ff 6e 6f 38 47  |.eU.UM..f...no8G|
+037001f0  91 f7 82 eb 82 d8 ab 97  37 1d df ef 2c 85 36 8e  |........7...,.6.|
+03700200
+/ # 
+=== [send @15000ms] "busybox hexdump -C -s 0x3860000 -n 512 /dev/mtd0 | busybox sed -n \"1p;31,33p\"\r\n"
+busybox hexdump -C -s 0x3860000 -n 512 /dev/mtd0 | busybox sed -n "1p;31,33p
+"
+03860000  00 00 00 00 00 00 00 00  51 13 00 00 11 52 00 00  |........Q....R..|
+/ # 
+=== [send @19000ms] "busybox hexdump -C -s 0x3700000 -n 64 /dev/mtd0\r\n"
+busybox hexdump -C -s 0x3700000 -n 64 /dev/mtd0
+03700000  bf cf 01 04 67 84 fb 3a  e7 cc e3 10 e8 f8 83 be  |....g..:........|
+03700010  6b 94 3b 64 5b ca 43 1f  88 d9 0f 67 c9 a3 2a 7e  |k.;d[.C....g..*~|
+03700020  3e 74 52 b1 a7 6a f1 3c  6f 11 da 50 76 18 87 91  |>tR..j.<o..Pv...|
+03700030  1d 21 dd b3 97 e5 ec 0d  ac aa a8 1a 62 c7 2c 49  |.!..........b.,I|
+03700040
+/ # 
+=== [send @23000ms] "busybox hexdump -C -s 0x3860000 -n 64 /dev/mtd0\r\n"
+busybox hexdump -C -s 0x3860000 -n 64 /dev/mtd0
+03860000  00 00 00 00 00 00 00 00  51 13 00 00 11 52 00 00  |........Q....R..|
+03860010  56 31 2e 30 2e 30 2e 37  42 35 2e 38 30 30 30 00  |V1.0.0.7B5.8000.|
+03860020  00 00 00 00 00 00 00 00  00 00 00 00 01 00 00 00  |................|
+03860030  00 00 56 01 cc fd 33 00  34 02 00 00 46 c2 f7 9e  |..V...3.4...F...|
+03860040
+/ # 
+=== [send @27000ms] "/var/tmp/fw info\r\n"
+/var/tmp/fw info
+/bin/sh: /var/tmp/fw: not found
+/ # 
+=== [send @31000ms] "echo ZDONE\r\n"
+echo ZDONE
+ZDONE
+/ # 
+=== [send @33000ms] "exit\r\n"
+exit
+
+### CLOSED

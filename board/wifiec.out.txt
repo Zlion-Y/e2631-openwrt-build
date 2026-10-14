@@ -1,0 +1,16 @@
+[connected 192.168.5.3:23]
+E2631> root
+
+Login: > <redacted:vendor telnet password>
+r> echo V1_PCI; ls /sys/bus/pci/devices/; echo --drivers--; ls /sys/bus/pci/drivers/
+> echo V2_IDENT; for d in /sys/bus/pci/devices/*; do echo "$d $(cat $d/vendor):$(cat $d/device) class=$(cat $d/class) irq=$(cat $d/irq)"; done
+> echo V3_DMESG; dmesg | grep -iE "pcie|phy|link|mt7|14c3|perst|reset" | head -25
+> echo V4_IF; ls /sys/class/net/; echo --; cat /sys/class/net/wlan0/operstate /sys/class/net/wlan0/address 2>&1
+> echo V5_WIFI; ls /wlan 2>/dev/null | head -8; echo --; cat /proc/capability/portinfo 2>/dev/null | head -3
+> echo V6_INT; grep -iE "pcie|phy" /proc/interrupts
+> echo V7_MODS; cat /proc/modules | cut -d" " -f1 | tr "\n" " "
+> echo V8_GPIO; cat /sys/kernel/debug/gpio 2>/dev/null | head -40
+> echo V9_MTDS; cat /proc/mtd
+> echo VA_WLANSVC; ls /etc/init.d/ | grep -iE "lan|wifi|wlan"; echo --; grep -riE "gpio|perst|power" /etc/init.d/*wlan* /etc/init.d/*wifi* 2>/dev/null | head -12
+> echo VZ_END
+> exit

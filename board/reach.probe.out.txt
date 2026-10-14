@@ -1,0 +1,46 @@
+### connected 192.168.5.3:23
+E2631
+Login: 
+=== [send @1500ms] "root\r\n"
+root
+Password: 
+=== [send @4500ms] "<redacted:vendor telnet password>\r\n"
+
+
+BusyBox v1.17.2 (2025-09-25 21:57:20 CST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+/ # 
+=== [send @8000ms] "echo C-IP; ifconfig | busybox grep -E \"addr|HWaddr\" | head -6\r\n"
+echo C-IP; ifconfig | busybox grep -E "addr|HWaddr" | head -6
+C-IP
+/bin/sh: head: not found
+/ # 
+=== [send @12000ms] "echo C-ARP; ping -c 2 -W 2 192.168.5.5 2>&1 | tail -3\r\n"
+echo C-ARP; ping -c 2 -W 2 192.168.5.5 2>&1 | tail -3
+C-ARP
+/bin/sh: tail: not found
+/ # 
+=== [send @18000ms] "echo C-GW; ip route 2>/dev/null | head -4; arp -n 2>/dev/null | head -5\r\n"
+echo C-GW; ip route 2>/dev/null | head -4; arp -n 2>/dev/null | head -5
+C-GW
+/bin/sh: head: not found
+/bin/sh: head: not found
+/ # 
+=== [send @24000ms] "echo C-HTTP; /bin/curl -m 10 -s -o /dev/null -w 'code=%{http_code} bytes=%{size_download}\\n' http://192.168.5.5:8000/e2631-openwrt-efusefix.bin\r\n"
+echo C-HTTP; /bin/curl -m 10 -s -o /dev/null -w 'code=%{http_code} bytes=%{s
+ize_download}\n' http://192.168.5.5:8000/e2631-openwrt-efusefix.bin
+C-HTTP
+code=000 bytes=0
+/ # 
+=== [send @36000ms] "echo C-HTTP177; /bin/curl -m 10 -s -o /dev/null -w 'code=%{http_code} bytes=%{size_download}\\n' http://192.168.1.177:8000/e2631-openwrt-efusefix.bin\r\n"
+echo C-HTTP177; /bin/curl -m 10 -s -o /dev/null -w 'code=%{http_code} bytes=
+%{size_download}\n' http://192.168.1.177:8000/e2631-openwrt-efusefix.bin
+C-HTTP177
+
+=== [send @46000ms] "exit\r\n"
+exit
+code=000 bytes=0
+/ # exit
+
+### CLOSED
