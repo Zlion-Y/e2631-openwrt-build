@@ -1,21 +1,34 @@
 # OpenWrt for the ZTE ZXHN E2631 (Sanechips ZX279128S)
 
+**To build this: [BUILD.md](BUILD.md).** It is the single supported path from a clone to
+a package that flashes, and it lists the two inputs this repository cannot hand you (the
+pinned base tree, the vendor version-header template) plus the failure modes.
+`make check` runs every gate. [docs/architecture.md](docs/architecture.md) maps the
+pieces; [docs/known-issues.md](docs/known-issues.md) is the machine-readable honest list,
+including what is still broken on real hardware.
+
 This one repository holds the whole port: the overlay that turns the base tree into an
-E2631 build (`overlay/`), the local build path (`wsl/`, grouped in `wsl/INDEX.md`), the
-board-side scripts and the vendor-side flash plans (`board/`), the Windows-side tooling
-(`host/`), and the two working documents with the evidence notes (`docs/`). There is no
-CI any more - the build happens in WSL on this machine, and `wsl/check-kit.sh` plus
-`node build/host/release.mjs` are the gates that used to live in a workflow.
+E2631 build (`overlay/`), the local build path (`wsl/`, grouped in `wsl/INDEX.md`, and the
+portable entry points in `scripts/`), the board-side scripts and the vendor-side flash
+plans (`board/`), the Windows-side tooling (`host/`), and the two working documents with
+the evidence notes (`docs/`). There is no CI any more - the build happens in WSL on this
+machine, and `make check` (which runs `wsl/check-kit.sh` and the ash/dts gates) plus
+`node build/host/release.mjs` are the checks that used to live in a workflow.
 
     git clone --branch pr-zte-zxhn-h3600 https://github.com/Zlion-Y/openwrt-sanechips-mirror openwrt
     git -C openwrt checkout db8b8d4130457dbe46558a7cea872dd2dae539e6
     ./apply.sh openwrt
 
-Packaging into the vendor upgrade format happens on the Windows side with
-`node build/host/release.mjs --dir out/<build>` (run from the workspace root, because
-`out/` and the official template package in `升级包/` are not in git): it packs, then
-re-derives the geometry independently and screens the artifact for the things that stop a
-boot. The official package used as the version-header template is never uploaded here.
+`scripts/bootstrap.sh` does those three lines, the feeds and the seed config, and
+witnesses each one; `scripts/build.sh` then continues to a flashable package.
+
+Packaging into the vendor upgrade format is `node host/release.mjs --dir <out/build-dir>`
+from anywhere: `out/`, the base tree and the template package resolve through
+`E2631_WORK`/`E2631_TREE`/`E2631_TEMPLATE` (environment or `.env`, see
+`.env.example`), so the run no longer depends on which directory you stood in. It packs,
+then re-derives the geometry independently and screens the artifact for the things that
+stop a boot. The official package used as the version-header template is never uploaded
+here, and the tool now says so instead of reading a nonexistent default path.
 
 Three screens run before the forty-minute build is allowed to be the test:
 `tools/dts_lint.mjs` resolves the board file's includes, `&labels` and
@@ -49,9 +62,14 @@ builds the E2631, not the H3600.
 
 ## Building it inside WSL
 
+For a Linux box with no Windows in the loop, use `scripts/bootstrap.sh` and
+`scripts/build.sh` - they are the portable path and they read the same `.env`. What
+follows is the WSL-specific half of this machine: the same steps, plus the workarounds
+for the network here.
+
 The Windows side of this machine has no cross toolchain, WSL does, and
-`wsl/build.sh` runs the same steps CI does against `~/openwrt` with this repo at
-`~/e2631`. What differs is the network: no proxy here, and the mirrors that
+`wsl/build.sh` runs the same steps CI does against `$E2631_TREE` with this repo at
+`$E2631_KIT`. What differs is the network: no proxy here, and the mirrors that
 answer throttle per connection (kernel.org 73 KB/s, sources.cdn.openwrt.org
 25 KB/s, sources.openwrt.org 14 KB/s, musl.libc.org nothing at all inside a 12 s
 probe). Three things keep that from owning the build:
@@ -131,15 +149,24 @@ no oops. Both are documented with their sample data in `docs/02-...md` section P
 
 ## What is deliberately not in here
 
-`out/` stays at the workspace root (`D:\AI\Qoder\E2631-OpenWRT\out`): every build
-directory, packed image, log and one-off experiment script. It is 1.1 GB of things that
-are either regenerable or evidence with a filename quoted in `docs/`, and `docs/` says so
-inline - a path written as `out/xxx.log` means the workspace root, not this repo. Also
-excluded by `.gitignore`: `board/harvest-H8.txt` (a 356 MB vendor system harvest),
+`out/` stays outside the repository, at `$E2631_WORK` (on this machine
+`D:\AI\Qoder\E2631-OpenWRT\out`): every build directory, packed image, log and one-off
+experiment script. It is 1.1 GB of things that are either regenerable or evidence with a
+filename quoted in `docs/`, and `docs/` says so inline - a path written as `out/xxx.log`
+means that directory, not this repo. `.env` is not in here either (`.env.example` is): it
+is the one file that may name a path from somebody's disk. Also excluded by
+`.gitignore`: `board/harvest-H8.txt` (a 356 MB vendor system harvest),
 `board/backup/` and `board/web/` (mtd and driver dumps, the scraped vendor UI),
 `board/config18.xml` and `board/webcreds.out.txt` (a vendor config export and a deliberate
 grep for password fields - neither belongs on GitHub), and `host/askpass.bat` (a
 git-credential helper whose only job is to hand a token to git).
+
+A note on `host/`: several of those scripts are one-off analyses that read evidence
+files - transcripts, mtd dumps, the vendor config export - which are deliberately not in
+git. They are here because `docs/` cites the numbers they printed, not because they are
+runnable on your machine. The ones that are part of the supported path are
+`release.mjs` (pack + both screens), `verify_pkg.mjs`, `publish.mjs`, `stage.mjs` and
+`test-token-expansion.mjs`; the build-side tools are in `tools/` and `wsl/`.
 
 Two sibling repos of ours are related. `Zlion-Y/e2631-mainline-zx279128s` (mainline
 Linux port) stays a separate effort - it is still where the real "this SoC boots"
