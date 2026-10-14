@@ -97,8 +97,13 @@ directory you did not just unpack is a stale answer.
 
 ## Status on the real board (2026-10-14, slot 1 = `e2631-openwrt-gen1.bin`)
 
-The published package is Release **`v1.0`** (`e2631-openwrt-v1.0.bin`, sha256
-`86012481bf92701bb901f8a996c84f20101babaa2f7fcfb17487742b8d408487`). Its kernel region is
+The current package is Release **`v1.1`** (`e2631-openwrt-v1.1.bin`, sha256
+`a6295d4aea3370b135c5f22c014cafc889b7c5cd3a05fcccc62b2a687c1fd769`): it adds `/sbin/e2631-wifi-ap`
+(the second gate: without it there is no /etc/config/wireless at all, and netifd marks every
+generated iface `disabled 1`) and makes the first-boot auto-revert opt-in via
+`/etc/e2631-trial-arm` instead of the default. Kernel region byte-identical to `v1.0`.
+
+`v1.0` (`e2631-openwrt-v1.0.bin`, sha256 `86012481bf92701bb901f8a996c84f20101babaa2f7fcfb17487742b8d408487`). Its kernel region is
 byte-identical to the `gen1` image in the table below -- already flashed and run on the box --
 and it differs only in the rootfs, which now actually carries `e2631-hb`, `e2631-wifi-on`,
 `e2631-wifi-load`, `e2631-linkspeed` and `e2631-fwstate`. That `.bin` has not been flashed
