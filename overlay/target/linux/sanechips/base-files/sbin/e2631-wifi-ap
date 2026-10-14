@@ -1,0 +1,86 @@
+#!/bin/sh
+# Turn "driver loaded" into "SSID a phone can see".
+#
+# This image boots silent on purpose, and there are TWO separate gates:
+#   1) the driver is not loaded at all (/etc/init.d/e2631-wifi-load only does it when
+#      /etc/e2631-wifi-autoload exists -- see /sbin/e2631-wifi-on);
+#   2) there is no /etc/config/wireless in the squashfs, and when netifd generates one,
+#      every interface it writes carries "option disabled '1'" because this board has no
+#      board.json wlan.defaults.  So even with the phy up, nothing is transmitting.
+# This script is gate 2.  It only touches configuration and netifd; it never loads a
+# module, so it is safe to run before or after e2631-wifi-on.
+#
+#   e2631-wifi-ap                  # open network "E2631-OpenWrt" on every radio
+#   e2631-wifi-ap MySSID 12345678   # WPA2-PSK (key must be >= 8 chars)
+#   e2631-wifi-ap off               # disable every interface again (driver stays loaded)
+#
+# Heads-up, measured on this board: a client ASSOCIATING has been hanging the whole
+# machine (no AER, no oops, only a power cycle). Scanning is not the risky part.
+set -u
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+WIRELESS=/etc/config/wireless
+
+log() { echo "wifi-ap: $*"; }
+
+iface_indexes() {
+	uci -q show wireless 2>/dev/null | sed -n "s/^\(wireless\.\)\?@*wifi-iface\[\([0-9]*\)\]\(=\|.*\)$/\2/p" | sort -n -u
+}
+
+[ "$(id -u)" = 0 ] || { log "needs root"; exit 1; }
+
+if [ "${1:-}" = off ]; then
+	idx=$(iface_indexes)
+	[ -n "$idx" ] || { log "no wifi-iface configured, nothing to turn off"; exit 0; }
+	for i in $idx; do uci set "wireless.@wifi-iface[$i].disabled=1"; done
+	uci commit wireless
+	wifi reload
+	log "interfaces disabled (driver still loaded; 'rmmod' is not offered because it has hung the box)"
+	exit 0
+fi
+
+SSID=${1:-E2631-OpenWrt}
+KEY=${2:-}
+
+# gate 1 has to be done by hand or by autoload: a missing phy is not this script's job
+if ! iw phy 2>/dev/null | grep -q '^Wiphy'; then
+	log "no wireless phy yet -- run:  /sbin/e2631-wifi-on 0"
+	log "then come back to this command"
+	exit 1
+fi
+
+if [ ! -f "$WIRELESS" ]; then
+	log "no $WIRELESS, generating it from the phys that exist (wifi config)"
+	wifi config
+fi
+
+idx=$(iface_indexes)
+[ -n "$idx" ] || { log "wifi config produced no interface (no phy visible to netifd?)"; exit 1; }
+
+if [ ${#KEY} -lt 8 ]; then
+	[ -z "$KEY" ] || log "key shorter than 8 chars, ignoring it -> open network"
+	enc_val=none
+else
+	enc_val=psk2
+fi
+
+# the wifi-device can be disabled too; clear both gates for what we are about to start
+for d in $(uci -q show wireless | sed -n 's/^\(wireless\.[^.=]*\)=wifi-device$/\1/p'); do
+	uci set "$d.disabled=0"
+done
+
+for i in $idx; do
+	uci set "wireless.@wifi-iface[$i].disabled=0"
+	uci set "wireless.@wifi-iface[$i].mode=ap"
+	uci set "wireless.@wifi-iface[$i].network=lan"
+	uci set "wireless.@wifi-iface[$i].ssid=$SSID"
+	uci set "wireless.@wifi-iface[$i].encryption=$enc_val"
+	if [ "$enc_val" = psk2 ]; then uci set "wireless.@wifi-iface[$i].key=$KEY"; fi
+done
+uci commit wireless
+wifi reload
+
+log "configured $(echo "$idx" | wc -w) interface(s), ssid '$SSID', encryption $enc_val"
+log "state now:"
+iw dev
+ubus call network.wireless status 2>/dev/null | sed -n '1,40p'
+log "if a client connecting hangs the box, that is the known association stall, not this script"
