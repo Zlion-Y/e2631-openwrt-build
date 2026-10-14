@@ -1,0 +1,7 @@
+# Build/lint scratch and artifacts produced beside the scripts, never inputs.
+*.log
+*.err
+*.ko
+*.bin
+*.dtb
+payload/
