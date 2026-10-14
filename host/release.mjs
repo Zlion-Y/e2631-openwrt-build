@@ -1,48 +1,80 @@
 // Take a finished build's images and turn them into a flashable E2631 factory
-// package, then verify it independently. Everything stays in this workspace;
-// the official template package never leaves the machine.
+// package, then verify it independently. Everything stays on this machine; the
+// official template package never leaves it.
 //
-//   node build/host/release.mjs --dir out/<build>        # local build (the normal path)
+//   node build/host/release.mjs --dir <out/build-dir> --template <official.bin>
 //   node build/host/release.mjs --run <runId>            # only if you did use Actions
-//   [--template <official.bin>] [--out <file>]
+//   [--out <file>] [--rootfs-at 0x400000] [--header-at 0x1400000]
 //
-// Run it from the workspace root: inputs that are not part of the repo (out/,
-// 升级包/, the base tree clones) are resolved against the current directory, while
-// the repo's own scripts are found through this file's location.
+// Paths that are not part of the repo (out/, the template, the base tree clone)
+// resolve against $E2631_WORK - see scripts/env.sh and .env.example - so this can
+// be run from anywhere. Relative --template/--out/--dir values fall back to the
+// current directory when E2631_WORK is unset.
 //
 // Steps: fetch payload -> find kernel + rootfs -> mkfactory pack ->
 //        verify_pkg (independent re-derivation) -> print sha256 and slot budget.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));	// <repo>/host
 const REPO = path.join(HERE, '..');
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : d; };
+// scripts/env.sh reads $KIT/.env; do the same here so one file configures both
+// halves. Values stay literal - this parses the file, it never executes it, and an
+// exported variable still wins.
+const DOTENV = (() => {
+  try {
+    const out = {};
+    for (const line of fs.readFileSync(path.join(REPO, '.env'), 'utf8').split('\n')) {
+      const m = /^\s*(E2631_[A-Z0-9_]*)\s*=\s*(.*?)\s*$/.exec(line);
+      if (m && !line.trim().startsWith('#')) out[m[1]] = m[2].replace(/^["']|["']$/g, '');
+    }
+    return out;
+  } catch { return {}; }
+})();
+const envv = (k) => process.env[k] || DOTENV[k] || '';
+
+// Same default as scripts/env.sh: the directory that holds out/ and the template
+// is the kit's parent, so this works from the kit root and from the workspace
+// root alike. An E2631_WORK (env or .env) overrides it.
+const WORK = envv('E2631_WORK') || path.resolve(REPO, '..');
+const abs = (p) => (p && path.isAbsolute(p) ? p : path.join(WORK, p || ''));
 const run = arg('--run');
-const TEMPLATE = arg('--template', '升级包/zxhne2631_hv100_fv1008b88000_firmware-20260916183918.bin');
+// No default template: it is a vendor binary, it is not in this repository, and
+// guessing a path produced a confusing ENOENT from three files away.
+const TEMPLATE = abs(arg('--template', envv('E2631_TEMPLATE')));
 const ROOTFS_AT = arg('--rootfs-at', '0x400000');
 const HEADER_AT = arg('--header-at', '0x1400000');
-const OUT = arg('--out', 'out/e2631-openwrt-factory.bin');
+const OUT = abs(arg('--out', 'out/e2631-openwrt-factory.bin'));
 const DTS = path.join(REPO, 'overlay/target/linux/sanechips/dts/zx279128s-zte-zxhn-e2631.dts');
-const LOCAL = arg('--dir');	// a directory already holding kernel/root, to test this script
-if (!run && !LOCAL) { console.error('usage: release.mjs --run <runId> [--template f] [--out f] | --dir <dir>'); process.exit(2); }
-fs.mkdirSync('out', { recursive: true });
+const LOCAL = arg('--dir') ? abs(arg('--dir')) : '';	// a directory already holding kernel/root
+if (!run && !LOCAL) {
+  console.error('usage: release.mjs --dir <build dir> --template <official.bin> [--out f]');
+  console.error('   or: release.mjs --run <runId>   (fetches the Actions artifact)');
+  process.exit(2);
+}
+if (LOCAL && (!TEMPLATE || !fs.existsSync(TEMPLATE))) {
+  console.error(`release: no version-header template (${TEMPLATE || 'unset'}).`);
+  console.error('       Set --template or E2631_TEMPLATE to one official ZTE E2631 upgrade');
+  console.error('       package you own. It is deliberately not redistributed here: the packer');
+  console.error('       copies the 512-byte version header from it, and BUILD.md explains how');
+  console.error('       the fields are decoded (docs/01, section 2) if you want to build one.');
+  process.exit(2);
+}
+fs.mkdirSync(abs('out'), { recursive: true });
 
-const token = execFileSync('git', ['credential', 'fill'], {
-  input: 'protocol=https\nhost=github.com\n\n', encoding: 'utf8',
-}).split('\n').find((l) => l.startsWith('password='))?.slice(9);
-if (!token && !LOCAL) { console.error('no github credential from git credential fill'); process.exit(1); }
-// Which repository this is, straight from the origin remote: the project was renamed once
-// already, and a hardcoded slug would silently point release.mjs at the wrong repo.
-const SLUG = (() => {
-  const url = execFileSync('git', ['-C', REPO, 'remote', 'get-url', 'origin'], { encoding: 'utf8' }).trim();
-  const m = /github\.com[:/]([\w.-]+\/[\w.-]+?)(?:\.git)?$/.exec(url);
-  if (!m) { console.error(`cannot read the GitHub slug from origin (${url})`); process.exit(1); }
-  return m[1];
-})();
-const API = `https://api.github.com/repos/${SLUG}`;
+let token;
+if (run) {
+  // spawnSync, not execFileSync: on failure the exception carries the input, and
+  // this is the one place in the repo that touches a credential.
+  const r = spawnSync('git', ['credential', 'fill'], {
+    input: 'protocol=https\nhost=github.com\n\n', encoding: 'utf8',
+  });
+  token = r.status === 0 ? r.stdout.split('\n').find((l) => l.startsWith('password='))?.slice(9) : '';
+  if (!token) { console.error('release: --run needs a GitHub credential that git can fill (git credential fill failed)'); process.exit(1); }
+}
 const get = async (url, binary) => {
   const r = await fetch(url, { headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github+json' }, redirect: 'follow' });
   if (!r.ok) throw new Error(`${r.status} ${url}`);
@@ -51,18 +83,24 @@ const get = async (url, binary) => {
 
 let dir = LOCAL;
 if (!dir) {
+  // Which repository this is, straight from the origin remote: the project was
+  // renamed once already, and a hardcoded slug would point --run at the wrong repo.
+  const url0 = execFileSync('git', ['-C', REPO, 'remote', 'get-url', 'origin'], { encoding: 'utf8' }).trim();
+  const m = /github\.com[:/]([\w.-]+\/[\w.-]+?)(?:\.git)?$/.exec(url0);
+  if (!m) { console.error(`cannot read the GitHub slug from origin (${url0})`); process.exit(1); }
+  const API = `https://api.github.com/repos/${m[1]}`;
   const arts = (await get(`${API}/actions/runs/${run}/artifacts`)).artifacts;
   if (!arts?.length) throw new Error('the run produced no artifacts');
   const a = arts.find((x) => x.name === 'e2631-images') || arts[0];
   console.log(`artifact: ${a.name}  ${a.size_in_bytes} B  (expired=${a.expired})`);
-  const zip = path.join('out', `${a.name}-${run}.zip`);
+  const zip = abs(path.join('out', `${a.name}-${run}.zip`));
   // The field is archive_download_url; download_url only exists on the
   // workflow-run object. The endpoint 302s to a signed blob URL, so fetch has
   // to follow it and the body has to be read as bytes, not parsed as JSON.
   const url = a.archive_download_url || a.download_url;
   if (!url) throw new Error(`artifact ${a.name} carries no download url: ${JSON.stringify(Object.keys(a))}`);
   fs.writeFileSync(zip, await get(url, true));
-  dir = path.join('out', `artifacts-${run}`);
+  dir = abs(path.join('out', `artifacts-${run}`));
   fs.rmSync(dir, { recursive: true, force: true });
   fs.mkdirSync(dir, { recursive: true });
   execFileSync('unzip', ['-q', '-o', zip, '-d', dir]);
@@ -141,8 +179,11 @@ if (missing.length) {
 }
 console.log('\n--- boot readiness (dtb + kernel .config + payload) ---');
 // A local clone of the base tree gives the config checks a second witness: the
-// .config in an artifact is whichever build phase wrote it last.
-const TREE = ['owrt-up', 'openwrt', '_base/owrt'].find((t) => fs.existsSync(path.join(t, 'target/linux/generic')));
+// .config in an artifact is whichever build phase wrote it last. Resolved against
+// E2631_WORK, not the current directory - running this from the kit root used to
+// silently drop the fragments witness, and INITRAMFS_SOURCE then failed the screen.
+const TREE = [envv('E2631_TREE'), abs('owrt-up'), abs('openwrt'), abs('_base/owrt')]
+  .filter(Boolean).find((t) => fs.existsSync(path.join(t, 'target/linux/generic')));
 if (TREE) console.log(`config fragments from: ${TREE}`);
 try {
   execFileSync(process.execPath, [path.join(REPO, 'tools/verify_img.mjs'), dir, ...(TREE ? ['--tree', TREE, '--target', 'sanechips'] : [])], { stdio: 'inherit' });
@@ -159,8 +200,9 @@ console.log(`  sha256 ${crypto.createHash('sha256').update(buf).digest('hex')}`)
 // it is what writes the first image from the vendor side.
 const tool = files.find((f) => path.basename(f) === 'e2631-fwslot');
 if (tool) {
-  fs.copyFileSync(tool, 'out/e2631-fwslot');
-  console.log(`  tool   out/e2631-fwslot  ${fs.statSync('out/e2631-fwslot').size} B, static`);
+  const dst = abs(path.join('out', 'e2631-fwslot'));
+  fs.copyFileSync(tool, dst);
+  console.log(`  tool   ${dst}  ${fs.statSync(dst).size} B, static`);
 } else {
   console.log('  tool   not in this artifact (run predates the collect change)');
 }

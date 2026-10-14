@@ -52,6 +52,8 @@ const args = (() => { const a = process.argv.slice(2); const cmd = a.shift(); co
 const die = (m) => { console.error('mkfactory: ' + m); process.exit(1); };
 
 function readTemplate(path) {
+  if (!path) die('no --template <official.bin>: pack copies the 512-byte version header from it (BUILD.md, "the template")');
+  if (!fs.existsSync(path)) die(`template not found: ${path}`);
   const data = fs.readFileSync(path);
   if (!data.subarray(0, 16).equals(OUTER_MAGIC)) die('template lacks the outer magic');
   const hdrOfs = OUTER + data.readUInt32LE(OUTER - 4);

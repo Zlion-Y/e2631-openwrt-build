@@ -1,4 +1,6 @@
 // Reconstruct the two live slot headers captured by `hexdump -C` and verify the CRC scheme.
+// One-off evidence reader: it parses the transcripts under board/ that are on this disk
+// but not in git, so it is documentation of how the scheme was proven, not a tool to run.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -49,7 +51,9 @@ const hdrs = [
   ['slot A hdr (flash 0x1c60000, boot-time original)', grabFrom(files.pass3, 0x1c60000)],
   ['slot B hdr (flash 0x3860000, syn_version copy)', grabFrom(txt, 0x3860000)],
 ];
-const pkg = fs.readFileSync(process.argv[3] || '升级包/zxhne2631_hv100_fv1007b58000_firmware-20251027210306.bin');
+const PKGF = process.argv[3] || process.env.E2631_TEMPLATE;
+if (!PKGF) { console.error('usage: verify_hdr_crc.mjs <transcript> <official-package.bin>  (or set E2631_TEMPLATE)'); process.exit(2); }
+const pkg = fs.readFileSync(PKGF);
 hdrs.push(['7B5 package verhdr (file 0x14)', pkg.subarray(0x14, 0x214)]);
 
 for (const [name, b] of hdrs) {

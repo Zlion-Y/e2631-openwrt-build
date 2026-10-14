@@ -6,6 +6,7 @@
 //   node build/tools/dts_lint.mjs <board.dts> <patches-dir> [...more dirs]
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const [board, ...dirs] = process.argv.slice(2);
 if (!board || !dirs.length) { console.error('usage: dts_lint.mjs <board.dts> <patches dir>'); process.exit(2); }
@@ -99,11 +100,15 @@ if (dup.length) console.log(`\nWARN: &node overridden more than once in the boar
 // symbols are checked here against cached headers. Refresh the cache with
 // curl against include/dt-bindings/{leds/common.h,gpio/gpio.h,input/linux-event-codes.h}.
 {
-  const dir = 'out/hdrs';
+  // scripts/env.sh exports E2631_WORK/E2631_OUT; the fallback is the same default
+  // it uses (the kit's parent), so the cache is found from either root.
+  const WORK = process.env.E2631_WORK
+    || path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+  const dir = path.join(process.env.E2631_OUT || path.join(WORK, 'out'), 'hdrs');
   let cached = [];
   try { cached = fs.readdirSync(dir).filter((f) => f.endsWith('.h')); } catch { /* no cache */ }
   const used = [...new Set([...own.matchAll(/\b(?:LED_|GPIO_|KEY_|INPUT_)[A-Z0-9_]+\b/g)].map((m) => m[0]))];
-  if (!cached.length) console.log('\nNOTE: no dt-binding headers in out/hdrs: macro names NOT checked');
+  if (!cached.length) console.log(`\nNOTE: no dt-binding headers in ${dir}: macro names NOT checked`);
   else {
     const known = new Set();
     for (const f of cached)
