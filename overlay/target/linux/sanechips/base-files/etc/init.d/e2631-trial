@@ -1,6 +1,6 @@
 #!/bin/sh /etc/rc.common
-# Runs /sbin/e2631-trial as a one-shot service on boot: the image has to be
-# accepted with e2631-commit or the box reverts to the stock firmware slot.
+# Runs /sbin/e2631-trial as a one-shot service on boot.  The script is a no-op unless
+# /etc/e2631-trial-arm exists; see its header for why the auto-revert is not the default.
 START=99
 USE_PROCD=1
 

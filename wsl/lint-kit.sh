@@ -13,6 +13,8 @@ board/linkspeed.sh
 overlay/target/linux/sanechips/base-files/sbin/e2631-hb
 overlay/target/linux/sanechips/base-files/sbin/e2631-wifi-on
 overlay/target/linux/sanechips/base-files/sbin/e2631-wifi-ap
+overlay/target/linux/sanechips/base-files/sbin/e2631-trial
+overlay/target/linux/sanechips/base-files/etc/init.d/e2631-trial
 overlay/target/linux/sanechips/base-files/sbin/e2631-linkspeed
 overlay/target/linux/sanechips/base-files/sbin/e2631-fwstate
 overlay/target/linux/sanechips/base-files/etc/init.d/e2631-wifi-eeprom
