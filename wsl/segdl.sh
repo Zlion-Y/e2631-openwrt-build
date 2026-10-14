@@ -7,7 +7,7 @@
 # expected on stdout (download.pl pipes it straight into mkhash), so nothing
 # but the file may appear there.
 #
-#   export DOWNLOAD_TOOL_CUSTOM=$HOME/e2631/wsl/segdl.sh
+#   export DOWNLOAD_TOOL_CUSTOM=$E2631_KIT/wsl/segdl.sh
 #
 # Worth it because the cap here is per connection, not per host: one stream from
 # sources.cdn.openwrt.org moves ~25 KB/s, twelve from kernel.org moved

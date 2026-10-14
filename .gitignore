@@ -27,3 +27,8 @@ payload/
 # A dependency-only experiment directory (package.json + node_modules for an ssh helper we never
 # used; the real path is plain ssh through out/push-run.mjs). Nothing references it.
 /host/sshcli/
+
+# Local, untracked config read by scripts/env.sh and host/release.mjs: the paths
+# on this machine and the vendor template package. Never commit it - .env.example
+# is the checked-in version.
+/.env

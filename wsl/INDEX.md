@@ -1,8 +1,12 @@
 # wsl/ - the build path, the patch generators, and the evidence tools
 
-Everything here runs inside the WSL build box (`~/openwrt` tree, this repo at
-`~/e2631`, workspace mounted at `/mnt/d/AI/Qoder/E2631-OpenWRT`). `bash -n` for all of
-them, plus an ash gate for every script we push to the board, is `lint-kit.sh`.
+Everything here runs on the Linux build box: `$E2631_TREE` for the OpenWrt tree,
+`$E2631_KIT` for this repo, `$E2631_WORK` (default: the kit's parent) for `out/`. The
+three come from `scripts/env.sh`, which every script in here sources, so nothing depends
+on this particular machine any more - the directory is a name from how it was developed,
+and `scripts/bootstrap.sh` + `scripts/build.sh` are the portable entry points.
+`bash -n` for all of them, plus an ash gate for every script we push to the board, is
+`lint-kit.sh` (or `make check`, which runs all of it).
 The WSL box has gcc but **no node**; the Windows side has node but no toolchain - that
 split is why some checks are two commands instead of one.
 

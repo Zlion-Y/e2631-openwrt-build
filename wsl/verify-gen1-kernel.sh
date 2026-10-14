@@ -1,4 +1,5 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Kill any build left over from the script I launched by mistake, then prove at
 # the binary level that the kernel we are about to ship really carries the
 # Vendor:Device gate inside pcie_failed_link_retrain().
@@ -13,7 +14,7 @@ sleep 3
 echo "== make procs left"
 pgrep -a -f 'make ' || echo none
 
-TREE=$HOME/openwrt
+TREE=$E2631_TREE
 K=""
 for d in "$TREE"/build_dir/target-*/linux-sanechips*/linux-*/; do
   [ -f "$d/vmlinux" ] && { K=$d; break; }

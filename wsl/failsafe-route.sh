@@ -1,9 +1,10 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Two facts that decide the recovery route:
 #  1. can a physical button arm failsafe without serial TX?
 #  2. does failsafe hand us a network shell (telnetd) we can drive ourselves?
 set -u
-LOG=/mnt/d/AI/Qoder/E2631-OpenWRT/out/failsafe-route.log
+LOG=$E2631_WORK/out/failsafe-route.log
 exec >"$LOG" 2>&1
 W=/tmp/fsroot
 echo "W=$W exists=$([ -d $W ] && echo yes || echo no)"

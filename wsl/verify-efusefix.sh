@@ -1,11 +1,12 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # mt7915_eeprom_load() is inlined, so key the witness off the function that
 # actually ships: within mt7915_eeprom_init's body, the call that loads the
 # calibration FILE must be relocated BEFORE the call that reads the efuse.
 set -u
-LOG=/mnt/d/AI/Qoder/E2631-OpenWRT/out/efusefix-verify.log
+LOG=$E2631_WORK/out/efusefix-verify.log
 exec >"$LOG" 2>&1
-SRC=$HOME/openwrt
+SRC=$E2631_TREE
 M=$(ls -d $SRC/build_dir/target-*/linux-sanechips_generic/mt76-*/ | head -1)
 OD=$(ls $SRC/staging_dir/toolchain-*/bin/*-objdump | head -1)
 for F in "$M/mt7915/eeprom.o" "$SRC/build_dir/target-*/root-sanechips/lib/modules/6.18.55/mt7915e.ko"; do

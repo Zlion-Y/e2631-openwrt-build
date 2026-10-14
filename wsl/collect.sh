@@ -1,4 +1,5 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Collect a finished local build into a directory that
 #   node build/host/release.mjs --dir <this dir>   (run from the workspace root)
 # accepts. The file names mirror the CI workflow's "collect the artifacts"
@@ -6,7 +7,7 @@
 # config-<version>, so a locally built image gets screened exactly like an
 # artifact from Actions.
 set -e
-SRC="$HOME/openwrt"
+SRC="$E2631_TREE"
 OUTD="${1:?usage: collect.sh <out-dir>}"
 B="$SRC/bin/targets/sanechips/generic"
 

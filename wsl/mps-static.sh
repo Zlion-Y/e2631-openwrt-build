@@ -1,11 +1,12 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Static evidence for the MPS/MRRS hypothesis. No device needed.
 set -u
-LOG=/mnt/d/AI/Qoder/E2631-OpenWRT/out/mps-static.log
+LOG=$E2631_WORK/out/mps-static.log
 exec >"$LOG" 2>&1
 
 echo "=== vendor mt7916.ko: which PCI core helpers does it call? ==="
-KO=/mnt/d/AI/Qoder/E2631-OpenWRT/device/backup/mt7916.ko
+KO=$E2631_WORK/device/backup/mt7916.ko
 readelf -sW "$KO" 2>/dev/null | grep -iE 'pci|pcie' | head -60
 echo "--- relocations mentioning mps/readrq/payload ---"
 readelf -rW "$KO" 2>/dev/null | grep -iE 'mps|readrq|payload|pcie_|link_' | sort -u | head -40
@@ -14,7 +15,7 @@ strings -a "$KO" | grep -iE 'mps|payload|maxread|readrq' | head -20
 
 echo
 echo "=== our kernel source: locate probe.c ==="
-K=$(ls -d ~/openwrt/build_dir/target-*/linux-*/linux-*/ 2>/dev/null | head -1)
+K=$(ls -d $E2631_TREE/build_dir/target-*/linux-*/linux-*/ 2>/dev/null | head -1)
 echo "K=$K"
 if [ -n "$K" ]; then
   echo "--- pcie_bus_config default + parse ---"
@@ -29,13 +30,13 @@ if [ -n "$K" ]; then
   echo "--- does the DWC controller write DevCtl anywhere? ---"
   grep -rn 'PCI_EXP_DEVCTL\|pcie_set_mps\|pcie_get_mps' "$K/drivers/pci/controller/dwc/" | head -20
   echo "--- sanechips patches touching pci ---"
-  ls ~/openwrt/target/linux/sanechips/patches-6.18/ | grep -iE 'pci|dwc'
+  ls $E2631_TREE/target/linux/sanechips/patches-6.18/ | grep -iE 'pci|dwc'
   echo "--- bootargs / cmdline in tree for our board ---"
-  grep -rn 'bootargs\|append-rootarg\|CONFIG_CMDLINE' ~/openwrt/target/linux/sanechips/ 2>/dev/null | head -20
+  grep -rn 'bootargs\|append-rootarg\|CONFIG_CMDLINE' $E2631_TREE/target/linux/sanechips/ 2>/dev/null | head -20
   grep -n 'CONFIG_CMDLINE' "$K/.config" 2>/dev/null | head
 fi
 
 echo
 echo "=== seed config: pcie-related symbols ==="
-grep -iE 'PCIE|DWC' ~/e2631/seed/e2631.config 2>/dev/null | head -20
-ls ~/e2631/seed/ 2>/dev/null
+grep -iE 'PCIE|DWC' $E2631_KIT/seed/e2631.config 2>/dev/null | head -20
+ls $E2631_KIT/seed/ 2>/dev/null

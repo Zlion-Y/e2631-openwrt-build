@@ -5,13 +5,28 @@
 #   git clone --branch <base-branch> https://github.com/Zlion-Y/openwrt-sanechips-mirror openwrt
 #   git -C openwrt checkout $BASE_SHA
 #   ./apply.sh openwrt
+#
+# scripts/bootstrap.sh does all of that, and scripts/env.sh resolves the paths.
 set -eu
+. "$(dirname "$0")/scripts/env.sh"
 
-BASE_SHA=db8b8d4130457dbe46558a7cea872dd2dae539e6
+BASE_SHA=${E2631_BASE_SHA:-db8b8d4130457dbe46558a7cea872dd2dae539e6}
 TREE=${1:-openwrt}
 HERE=$(cd "$(dirname "$0")" && pwd)
 
-[ -d "$TREE/target/linux/sanechips" ] || { echo "no sanechips target in $TREE - fetch the base first" >&2; exit 1; }
+[ -d "$TREE/target/linux/sanechips" ] || {
+	echo "apply.sh: no sanechips target in $TREE." >&2
+	echo "        That is the base tree this overlay is written against; get it with" >&2
+	echo "        'bash scripts/bootstrap.sh', or point E2631_TREE at a checkout of" >&2
+	echo "        $E2631_BASE_REPO#$E2631_BASE_SHA." >&2
+	exit 1; }
+
+# Say which commit the tree is actually at. Everything below edits files by
+# pattern, so a tree at another commit can apply cleanly and still be wrong.
+if command -v git >/dev/null 2>&1 && [ -d "$TREE/.git" ]; then
+	at=$(git -C "$TREE" rev-parse HEAD 2>/dev/null || echo unknown)
+	[ "$at" = "$BASE_SHA" ] || echo "apply.sh: NOTE $TREE is at $at, not the pinned $BASE_SHA"
+fi
 
 cp -r "$HERE/overlay/." "$TREE/"
 mkdir -p "$TREE/tools"
@@ -193,5 +208,29 @@ fi
 # Why the request is dropped is still unexplained, so do not re-add a fragment edit on
 # the assumption that it will work. Read the MT7916's MT_TOP_MISC without a driver with
 # the probe module instead: build/wsl/build-regprobe.sh.
+
+# apply.sh copies; it does not sync. A patch or base-file edit that leaves
+# overlay/ therefore stays in the tree for ever and keeps being applied - that is
+# exactly how two abandoned Dosilicon SPI-NAND patches went on building into the
+# kernel after they were deleted from this repository. Anything in the tree's patch
+# series that is neither in the base commit nor in overlay/ is listed, not removed:
+# it may be somebody's own work, and deleting it is their call.
+PD="$TREE/target/linux/sanechips/patches-6.18"
+if [ -d "$PD" ] && [ -d "$TREE/.git" ]; then
+	orphan=
+	for f in "$PD"/*.patch; do
+		[ -e "$f" ] || continue
+		b=$(basename "$f")
+		git -C "$TREE" ls-files --error-unmatch "target/linux/sanechips/patches-6.18/$b" \
+			>/dev/null 2>&1 && continue
+		[ -e "$HERE/overlay/target/linux/sanechips/patches-6.18/$b" ] && continue
+		orphan="$orphan $b"
+	done
+	if [ -n "$orphan" ]; then
+		echo "apply.sh: WARNING these patches are in the tree but in neither the base commit nor overlay/:"
+		for b in $orphan; do echo "            $b"; done
+		echo "        If they are stale, remove them and re-run; if they are yours, ignore this."
+	fi
+fi
 
 echo "overlay applied to $TREE (base $BASE_SHA)"

@@ -1,9 +1,10 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Local build of the E2631 image inside WSL (Ubuntu 22.04, user `builder`,
-# tree at ~/openwrt, this repo at ~/e2631). Same steps CI runs, but the
+# tree at $E2631_TREE, this repo at $E2631_KIT). Same steps CI runs, but the
 # network here is the constraint, not the CPU.
 #
-#   bash ~/e2631/wsl/build.sh
+#   bash $E2631_KIT/wsl/build.sh
 #
 # Four traps this avoids, all of them hit in practice on this machine:
 #  - a killed half-clone leaves a shallow feed repo whose next `git pull`
@@ -25,7 +26,7 @@
 # this build does not use - while the selected set waited.
 set -x
 export CURL_OPTIONS="--speed-limit 20000 --speed-time 20"
-export DOWNLOAD_TOOL_CUSTOM="$HOME/e2631/wsl/segdl.sh"
+export DOWNLOAD_TOOL_CUSTOM="$E2631_KIT/wsl/segdl.sh"
 export SEGN=12
 
 # WSL is NAT, so it cannot see a proxy bound to Windows' loopback - every byte
@@ -47,9 +48,9 @@ if [ -n "$PHOST" ] && [ -n "$PHPORT" ] && (exec 3<>"/dev/tcp/$PHOST/$PHPORT") 2>
 else
 	echo "PHASE proxy unavailable ($PHOST:$PHPORT), downloading direct"
 fi
-cd ~/openwrt || exit 1
+cd $E2631_TREE || exit 1
 
-E2631_GNU_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/gnu ~/e2631/apply.sh ~/openwrt || exit 1
+E2631_GNU_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/gnu $E2631_KIT/apply.sh $E2631_TREE || exit 1
 grep -qx "CONFIG_CMDLINE_FORCE=y" target/linux/sanechips/config-6.18 || { echo "APPLY INCOMPLETE: no forced cmdline"; exit 1; }
 grep -q "Makefile.e2631" target/linux/sanechips/image/Makefile || { echo "APPLY INCOMPLETE: image hook"; exit 1; }
 
@@ -61,7 +62,7 @@ echo "PHASE feeds-install $(date +%T)"
 ./scripts/feeds install -a 2>&1 | grep -E "Ignoring|Installing" | tail -8
 
 echo "PHASE seed-config $(date +%T)"
-cp ~/e2631/seed/e2631.config .config
+cp $E2631_KIT/seed/e2631.config .config
 make defconfig > /dev/null 2>&1
 # include/download.mk does `export DOWNLOAD_TOOL_CUSTOM:=$(CONFIG_DOWNLOAD_TOOL_CUSTOM)`,
 # so the environment variable on its own is clobbered back to empty; the symbol
@@ -70,8 +71,8 @@ make defconfig > /dev/null 2>&1
 # command-line assignment wins over the .config include and reaches sub-makes.
 # Not in seed/e2631.config: the path is this machine's, and CI has no such tool.
 MAKEVAR=
-if [ -x "$HOME/e2631/wsl/segdl.sh" ]; then
-	MAKEVAR="CONFIG_DOWNLOAD_TOOL_CUSTOM=$HOME/e2631/wsl/segdl.sh"
+if [ -x "$E2631_KIT/wsl/segdl.sh" ]; then
+	MAKEVAR="CONFIG_DOWNLOAD_TOOL_CUSTOM=$E2631_KIT/wsl/segdl.sh"
 	echo "PHASE segdl $MAKEVAR"
 fi
 grep -cE '^CONFIG_PACKAGE_luci' .config

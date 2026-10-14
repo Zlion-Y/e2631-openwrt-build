@@ -1,9 +1,10 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Which driver family is the stock mt7916.ko? mt76 (upstream) or MTK's own
 # proprietary HAP/HIF driver? It decides whose firmware-download flow we should
 # be comparing against. Run: bash build/wsl/vendor-ko-family.sh
 set -u
-KO=/mnt/d/AI/Qoder/E2631-OpenWRT/device/backup/mt7916.ko
+KO=$E2631_WORK/device/backup/mt7916.ko
 ls -l "$KO"
 echo "== vermagic / name"
 strings -a "$KO" | grep -m3 -E '^vermagic=|^mt7916' || true

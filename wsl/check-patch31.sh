@@ -1,11 +1,12 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Dry-run kernel patch 031 against the source the build currently uses, so a bad
 # context line is caught before spending 40 minutes on `make world`.
 set -u
-TREE=$HOME/openwrt
+TREE=$E2631_TREE
 LOG=/tmp/patch31-check.out
 exec >"$LOG" 2>&1
-P=/mnt/d/AI/Qoder/E2631-OpenWRT/build/overlay/target/linux/sanechips/patches-6.18/031-pci-gate-link-retrain-speed-lift-by-vendor-device.patch
+P=$E2631_WORK/build/overlay/target/linux/sanechips/patches-6.18/031-pci-gate-link-retrain-speed-lift-by-vendor-device.patch
 K=""
 for d in "$TREE"/build_dir/target-*/linux-sanechips*/linux-*/; do
   [ -f "$d/drivers/pci/quirks.c" ] && { K=$d; break; }

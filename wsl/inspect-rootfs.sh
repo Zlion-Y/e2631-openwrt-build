@@ -1,15 +1,16 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # What is actually inside the rootfs we are about to flash - format checks pass on
 # images that will not boot, so look at the payload itself: the A/B switcher, whether the
 # squashfs extracted completely, and what the shipped wireless config defaults to.
 #
 #   bash wsl/inspect-rootfs.sh <dir holding payload/sysupgrade-*>   (default: the newest)
 set -u
-LOG=/mnt/d/AI/Qoder/E2631-OpenWRT/out/inspect-rootfs.log
+LOG=$E2631_WORK/out/inspect-rootfs.log
 exec >"$LOG" 2>&1
 W=/tmp/finalroot
-P=${1:-/mnt/d/AI/Qoder/E2631-OpenWRT/out/gen1/payload/sysupgrade-zte_zxhn-e2631}
-U=$(ls -d ~/openwrt/staging_dir/host/bin/unsquashfs* | head -1)
+P=${1:-$E2631_WORK/out/gen1/payload/sysupgrade-zte_zxhn-e2631}
+U=$(ls -d $E2631_TREE/staging_dir/host/bin/unsquashfs* | head -1)
 
 # Extract FIRST. This script used to read /tmp/finalroot without ever populating it, so every
 # report it gave was whatever an earlier run of the same script had left there -- a stale rootfs
@@ -49,4 +50,4 @@ ls "$W/etc/hotplug.d/" 2>/dev/null
 echo
 echo "=== LED / DTB sanity: led aliases and names baked into the shipped dtb ==="
 D=$(find "$W" -name '*e2631*.dtb' | head -1); echo "dtb=$D"
-[ -n "$D" ] && ~/openwrt/staging_dir/host/bin/dtc -I dtb -O dts "$D" 2>/dev/null | sed -n '1,60p'
+[ -n "$D" ] && $E2631_TREE/staging_dir/host/bin/dtc -I dtb -O dts "$D" 2>/dev/null | sed -n '1,60p'

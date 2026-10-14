@@ -1,9 +1,10 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # List the vendor driver's firmware/patch bring-up symbols by name (no text
 # filters: plain read loops), so the real functions behind the chip_ops
 # dispatcher (chip_fw_init) can be disassembled next.
 set -u
-KO=/mnt/d/AI/Qoder/E2631-OpenWRT/device/backup/mt7916.ko
+KO=$E2631_WORK/device/backup/mt7916.ko
 LOG=/tmp/mtk-syms.out
 exec >"$LOG" 2>&1
 

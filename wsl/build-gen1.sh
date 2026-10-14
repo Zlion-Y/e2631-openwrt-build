@@ -1,10 +1,11 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Rebuild the image with kernel patch 031 (gate the 2.5GT/s speed lift), which
 # should leave the ZTE root ports at the Gen1 speed U-Boot trained -- the same
 # speed the vendor stack runs at. Witnesses are printed after each phase so a
 # green rc cannot hide an unapplied patch.
 set -u
-TREE=$HOME/openwrt
+TREE=$E2631_TREE
 LOG=$HOME/build-gen1.log
 say() { echo "PHASE $(date +%T) $1 $2" | tee -a "$LOG"; }
 
@@ -19,9 +20,9 @@ count_match() { # <file> <substring>
 }
 
 say START ""
-bash $HOME/e2631/wsl/sync.sh >>"$LOG" 2>&1
+bash $E2631_KIT/wsl/sync.sh >>"$LOG" 2>&1
 say SYNC "rc=$?"
-( cd $HOME/e2631 && bash apply.sh "$TREE" ) >>"$LOG" 2>&1
+( cd $E2631_KIT && bash apply.sh "$TREE" ) >>"$LOG" 2>&1
 say APPLY "rc=$?"
 
 ls -l "$TREE/target/linux/sanechips/patches-6.18/" >>"$LOG" 2>&1
@@ -93,11 +94,11 @@ make -j"$(nproc)" world >>"$LOG" 2>&1
 say WORLD "rc=$?"
 # collect.sh takes the output directory as $1; called bare it dies with a usage
 # error and leaves the Windows side without artifacts.
-bash $HOME/e2631/wsl/collect.sh /tmp/gen1 >>"$LOG" 2>&1
+bash $E2631_KIT/wsl/collect.sh /tmp/gen1 >>"$LOG" 2>&1
 say COLLECT "rc=$?"
-rm -rf /mnt/d/AI/Qoder/E2631-OpenWRT/out/gen1
-mkdir -p /mnt/d/AI/Qoder/E2631-OpenWRT/out/gen1
-cp -r /tmp/gen1/. /mnt/d/AI/Qoder/E2631-OpenWRT/out/gen1/ >>"$LOG" 2>&1
+rm -rf $E2631_WORK/out/gen1
+mkdir -p $E2631_WORK/out/gen1
+cp -r /tmp/gen1/. $E2631_WORK/out/gen1/ >>"$LOG" 2>&1
 say PULL "rc=$?"
-ls -l /mnt/d/AI/Qoder/E2631-OpenWRT/out/gen1 >>"$LOG" 2>&1
+ls -l $E2631_WORK/out/gen1 >>"$LOG" 2>&1
 say DONE ""

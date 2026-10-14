@@ -1,9 +1,10 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Normalize line endings for every script we push to the box and prove each one
 # parses under busybox ash.  Without this, a Windows-authored CRLF shows up on
 # the device as a baffling "unexpected newline (expecting ")")".
 set -u
-cd /mnt/d/AI/Qoder/E2631-OpenWRT/build || exit 1   # the repo root; out/ lives one level above
+cd "$E2631_KIT" || exit 1   # the repo root; out/ lives one level above
 FILES="
 board/fw-ab.sh
 board/hb.sh

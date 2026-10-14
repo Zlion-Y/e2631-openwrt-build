@@ -1,13 +1,14 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Carve the vendor DTB out of the stock kernel image and look for the hardware
 # watchdog node: we need its compatible + register window to write a driver (or
 # at least to poke it from userspace) so a hung boot resets itself instead of
 # costing a power cycle.
 set -u
-LOG=/mnt/d/AI/Qoder/E2631-OpenWRT/out/vendor-dtb-wdt.log
+LOG=$E2631_WORK/out/vendor-dtb-wdt.log
 exec >"$LOG" 2>&1
-IMG=/mnt/d/AI/Qoder/E2631-OpenWRT/device/backup/kernel1.bin
-DTC=$(ls ~/openwrt/staging_dir/host/bin/dtc 2>/dev/null | head -1)
+IMG=$E2631_WORK/device/backup/kernel1.bin
+DTC=$(ls $E2631_TREE/staging_dir/host/bin/dtc 2>/dev/null | head -1)
 echo "dtc=$DTC"
 W=/tmp/vdtb; rm -rf $W; mkdir -p $W
 for off in 0xa00 0x331080; do

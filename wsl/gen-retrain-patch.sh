@@ -1,13 +1,14 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Generate kernel patch 031 from the source the build actually uses, so the
 # context lines and tabs are exact. Inserts the upstream Vendor:Device gate into
 # pcie_failed_link_retrain() so the ZTE root ports keep the Gen1 speed their
 # bootloader trained (the vendor product only ever runs Gen1 on that link).
 set -u
-TREE=$HOME/openwrt
+TREE=$E2631_TREE
 LOG=/tmp/gen-retrain.out
 exec >"$LOG" 2>&1
-OUT=/mnt/d/AI/Qoder/E2631-OpenWRT/build/overlay/target/linux/sanechips/patches-6.18/031-pci-gate-link-retrain-speed-lift-by-vendor-device.patch
+OUT=$E2631_WORK/build/overlay/target/linux/sanechips/patches-6.18/031-pci-gate-link-retrain-speed-lift-by-vendor-device.patch
 
 K=""
 for d in "$TREE"/build_dir/target-*/linux-sanechips*/linux-*/; do

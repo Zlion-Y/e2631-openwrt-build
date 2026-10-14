@@ -1,10 +1,11 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Our booted kernel prints "removing 2.5GT/s downstream link speed restriction"
 # for the ZTE root port (1cf2:6830), yet upstream 6.18 gates that on a
 # Vendor:Device list containing only ASMedia. Find out which code actually runs
 # in OUR build, and whether a target patch touches it.
 set -u
-TREE=$HOME/openwrt
+TREE=$E2631_TREE
 LOG=/tmp/retrain.out
 exec >"$LOG" 2>&1
 

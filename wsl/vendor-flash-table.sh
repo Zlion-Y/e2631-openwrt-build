@@ -1,4 +1,5 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # What flash does the VENDOR kernel support?  The stock upgrade package carries a plaintext
 # legacy uImage at 0x234 (verhdr kSize at 0x48 tells how long), which decompresses to a
 # vmlinux whose string table still holds ZTE's own SPI-NAND table ("SPI NAND <part> <size> 3,3V").
@@ -9,7 +10,9 @@
 # Our OpenWrt image only boots a chip whose ID is in the Linux side tables, so this is the list
 # to compare against when someone asks "my E2631 has a different flash, will it take your image?".
 export LC_ALL=C
-PKG=${1:-/mnt/d/AI/Qoder/E2631-OpenWRT/升级包/zxhne2631_hv100_fv1008b88000_firmware-20260916183918.bin}
+# No filename baked in: this reads whichever official package you point it at -
+# the same input as E2631_TEMPLATE.
+PKG=${1:-${E2631_TEMPLATE:?usage: vendor-flash-table.sh <path/to/vendor-firmware.bin>  (or set E2631_TEMPLATE)}}
 W=/tmp/vendor-kernel; rm -rf "$W"; mkdir -p "$W"
 [ -f "$PKG" ] || { echo "no such package: $PKG" >&2; exit 1; }
 
@@ -35,7 +38,7 @@ echo
 echo "== compare with the Linux side of our own image =="
 echo "  upstream 6.18 tables: winbond gigadevice micron macronix xtx foresee toshiba skyhigh ato alliancememory fmsh paragon esmt"
 echo "  base tree backports add: ESMT F50L1G41LC, FudanMicro FM25S01BI3, HeYangTek HYF1GQ4UDACAE, FMSH FM25G01B/02B, Etron EM73D044VCx"
-echo "  our board booted with:  $(grep -ah 'SPI NAND was found' /mnt/d/AI/Qoder/E2631-OpenWRT/out/*.log 2>/dev/null | tail -1 | sed 's/^.*\] //')"
+echo "  our board booted with:  $(grep -ah 'SPI NAND was found' $E2631_WORK/out/*.log 2>/dev/null | tail -1 | sed 's/^.*\] //')"
 echo
 echo "reminder: matching is by two-byte (manufacturer, device) ID, not by part number --"
 echo "          a one-letter suffix difference is usually a different ID and therefore a new table entry."

@@ -1,4 +1,5 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Mine the stock MTK driver (board/backup/mt7916.ko) for its firmware bring-up
 # so we can compare it with the mt76 path that keeps hanging this board.
 #
@@ -6,7 +7,7 @@
 # the MCU to report ready" -- the symbols it defines, the strings it prints, and
 # whether the ready signal is a register poll or an IPC/semaphore handshake.
 set -u
-KO=/mnt/d/AI/Qoder/E2631-OpenWRT/device/backup/mt7916.ko
+KO=$E2631_WORK/device/backup/mt7916.ko
 LOG=/tmp/mtk-init.out
 exec >"$LOG" 2>&1
 

@@ -1,9 +1,10 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Build the FW_STATE probe module against the exact kernel we ship, so it loads
 # into the running system with no reflash.
 set -u
-TREE=$HOME/openwrt
-SRC=/mnt/d/AI/Qoder/E2631-OpenWRT/out/regprobe
+TREE=$E2631_TREE
+SRC=$E2631_WORK/out/regprobe
 LOG=/tmp/regprobe-build.out
 exec >"$LOG" 2>&1
 

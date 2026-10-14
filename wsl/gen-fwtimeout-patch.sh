@@ -1,4 +1,5 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Generate the mt76 patch that widens mt7915_firmware_state()'s wait for
 # MT_TOP_MISC FW_STATE == FW_STATE_RDY from 1000 ms to a much longer value.
 #
@@ -10,14 +11,14 @@
 # If the chip only needs time, this turns a hard -EIO (and, on a cold chip, the
 # stall we have been seeing) into a slow but successful init.
 set -u
-LOG=/mnt/d/AI/Qoder/E2631-OpenWRT/out/gen-fwtimeout.log
+LOG=$E2631_WORK/out/gen-fwtimeout.log
 : > "$LOG"
 exec >>"$LOG" 2>&1
 
 NEW=${NEW:-8000}
 OLD=${OLD:-1000}
 SRC=""
-for d in "$HOME"/openwrt/build_dir/target-*/linux-sanechips*/mt76-*/; do
+for d in $E2631_TREE/build_dir/target-*/linux-sanechips*/mt76-*/; do
   [ -f "$d/mt7915/mcu.c" ] && { SRC=$d; break; }
 done
 echo "SRC=$SRC  NEW=$NEW"
@@ -57,7 +58,7 @@ patch -p1 -i /tmp/fwtimeout.patch > /dev/null 2>&1
 echo "apply rc=$?"
 diff -q mt7915/mcu.c "$W/b/mt7915/mcu.c" && echo "APPLIED == GENERATED"
 
-OUT=/mnt/d/AI/Qoder/E2631-OpenWRT/build/overlay/package/kernel/mt76/patches
+OUT=$E2631_WORK/build/overlay/package/kernel/mt76/patches
 mkdir -p "$OUT"
 cp /tmp/fwtimeout.patch "$OUT/003-mt7915-wait-longer-for-fw-state.patch"
 echo "written: $OUT/003-mt7915-wait-longer-for-fw-state.patch"

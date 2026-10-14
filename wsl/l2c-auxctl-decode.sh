@@ -1,10 +1,11 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Decode the stock PL310 AUX_CTRL value (0x76430001, quoted by the PR's own DTS
 # comment) against the bit definitions in OUR kernel tree, and show which DT
 # properties our tree turns on. Run: bash build/wsl/l2c-auxctl-decode.sh
 set -u
 K=""
-for d in "$HOME"/e2631/openwrt/build_dir/target-*/linux-sanechips*/linux-*/; do
+for d in $E2631_KIT/openwrt/build_dir/target-*/linux-sanechips*/linux-*/; do
   [ -d "$d" ] && { K=$d; break; }
 done
 [ -n "$K" ] || { echo "no kernel build dir"; exit 1; }

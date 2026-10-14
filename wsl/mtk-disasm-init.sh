@@ -1,4 +1,5 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Disassemble the vendor MTK driver's firmware bring-up so we can read the actual
 # register protocol it uses to get the WACPU to "ready", and compare it with the
 # mt76 path that keeps hanging this board.
@@ -7,7 +8,7 @@
 #   chip_fw_init, StartFirmware/FwStart, LoadFirmware, hif_mcu_fw_init,
 #   WfHifHwInit, mt7906_hif_ctrl_chip_init, chip_reset_hif_dma, chip_wait_hif_dma_idle
 set -u
-KO=/mnt/d/AI/Qoder/E2631-OpenWRT/device/backup/mt7916.ko
+KO=$E2631_WORK/device/backup/mt7916.ko
 LOG=/tmp/mtk-disasm.out
 exec >"$LOG" 2>&1
 

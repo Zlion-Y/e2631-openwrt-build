@@ -1,16 +1,17 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Can we enter failsafe WITHOUT serial TX, and does failsafe give us a network
 # shell?  Check the image we actually flashed, not the upstream docs.
 set -u
-LOG=/mnt/d/AI/Qoder/E2631-OpenWRT/out/failsafe-check.log
+LOG=$E2631_WORK/out/failsafe-check.log
 exec >"$LOG" 2>&1
-P=/mnt/d/AI/Qoder/E2631-OpenWRT/out/efusefix/payload/sysupgrade-zte_zxhn-e2631
-U=$(ls -d ~/openwrt/staging_dir/host/bin/unsquashfs* | head -1)
+P=$E2631_WORK/out/efusefix/payload/sysupgrade-zte_zxhn-e2631
+U=$(ls -d $E2631_TREE/staging_dir/host/bin/unsquashfs* | head -1)
 W=/tmp/fsroot; rm -rf $W; mkdir -p $W
 "$U" -no-xattrs -d $W "$P/root" >/dev/null 2>&1
 
 echo "=== board DTS buttons (which physical key can trigger failsafe) ==="
-grep -n -B2 -A8 "keys\|button\|gpio-keys" ~/openwrt/target/linux/sanechips/dts/zx279128s-zte-zxhn-e2631.dts 2>/dev/null | head -40
+grep -n -B2 -A8 "keys\|button\|gpio-keys" $E2631_TREE/target/linux/sanechips/dts/zx279128s-zte-zxhn-e2631.dts 2>/dev/null | head -40
 echo
 echo "=== /etc/preinit failsafe logic in the shipped image ==="
 grep -n -A6 "failsafe\|fail_wait\|boot_failcount" "$W/etc/preinit" 2>/dev/null | head -40

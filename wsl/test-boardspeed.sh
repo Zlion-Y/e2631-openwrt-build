@@ -1,10 +1,11 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Offline check of board/linkspeed.sh (was device/) against config space pulled from the live
 # board (out/fake-sys/*.config, produced by node on the Windows side because NTFS
 # forbids ':' in names and WSL has no node).  Known-good decode: both ZTE root
 # ports have the PCIe cap at 0x70 and LnkSta=0x3012 => Gen2 x1, DLLLA=1.
 set -u
-W=/mnt/d/AI/Qoder/E2631-OpenWRT
+W=$E2631_WORK
 T=/tmp/lsys
 rm -rf $T; mkdir -p $T
 for f in $W/out/fake-sys/*.config; do

@@ -1,10 +1,11 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Read the mt7915 EEPROM load path from the tree we actually build, so the
 # "avoid the efuse round-trip at boot" patch can be written against real code.
 set -u
-LOG=/mnt/d/AI/Qoder/E2631-OpenWRT/out/mt7915-eeprom-src.log
+LOG=$E2631_WORK/out/mt7915-eeprom-src.log
 exec >"$LOG" 2>&1
-K=$(ls -d ~/openwrt/build_dir/target-*/linux-*/linux-*/ 2>/dev/null | head -1)
+K=$(ls -d $E2631_TREE/build_dir/target-*/linux-*/linux-*/ 2>/dev/null | head -1)
 echo "K=$K"
 D="$K/drivers/net/wireless/mediatek/mt76/mt7915"
 echo "=== files ==="
@@ -24,6 +25,6 @@ echo "=== is there already a firmware-first path (nvmem) in mt76 core? ==="
 grep -rn "mt76_eeprom_override\|nvmem" "$K/drivers/net/wireless/mediatek/mt76/eeprom.c" | head -20
 echo
 echo "=== does the package Makefile apply patches from the target dir? ==="
-ls ~/openwrt/target/linux/sanechips/patches-6.18/ | tail -6
-ls ~/e2631/overlay/../patches 2>/dev/null | head
-grep -rn "mt76" ~/e2631/apply.sh | head -20
+ls $E2631_TREE/target/linux/sanechips/patches-6.18/ | tail -6
+ls $E2631_KIT/overlay/../patches 2>/dev/null | head
+grep -rn "mt76" $E2631_KIT/apply.sh | head -20

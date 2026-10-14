@@ -1,4 +1,5 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Disassemble the vendor MTK driver's firmware bring-up functions and save the
 # listing into the workspace, so the register protocol can be read offline.
 #
@@ -6,13 +7,13 @@
 # FwStart, LoadFirmware, hif_mcu_fw_init, WfHifHwInit,
 # mt7906_hif_ctrl_chip_init, chip_wait_hif_dma_idle, chip_reset_hif_dma.
 set -u
-KO=/mnt/d/AI/Qoder/E2631-OpenWRT/device/backup/mt7916.ko
-OUTDIR=/mnt/d/AI/Qoder/E2631-OpenWRT/out/mtk
+KO=$E2631_WORK/device/backup/mt7916.ko
+OUTDIR=$E2631_WORK/out/mtk
 mkdir -p "$OUTDIR"
 FULL=/tmp/mtk.asm
 
 OD=""
-for c in "$HOME"/openwrt/staging_dir/toolchain-*/bin/*-objdump; do
+for c in $E2631_TREE/staging_dir/toolchain-*/bin/*-objdump; do
   [ -x "$c" ] && { OD=$c; break; }
 done
 [ -n "$OD" ] || { echo "no toolchain objdump"; exit 1; }

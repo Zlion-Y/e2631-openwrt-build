@@ -1,4 +1,5 @@
 #!/bin/bash
+. "$(dirname "$0")/../scripts/env.sh"
 # Generate the mt76 feed patch that makes mt7915 load its calibration file
 # BEFORE touching the (blank) on-chip efuse.
 #
@@ -6,11 +7,11 @@
 # lines have to match the source we actually build (mt76-2026.10.08~467ae2e3,
 # which is what produces kmod-mt7915e -- not the in-tree kernel copy).
 set -u
-LOG=/mnt/d/AI/Qoder/E2631-OpenWRT/out/gen-efuse-patch.log
+LOG=$E2631_WORK/out/gen-efuse-patch.log
 exec >"$LOG" 2>&1
 set -x
 
-SRC=$(ls -d ~/openwrt/build_dir/target-*/linux-sanechips_generic/mt76-*/ 2>/dev/null | head -1)
+SRC=$(ls -d $E2631_TREE/build_dir/target-*/linux-sanechips_generic/mt76-*/ 2>/dev/null | head -1)
 echo "SRC=$SRC"
 [ -f "$SRC/mt7915/eeprom.c" ] || { echo "no feed source"; exit 1; }
 
@@ -52,7 +53,7 @@ mkdir -p mt7915 && cp "$W/a/mt7915/eeprom.c" mt7915/eeprom.c
 patch -p1 -i /tmp/efuse.patch >/dev/null 2>&1; echo "apply rc=$?"
 diff -q mt7915/eeprom.c "$W/b/mt7915/eeprom.c" && echo "APPLIED PATCH == GENERATED FILE"
 
-OUT=/mnt/d/AI/Qoder/E2631-OpenWRT/build/overlay/package/kernel/mt76/patches
+OUT=$E2631_WORK/build/overlay/package/kernel/mt76/patches
 mkdir -p "$OUT"
 cp /tmp/efuse.patch "$OUT/001-mt7915-use-caldata-file-before-efuse.patch"
 chmod +x "$OUT/001-mt7915-use-caldata-file-before-efuse.patch" 2>/dev/null
