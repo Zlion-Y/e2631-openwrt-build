@@ -19,8 +19,10 @@ cp "$HERE/tools/mkfactory.mjs" "$TREE/tools/e2631-mkfactory.mjs"
 # The overlay is authored on a filesystem without exec bits; these have to be
 # runnable on the device, and rc.common refuses to enable a service script that
 # is not executable.
-for f in sbin/e2631-probe sbin/e2631-trial sbin/e2631-commit sbin/e2631-leds \
-	 etc/init.d/e2631-trial etc/init.d/e2631-wifi-eeprom etc/init.d/e2631-leds \
+for f in sbin/e2631-probe sbin/e2631-trial sbin/e2631-commit sbin/e2631-leds sbin/e2631-hb \
+	 sbin/e2631-linkspeed sbin/e2631-wifi-on sbin/e2631-fwstate \
+	 etc/init.d/e2631-trial etc/init.d/e2631-wifi-eeprom etc/init.d/e2631-wifi-load \
+	 etc/init.d/e2631-leds etc/init.d/e2631-hb \
 	 etc/hotplug.d/firmware/11-mt76-caldata; do
 	chmod +x "$TREE/target/linux/sanechips/base-files/$f"
 done
@@ -183,5 +185,10 @@ fi
 # The vendor kernel runs PCIe port services with AER enabled; without them a
 # poisoned TLP or an unread completion produces a silent bus stall instead of a
 # report, which is exactly the failure being chased here.
+#
+# /dev/mem is NOT obtainable this way: CONFIG_DEVMEM does not appear at all in the
+# built kernel .config (out/gen1/config-6.18 -- not even as "is not set"), so the
+# symbol is not reachable from either fragment. Read the MT7916's MT_TOP_MISC
+# without a driver with the probe module instead: build/wsl/build-regprobe.sh.
 
 echo "overlay applied to $TREE (base $BASE_SHA)"
