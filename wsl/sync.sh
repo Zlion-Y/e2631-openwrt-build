@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copy the workspace build repo into the WSL build repo so build.sh picks it up.
 #
-# build/ here IS a checkout of Zlion-Y/e2631-openwrt-build, and ~/e2631 is the
+# build/ here IS a checkout of Zlion-Y/zte-e2631-openwrt, and ~/e2631 is the
 # same repo, so the mapping is one directory: build/ -> ~/e2631 (minus .git).
 # /mnt/d is writable (appendWindowsPath only trims PATH), and copying beats a
 # git bundle for iteration: the build never has to wait for a commit or a push.

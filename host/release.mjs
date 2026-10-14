@@ -34,7 +34,15 @@ const token = execFileSync('git', ['credential', 'fill'], {
   input: 'protocol=https\nhost=github.com\n\n', encoding: 'utf8',
 }).split('\n').find((l) => l.startsWith('password='))?.slice(9);
 if (!token && !LOCAL) { console.error('no github credential from git credential fill'); process.exit(1); }
-const API = 'https://api.github.com/repos/Zlion-Y/e2631-openwrt-build';
+// Which repository this is, straight from the origin remote: the project was renamed once
+// already, and a hardcoded slug would silently point release.mjs at the wrong repo.
+const SLUG = (() => {
+  const url = execFileSync('git', ['-C', REPO, 'remote', 'get-url', 'origin'], { encoding: 'utf8' }).trim();
+  const m = /github\.com[:/]([\w.-]+\/[\w.-]+?)(?:\.git)?$/.exec(url);
+  if (!m) { console.error(`cannot read the GitHub slug from origin (${url})`); process.exit(1); }
+  return m[1];
+})();
+const API = `https://api.github.com/repos/${SLUG}`;
 const get = async (url, binary) => {
   const r = await fetch(url, { headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github+json' }, redirect: 'follow' });
   if (!r.ok) throw new Error(`${r.status} ${url}`);

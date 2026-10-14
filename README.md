@@ -7,7 +7,7 @@ board-side scripts and the vendor-side flash plans (`board/`), the Windows-side 
 CI any more - the build happens in WSL on this machine, and `wsl/check-kit.sh` plus
 `node build/host/release.mjs` are the gates that used to live in a workflow.
 
-    git clone --branch pr-zte-zxhn-h3600 https://github.com/Zlion-Y/openwrt-sanechips-base openwrt
+    git clone --branch pr-zte-zxhn-h3600 https://github.com/Zlion-Y/openwrt-sanechips-mirror openwrt
     git -C openwrt checkout db8b8d4130457dbe46558a7cea872dd2dae539e6
     ./apply.sh openwrt
 

@@ -2,7 +2,7 @@
 # Overlay the E2631 files onto a checked-out OpenWrt tree and wire them in.
 # Idempotent: re-running only refreshes the copies.
 #
-#   git clone --branch <base-branch> https://github.com/Zlion-Y/openwrt-sanechips-base openwrt
+#   git clone --branch <base-branch> https://github.com/Zlion-Y/openwrt-sanechips-mirror openwrt
 #   git -C openwrt checkout $BASE_SHA
 #   ./apply.sh openwrt
 set -eu
