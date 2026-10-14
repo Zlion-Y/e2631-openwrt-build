@@ -1,5 +1,5 @@
 1500|root
-4500|abc123\!@#
+4500|${ZTE_TELNET_PW}
 7000|/var/tmp/fw info
 11000|reboot
 14000|exit

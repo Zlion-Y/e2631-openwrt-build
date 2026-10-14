@@ -1,7 +1,7 @@
 1000|
 2500|
 4500|root
-9500|abc123\!@#
+9500|${ZTE_TELNET_PW}
 13000|id
 15000|/var/tmp/e2631-fwslot info
 20000|reboot

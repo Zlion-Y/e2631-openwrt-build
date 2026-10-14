@@ -12,7 +12,7 @@ Password:
 === [send @4500ms] "root\r\n"
 root
 Password: 
-=== [send @9500ms] "abc123\\!@#\r\n"
+=== [send @9500ms] "<redacted:vendor telnet password>\r\n"
 
 User name or Password is incorrect
 
