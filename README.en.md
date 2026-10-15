@@ -29,8 +29,12 @@ from anywhere: `out/`, the base tree and the template package resolve through
 `E2631_WORK`/`E2631_TREE`/`E2631_TEMPLATE` (environment or `.env`, see
 `.env.example`), so the run no longer depends on which directory you stood in. It packs,
 then re-derives the geometry independently and screens the artifact for the things that
-stop a boot. The official package used as the version-header template is never uploaded
-here, and the tool now says so instead of reading a nonexistent default path.
+stop a boot. The version-header template **ships here** as `seed/vendor-verhdr-8b8.bin` -
+532 bytes, the outer header plus that 512-byte version header - so packing needs no
+`--template` and no vendor firmware on your disk; measured, packing one build directory
+with the slice and with the full 21 MB official package gives **the same bytes**
+(`02b35106…`, which is the published `v1.2`). [seed/README.md](seed/README.md) carries the
+provenance and the caveats about re-cutting your own.
 
 Three screens run before the forty-minute build is allowed to be the test:
 `tools/dts_lint.mjs` resolves the board file's includes, `&labels` and

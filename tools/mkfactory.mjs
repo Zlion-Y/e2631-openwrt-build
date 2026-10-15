@@ -52,7 +52,7 @@ const args = (() => { const a = process.argv.slice(2); const cmd = a.shift(); co
 const die = (m) => { console.error('mkfactory: ' + m); process.exit(1); };
 
 function readTemplate(path) {
-  if (!path) die('no --template <official.bin>: pack copies the 512-byte version header from it (BUILD.md, "the template")');
+  if (!path) die('no --template <official.bin>: pack copies the 512-byte version header from it. seed/vendor-verhdr-8b8.bin ships here and is enough for pack (BUILD.md, "the template")');
   if (!fs.existsSync(path)) die(`template not found: ${path}`);
   const data = fs.readFileSync(path);
   if (!data.subarray(0, 16).equals(OUTER_MAGIC)) die('template lacks the outer magic');
@@ -64,6 +64,18 @@ function readTemplate(path) {
   if (crc32(hdr.subarray(0, M.crc2)) !== hdr.readUInt32LE(M.crc2)) die('template CRC2 does not verify');
   const body = data.subarray(hdrOfs + VER_HDR);
   return { data, hdr, body, hdrOfs };
+}
+
+// info and selftest read the vendor payload the header points at, so they need the
+// whole package; pack only ever needs the 512-byte header. Saying this beats printing
+// a confident "CRC BAD" about a file that simply has no payload in it.
+function needPayload(t, what) {
+  const end = Math.max(t.hdr.readUInt32LE(M.kFileOff) + t.hdr.readUInt32LE(M.kSize),
+    t.hdr.readUInt32LE(M.rFileOff) + t.hdr.readUInt32LE(M.rSize));
+  if (t.data.length < end)
+    die(`${what} needs a complete official package: this file is 0x${t.data.length.toString(16)} bytes ` +
+      `but the header points at 0x${end.toString(16)}. Use a vendor .bin you own; pack works with the ` +
+      `shipped seed/vendor-verhdr-8b8.bin.`);
 }
 
 function show(hdr, label) {
@@ -174,6 +186,7 @@ function putStr(hdr, ofs, size, text) {
 /* ---------- commands ---------- */
 if (args.cmd === 'info') {
   const t = readTemplate(args.o.template);
+  needPayload(t, 'info');
   show(t.hdr, 'template verhdr');
   const k = t.data.subarray(t.hdr.readUInt32LE(M.kFileOff), t.hdr.readUInt32LE(M.kFileOff) + t.hdr.readUInt32LE(M.kSize));
   const r = t.data.subarray(t.hdr.readUInt32LE(M.rFileOff), t.hdr.readUInt32LE(M.rFileOff) + t.hdr.readUInt32LE(M.rSize));
@@ -185,6 +198,7 @@ if (args.cmd === 'info') {
 
 if (args.cmd === 'selftest') {
   const t = readTemplate(args.o.template);
+  needPayload(t, 'selftest');
   const kOff = t.hdr.readUInt32LE(M.kFileOff), kLen = t.hdr.readUInt32LE(M.kSize);
   const rOff = t.hdr.readUInt32LE(M.rFileOff), rLen = t.hdr.readUInt32LE(M.rSize);
   const kernel = t.data.subarray(kOff, kOff + kLen);

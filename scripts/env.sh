@@ -65,9 +65,11 @@ E2631_TREE=${E2631_TREE:-$HOME/openwrt}
 E2631_BASE_REPO=${E2631_BASE_REPO:-https://github.com/Zlion-Y/openwrt-sanechips-mirror}
 E2631_BASE_BRANCH=${E2631_BASE_BRANCH:-pr-zte-zxhn-h3600}
 E2631_BASE_SHA=${E2631_BASE_SHA:-db8b8d4130457dbe46558a7cea872dd2dae539e6}
-# The vendor upgrade package used as the version-header template. Deliberately
-# without a default: it is not in this repo and cannot be fetched from it.
-E2631_TEMPLATE=${E2631_TEMPLATE:-}
+# The version-header template. Default is the 532-byte header slice shipped here
+# (seed/vendor-verhdr-8b8.bin): packing only reads the 512-byte version header, so a
+# full vendor package is optional. Point this at an official .bin you own to run
+# mkfactory's selftest/info, or to re-check the slice against the real thing.
+E2631_TEMPLATE=${E2631_TEMPLATE:-$E2631_KIT/seed/vendor-verhdr-8b8.bin}
 # Scripts that drop a log under out/ should not have to create it, and a fresh clone has
 # no out/ yet. Failing to create it is not fatal: the read-only tools need no scratch dir.
 [ -d "$E2631_OUT" ] || mkdir -p "$E2631_OUT" 2>/dev/null || true

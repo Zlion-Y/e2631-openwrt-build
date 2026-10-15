@@ -42,9 +42,12 @@ const envv = (k) => process.env[k] || DOTENV[k] || '';
 const WORK = envv('E2631_WORK') || path.resolve(REPO, '..');
 const abs = (p) => (p && path.isAbsolute(p) ? p : path.join(WORK, p || ''));
 const run = arg('--run');
-// No default template: it is a vendor binary, it is not in this repository, and
-// guessing a path produced a confusing ENOENT from three files away.
-const TEMPLATE = abs(arg('--template', envv('E2631_TEMPLATE')));
+// Default: the 532-byte version-header slice shipped in seed/. Packing reads only
+// the 512-byte version header out of the template, so a full vendor package is
+// optional - selftest and info are the two commands that want one. An explicit
+// --template / E2631_TEMPLATE still wins, and pointing it at a real package is how
+// you check this slice against the vendor bytes.
+const TEMPLATE = abs(arg('--template', envv('E2631_TEMPLATE')) || path.join(REPO, 'seed/vendor-verhdr-8b8.bin'));
 const ROOTFS_AT = arg('--rootfs-at', '0x400000');
 const HEADER_AT = arg('--header-at', '0x1400000');
 const OUT = abs(arg('--out', 'out/e2631-openwrt-factory.bin'));
@@ -57,10 +60,11 @@ if (!run && !LOCAL) {
 }
 if (LOCAL && (!TEMPLATE || !fs.existsSync(TEMPLATE))) {
   console.error(`release: no version-header template (${TEMPLATE || 'unset'}).`);
-  console.error('       Set --template or E2631_TEMPLATE to one official ZTE E2631 upgrade');
-  console.error('       package you own. It is deliberately not redistributed here: the packer');
-  console.error('       copies the 512-byte version header from it, and BUILD.md explains how');
-  console.error('       the fields are decoded (docs/01, section 2) if you want to build one.');
+  console.error('       The default is seed/vendor-verhdr-8b8.bin, which ships here - so this');
+  console.error('       usually means E2631_TEMPLATE points at a file you moved or deleted.');
+  console.error('       Either unset it, or set --template to that slice or to any official');
+  console.error('       ZTE E2631 upgrade package you own. BUILD.md, "the template", decodes');
+  console.error('       every field and shows how to cut the slice from a package yourself.');
   process.exit(2);
 }
 fs.mkdirSync(abs('out'), { recursive: true });

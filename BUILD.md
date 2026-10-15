@@ -11,7 +11,7 @@ network. If you are on Linux, use `scripts/`.
 
 ```
 base tree (pinned commit)  ->  apply.sh overlay  ->  make world  ->  collect
-                           ->  mkfactory pack (needs a template)  ->  verify x2  ->  flash
+                           ->  mkfactory pack (header template ships in seed/)  ->  verify x2  ->  flash
 ```
 
 ## 1. What you need
@@ -41,34 +41,47 @@ that tree; the `zte/*` patches in its `target/linux/sanechips/patches-6.18` are 
 make the SoC exist at all. If you want to build against a different commit, apply the
 overlay, then read `apply.sh`'s output: it says which commit it thinks it is editing.
 
-**The version-header template.** Packing needs one official ZTE upgrade package for
-the E2631 as a template. It is not in this repository and will not be added: the
-512-byte version header carries the `upgradeKey1/Key2` pair and the product/hw/slot
-table of a vendor firmware, and `tools/mkfactory.mjs` copies that header and rewrites
-only the geometry and CRC fields. What it must supply, therefore, is everything the
-packer does not compute:
+**The version-header template.** `tools/mkfactory.mjs pack` copies a 512-byte version
+header out of a template and rewrites only the geometry and CRC fields, so the template
+has to supply everything the packer does not compute:
 
     +0x08/+0x0c  upgradeKey1/Key2      +0x6c  product string
     +0x4c..+0x60 slot A/B base + span  +0x8c/+0x98 bootloader inclusion + U-Boot CRC
     +0x110       hw version            +0x1e0..+0x1f8 slot table, serial, isNew
 
-Where to get one, in the order we would try: the update file for your own hardware
-version, from wherever you originally obtained it (this is what we used); or a package
-a friend with the same model still has. We have not found a copy of an uploaded package
-left behind on the box - the vendor flasher is copied into `/var` during an upgrade
-(`docs/02-...md` section F), the firmware file itself was not located - and
-`e2631-fwslot info -j` prints a slot's header *fields*, not a package you can reuse. So
-treat the template as something you bring. The format itself is fully decoded in
+**That header now ships here: `seed/vendor-verhdr-8b8.bin`, 532 bytes, and it is the
+default.** No `--template`, no vendor firmware on your disk, and packing still produces a
+package the vendor flash page accepts. It is the outer header plus the version header cut
+out of `V1.0.0.8B8.8000`; [seed/README.md](seed/README.md) records the source file, its
+sha256, and the measurement that matters - packing a build directory twice, once with this
+slice and once with the full 21 MB package, gives **the same bytes**
+(`02b35106…`, which is also the published `v1.2`).
+
+You still want a real official package in two cases:
+
+* `mkfactory selftest` / `info` read the *payload* the header points at - they are the
+  proof that the geometry model matches the vendor's, and they say so plainly when handed
+  a header-only file.
+* your hardware revision needs a different `upgradeKey1/Key2` pair. The keys are not
+  stable across vendor versions: `6B5`/`7B5`/`8B8` all carry `0x1351/0x5211`, but the old
+  `4B4` package carries `0x238/0x2e`. Re-cut the slice from a 6B5-or-newer package
+  (`head -c 532 official.bin > my-template.bin`) and `host/verify_pkg.mjs` will check the
+  packed header against it.
+
+We have not found a copy of an uploaded package left behind on the box - the vendor
+flasher is copied into `/var` during an upgrade (`docs/02-...md` section F), the firmware
+file itself was not located - and `e2631-fwslot info -j` prints a slot's header *fields*,
+not a package you can reuse. The format is fully decoded in
 `docs/01-情报汇总与事实核验-2026-10-13.md` section 2 - every field of four official
-packages verified by recomputing CRC1 and CRC2 - and `tools/make_fixture.mjs` already
-synthesizes a self-consistent header from nothing, because the slot tool has to be
-testable without a vendor binary in git. **What has not been tested** is whether the
-vendor web page accepts a package built from a synthesized header: our own packages were
-built from a real one, and that is the only combination proven to flash.
+packages verified by recomputing CRC1 and CRC2 - and `tools/make_fixture.mjs` synthesizes
+a self-consistent header from nothing so the slot tool is testable without any vendor
+binary. **What has not been tested** is whether the vendor web page accepts a package
+built from a *synthesized* header: shipped packages were built from a real one, and that
+is the only combination proven to flash.
 
-Set it once:
+Override the template only if you need to:
 
-    E2631_TEMPLATE=<path to the official .bin>      # absolute, or relative to E2631_WORK
+    E2631_TEMPLATE=<path to the official .bin or your own slice>   # absolute, or relative to E2631_WORK
 
 ## 3. Configure the paths (optional)
 
@@ -83,7 +96,7 @@ overridden by an environment variable or by `.env` (untracked; copy `.env.exampl
 | `E2631_OUT` | `$E2631_WORK/out` | build directories, logs, packages |
 | `E2631_TREE` | `$HOME/openwrt` | the base tree being built |
 | `E2631_BASE_*` | the pinned repo/branch/SHA above | what bootstrap clones |
-| `E2631_TEMPLATE` | *unset on purpose* | the vendor package used as header template |
+| `E2631_TEMPLATE` | `seed/vendor-verhdr-8b8.bin` | the 532-byte version-header template; see section 2 |
 | `E2631_PROXY` | unset | http(s) proxy for the download phases |
 | `E2631_GNU_MIRROR` | unset | move a fast GNU mirror to the head of `@GNU` |
 | `E2631_SEGMENTED` | unset | fetch distfiles as parallel byte ranges (see section 7) |
@@ -118,8 +131,8 @@ index is missing, or if the seed's device selection does not survive `defconfig`
 
 `build` refuses to start a forty-minute job on inputs it can see are missing, so the
 errors you get are the useful ones: no base tree, no `.config`, overlay not applied,
-device not selected, no `node`, `node` too old for `zlib.crc32`, no template, template
-not found. It writes `$E2631_OUT/build-<timestamp>/world.log`, then collects into the
+device not selected, no `node`, `node` too old for `zlib.crc32`, a template path that
+does not exist (the default lives in `seed/`). It writes `$E2631_OUT/build-<timestamp>/world.log`, then collects into the
 same directory (`kernel`, `root`, `e2631.dtb`, `config-6.18`, `e2631-fwslot`) and packs
 `$E2631_OUT/e2631-openwrt-<timestamp>.bin`.
 
