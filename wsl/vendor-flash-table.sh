@@ -18,12 +18,14 @@ W=/tmp/vendor-kernel; rm -rf "$W"; mkdir -p "$W"
 
 KS=$(od -An -tu4 -j $((0x14 + 0x34)) -N4 "$PKG" | tr -d ' ')      # declared kernel size
 echo "package $(stat -c %s "$PKG") B, verhdr kSize=$KS (0x$(printf %x "$KS"))"
-dd if="$PKG" of="$W/k.uImage" bs=1 skip=$((0x234)) count="$KS" 2>/dev/null
+# skip_bytes/count_bytes, never bs=1: a package on /mnt/d is a drvfs file, and bs=1 turns a
+# 3.5 MiB extract into ~3.5 million single-byte reads that do not finish in minutes.
+dd if="$PKG" of="$W/k.uImage" bs=1M iflag=skip_bytes,count_bytes skip=$((0x234)) count="$KS" 2>/dev/null
 PAY=$(od -An -tu4 -j 12 -N4 --endian=big "$W/k.uImage" | tr -d ' ') # uImage payload size
-dd if="$W/k.uImage" of="$W/k.zImage" bs=1 skip=64 count="$PAY" 2>/dev/null
+dd if="$W/k.uImage" of="$W/k.zImage" bs=1M iflag=skip_bytes,count_bytes skip=64 count="$PAY" 2>/dev/null
 OFF=$(grep -abo $'\x1f\x8b\x08' "$W/k.zImage" | head -1 | cut -d: -f1)
 [ -n "${OFF:-}" ] || { echo "no gzip stream found in the zImage" >&2; exit 1; }
-dd if="$W/k.zImage" of="$W/k.gz" bs=1 skip="$OFF" 2>/dev/null
+dd if="$W/k.zImage" of="$W/k.gz" bs=1M iflag=skip_bytes,count_bytes skip="$OFF" 2>/dev/null
 gzip -dc "$W/k.gz" > "$W/vmlinux" 2>/dev/null
 echo "vendor vmlinux: $(stat -c %s "$W/vmlinux") B (from zImage offset $OFF)"
 echo
